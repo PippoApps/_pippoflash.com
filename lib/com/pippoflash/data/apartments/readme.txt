@@ -1,0 +1,2 @@
+These repesent usual data objects to store apartments for SectorLight.
+It wiould be too complex to generate an abstract UnitsData flow, therefore these must be copied in project folder and used in there.

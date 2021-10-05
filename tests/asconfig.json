@@ -1,0 +1,18 @@
+{
+	"compilerOptions": {
+        "output": "bin/Main.swf",
+        "source-path": [
+            "src",
+            "lib"
+        ],
+        "library-path": [
+            "lib/greensock.swc",
+            "lib/starling.swc",
+            "lib/as3corelib.swc",
+        ]
+	},
+	"files":
+	[
+		"src/TestAirVideoInVideo.as"
+	]
+}
