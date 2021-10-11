@@ -4,6 +4,7 @@ package com.pippoflash.framework.air.ane.distriqt
 	import com.distriqt.extension.core.Core;
 	import com.pippoflash.utils.Debug;
 	import com.pippoflash.utils.USystem;
+	import com.pippoflash.framework.air.UAir;
 	/**
 	 * ...
 	 * @author Pippo Gregoretti
@@ -34,6 +35,20 @@ package com.pippoflash.framework.air.ane.distriqt
 		static public function get initialized():Boolean {
 			return _initializedCore;
 		}
+		//static protected function activateApplicationWakeListeners():void {
+			//UAir.addSleepListener(onPermissionRequestSleep);
+			//UAir.addWakeListener(onPermissionRequestAwake);
+		//}
+		//static protected function deActivateApplicationWakeListeners():void {
+			//UAir.removeSleepListenerSleepListener(onPermissionRequestSleep);
+			//UAir.removeWakeListenerWakeListener(onPermissionRequestAwake);
+		//}
+		//static protected function onPermissionRequestSleep(e:*):void {
+			//Debug.debug(_debugPrefix, "Application went to sleep.");
+		//}
+		//static protected function onPermissionRequestAwake(e:*):void {
+			//Debug.debug(_debugPrefix, "Application woke up.");
+		//}
 		
 		// INIT ///////////////////////////////////////////////////////////////////////////////////////
 		public function _DistriqtAne(id:String, cl:Class=null) 

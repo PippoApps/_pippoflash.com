@@ -189,22 +189,22 @@ package com.pippoflash.utils {
 		public static function getCapability(s:String):* { // Direct link to Capabilities
 			return Capabilities[s];
 		}
-		public static function getPlayerType			():String {
-			return							Capabilities.playerType;
+		public static function getPlayerType():String {
+			return Capabilities.playerType;
 		}
-		public static function getDeviceType			():String {
-			return							_deviceType;
+		public static function getDeviceType():String {
+			return _deviceType;
 		}
-		public static function getSystemType			():String {
-			return							_systemType;
+		public static function getSystemType():String {
+			return _systemType;
 		}
 	// ENVIRONMENT PLAYER
-		public static function isAir					():Boolean {
+		public static function isAir():Boolean {
 			// This has to be computed in real time, since it can be called before USystem is initialized.
-			return							_isAir;
+			return _isAir;
 		}
-		public static function isSwf					():Boolean {
-			return							!isAir();
+		public static function isSwf():Boolean {
+			return !isAir();
 		}
 	// OS
 		public static function isMac():Boolean {

@@ -1,6 +1,8 @@
 package com.pippoflash.framework.air.ane 
 {
 	import com.pippoflash.framework._PippoFlashBaseNoDisplay;
+	import com.pippoflash.framework.air.UAir;
+	import com.pippoflash.utils.Debug;
 	
 	/**
 	 * ...
@@ -15,6 +17,16 @@ package com.pippoflash.framework.air.ane
 		private var _androidCompatible:Boolean;
 		
 		
+
+		
+		
+		
+		
+		
+		
+		
+		
+		
 		
 		
 		
@@ -23,6 +35,11 @@ package com.pippoflash.framework.air.ane
 			super(id, cl);
 			
 		}
+		
+		
+		
+		
+		
 		
 		
 		// GET SET ///////////////////////////////////////////////////////////////////////////////////////

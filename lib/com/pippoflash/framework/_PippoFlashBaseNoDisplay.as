@@ -12,35 +12,36 @@ package com.pippoflash.framework {
 // CLASS ///////////////////////////////////////////////////////////////////////////////////////
 	public dynamic class _PippoFlashBaseNoDisplay implements IPippoFlashBase {
 		// STATIC USER DEFINABLE //////////////////////////////////////////////////////
-		public static var _debug					:Boolean = true; // Main debug switch
+		public static var _debug:Boolean = true; // Main debug switch
+		private var _verbose:Boolean = true;
 		// STATIC SYSTEM 
 		// STATIC REFERENCES
 		// Public
-		public static var _mainApp					:_PippoFlashBase; // Reference to _mainApp - this should be _Application, but it would not work when this is used as a standalone plugin
+		public static var _mainApp:_PippoFlashBase; // Reference to _mainApp - this should be _Application, but it would not work when this is used as a standalone plugin
 		// public static var _mainApp					:_Application; // Reference to _mainApp
-		public static var _ref						:*; // Reference to the relevant Ref object () - defaults to Ref(), can be expanded
-		public static var _config					:*; // Stores a reference to a ConfigProj instance
+		public static var _ref:*; // Reference to the relevant Ref object () - defaults to Ref(), can be expanded
+		public static var _config:*; // Stores a reference to a ConfigProj instance
 		// Protected
-		protected static var _instances				:Array = []; // Stores all instances inherited from this class as a simple list
-		protected static var _instancesById			:Object = {}; // Stores intances by _configId
-		protected static var _classes				:Object = {}; // This has to be configured by extrended class using reference to the class
+		protected static var _instances:Array = []; // Stores all instances inherited from this class as a simple list
+		protected static var _instancesById:Object = {}; // Stores intances by _configId
+		protected static var _classes:Object = {}; // This has to be configured by extrended class using reference to the class
 		// UTY - STATIC
-		protected static var _b					:Boolean;
-		protected static var _xml					:XML;
-		protected static var _clip					:MovieClip;
-		protected static var _c					:MovieClip;
-		protected static var _sprite					:Sprite;
-		protected static var _counter				:int = 0;
-		protected static var _o					:Object;
-		protected static var _a					:Array;
-		protected static var _n					:Number;
-		protected static var _i						:int;
-		protected static var _s						:String;
-		protected static var _point					:Point;
-		protected static var _j						:*;
+		protected static var _b:Boolean;
+		protected static var _xml:XML;
+		protected static var _clip:MovieClip;
+		protected static var _c:MovieClip;
+		protected static var _sprite:Sprite;
+		protected static var _counter:int = 0;
+		protected static var _o:Object;
+		protected static var _a:Array;
+		protected static var _n:Number;
+		protected static var _i:int;
+		protected static var _s:String;
+		protected static var _point:Point;
+		protected static var _j:*;
 		// DYNAMIC SYSTEM
-		public var _debugPrefix					:String = "_PippoFlashBase"; // Marks the ID of the item, good for initialization, text, and storage purposes
-		protected var _pfId						:String = "_PippoFlashBase";
+		public var _debugPrefix:String = "_PippoFlashBase"; // Marks the ID of the item, good for initialization, text, and storage purposes
+		protected var _pfId:String = "_PippoFlashBase";
 		//protected var _listeners					:Array; // List of listeners for each instance
 		//protected var _eventListeners				:Object;
 // INIT //////////////////////////////////////////////////////////////////////////////////////////
@@ -106,6 +107,14 @@ package com.pippoflash.framework {
 // OOP METHODS ///////////////////////////////////////////////////////////////////////////////////////
 		public function getInstance(id:String):* {
 			return _PippoFlashBase.getInstanceStatic(id);
+		}
+		
+		public function get verbose():Boolean {
+			return _verbose;
+		}
+		
+		public function set verbose(value:Boolean):void {
+			_verbose = value;
 		}
 		//public function callPrivateEvent				(mn:String, pars:Array):Boolean {
 			//if (Boolean(this[mn])) {

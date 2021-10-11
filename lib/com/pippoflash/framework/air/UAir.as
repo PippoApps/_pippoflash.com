@@ -287,7 +287,7 @@ package com.pippoflash.framework.air {
 			_nativeApplication.removeEventListener(Event.ACTIVATE, f);
 		}
 		// INTERNAL LISTENERS FOR APPLICATION STATE
-		private static function onApplicationActive		(e:Event):void {
+		private static function onApplicationActive(e:Event):void {
 			Debug.debug(_debugPrefix, "Application ACTIVE");
 			_awake = true;
 			if (_fixAndroidBlackScreen) {

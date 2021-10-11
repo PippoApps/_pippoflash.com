@@ -444,7 +444,7 @@ package com.pippoflash.utils {
 			const index:int = s.indexOf(searchFor);
 			const newS:String = s;
 			if (index != -1) {
-				s = s.substr(index);
+				s = s.substr(index + searchFor.length);
 			}
 			return s;
 		}
@@ -593,6 +593,9 @@ package com.pippoflash.utils {
 			for (var i:uint=0; i<_stringSubsList.length; i++) if (s.indexOf(_stringSubsList[i].s) != -1) s = s.split(_stringSubsList[i].s).join(_stringSubsList[i].x);
 			Debug.debug						(_debugPrefix,"result: <" + s + ">");
 			return							s;
+		}
+		static public function substituteInString(source:String, key:String, value:String):String {
+			return source.split(key).join(value);
 		}
 // STRING - DATE ///////////////////////////////////////////////////////////////////////////////////
 		public static function getDateFromString			(d:String):String {

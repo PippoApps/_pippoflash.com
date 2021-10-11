@@ -83,11 +83,11 @@ package com.pippoflash.framework.air {
 				Debug.debug(_debugPrefix, "URLs: \n" + "applicationDirectory " +  _filePaths.application.url + "\nstorage " +  _filePaths.storage.url + "\ndocuments " +  _filePaths.documents.url + "\ncache " +  _filePaths.user.url + "\nuser " +  _filePaths.user.url + "\ndesktop " +  _filePaths.desktop.url + "\n" +  File.desktopDirectory.nativePath);
 				Debug.debug(_debugPrefix, "Root directories:");
 				import flash.filesystem.File;
-				var rootDirs:Array = File.getRootDirectories();
-
-				for (var i:uint = 0; i < rootDirs.length; i++) {
-					Debug.debug(_debugPrefix, rootDirs[i].nativePath + " ||| " + rootDirs[i].url);
-				}
+				//var rootDirs:Array = File.getRootDirectories();
+//
+				//for (var i:uint = 0; i < rootDirs.length; i++) {
+					//Debug.debug(_debugPrefix, rootDirs[i].nativePath + " ||| " + rootDirs[i].url);
+				//}
 				// Check for authorization
 				if (USystem.isAndroid()) {
 					Debug.warning(_debugPrefix, "This is an Android device, UFil requires authorization before.");
@@ -212,6 +212,7 @@ package com.pippoflash.framework.air {
 		static private var _permissionFile:File;
 		static private var _permissionListenerMethod:Function;
 		static public function checkPermission(onPermissionGranted:Function):void {
+			//trace("PERMISSIOIONSSSSSSSSSSS");
 			// If already authorized just call the callback
 			if (_authorized) {
 				UExec.time(0.2, onPermissionGranted);
@@ -295,24 +296,25 @@ package com.pippoflash.framework.air {
 			}
 			return							null;
 		}
-		public static function saveFile					(path:String, file:*, target:String="storage"):* { // This savea a ByteArray as a binary or a string as an UTF8 somewhere...
+		public static function saveFile(path:String, file:*, target:String="storage"):* { // This savea a ByteArray as a binary or a string as an UTF8 somewhere...
 			try {
-				var f								:File = _filePaths[target].resolvePath(path); 
-				f.canonicalize						();
-				Debug.debug						(_debugPrefix, "Saving file: " + f.nativePath);
+				var fBase:File = _filePaths[target] ? _filePaths[target] : new File(target); // Use a default folder or get a custom one if default is not defined
+				var f:File = fBase.resolvePath(path); 
+				f.canonicalize();
+				Debug.debug(_debugPrefix, "Saving file in " +target +" : " + f.nativePath);
 				// create a file stream
-				var fs:FileStream					= new FileStream();
+				var fs:FileStream = new FileStream();
 				// open the stream for writting
-				fs.open							(f, FileMode.WRITE);
+				fs.open(f, FileMode.WRITE);
 				// write the string data down to the file
-				if (file is String)						fs.writeUTFBytes(file);
-				else								fs.writeBytes(file);
-				fs.close							();
+				if (file is String) fs.writeUTFBytes(file);
+				else fs.writeBytes(file);
+				fs.close();
 			} catch (e:Error) {
-				Debug.error						(_debugPrefix, "Error saving file " + path + "\n" + e);
-				return						false;
+				Debug.error(_debugPrefix, "Error saving file " + path + "\n" + e);
+				return false;
 			}
-			return							true;
+			return true;
 		}
 		
 		
@@ -474,7 +476,7 @@ package com.pippoflash.framework.air {
 		}
 		static public function savePNG(path:String, bmp:Bitmap, fastCompression:Boolean=false, target:String="storage"):void {
 			//const bmp:Bitmap = new Bitmap(_selectedCap.bmp.bitmapData.clone());
-			Debug.debug(_debugPrefix, "Saving JPEG: " + bmp.bitmapData);
+			Debug.debug(_debugPrefix, "Saving PNG: " + bmp.bitmapData);
 			//const options:JPEGEncoderOptions = new JPEGEncoderOptions(quality);
 			const options:PNGEncoderOptions = new PNGEncoderOptions(fastCompression);
 			bmp.scaleX = bmp.scaleY = 1;

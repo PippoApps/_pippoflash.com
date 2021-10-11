@@ -50,10 +50,13 @@ package com.pippoflash.framework.air.ane.distriqt
 			return NativeWebView.isSupported;
 		}
 		static public function init(initCallback:Function):Boolean {
-			if (_initialized) return true;
+			if (_initialized) {
+				initCallback();
+				return true;
+			}
 			if (isSupported) {
 				_DistriqtAne.initCore();
-				Debug.debug(_debugPrefix, "Initializeng Distriqt NativeWebView ver " + NativeWebView.VERSION);
+				Debug.debug(_debugPrefix, "Initializing Distriqt NativeWebView ver " + NativeWebView.VERSION);
 				//Core.init();
 				
 				_nativeOptions = new NativeWebViewOptions();
@@ -200,19 +203,19 @@ package com.pippoflash.framework.air.ane.distriqt
 
 		private function webViewCompleteHandler(evt:NativeWebViewEvent):void {
 			_webView.visible = true;		
-			Debug.debug(_debugPrefix, "HTML completely loaded.");
+			if (verbose) Debug.debug(_debugPrefix, "HTML completely loaded.");
 			PippoFlashEventsMan.broadcastInstanceEvent(this, EVT_COMPLETE, this);
 		} //end functions
 				
 		private  function webViewChangingHandler(evt:NativeWebViewEvent):void {
-			Debug.debug(_debugPrefix, "URL changing to " + evt.data);
+			if (verbose) Debug.debug(_debugPrefix, "URL changing to " + evt.data);
 			//evt.preventDefault();
 				//trace("CHANGING FIRED: " +_webView.location);
 			PippoFlashEventsMan.broadcastInstanceEvent(this, EVT_CHANGING, this, evt);
 		} //end function
 				
 		private  function webViewChangedHandler(evt:NativeWebViewEvent):void {
-			Debug.debug(_debugPrefix, "URL changed.");
+			if (verbose) Debug.debug(_debugPrefix, "URL changed.");
 			//trace("CHANGED FIRED: " +_webView.location);
 			
 		} //end function
@@ -223,7 +226,7 @@ package com.pippoflash.framework.air.ane.distriqt
 				 
 		private  function javascriptResponseHandler( event:NativeWebViewEvent ):void{
 			if (event.data) {
-				Debug.debug(_debugPrefix, "JS RESPONSE: " + event.data);
+				if (verbose) Debug.debug(_debugPrefix, "JS RESPONSE: " + event.data);
 				PippoFlashEventsMan.broadcastInstanceEvent(this, EVT_JS_RESPONSE, this, event.data);
 			}
 		}
@@ -231,7 +234,7 @@ package com.pippoflash.framework.air.ane.distriqt
 		private  function javascriptMessageHandler( event:NativeWebViewEvent ):void{
 			// This is the message sent from the javascript 
 			// AirBridge.message i.e. 'content-for-air' 
-			Debug.debug(_debugPrefix, "JS MESSAGE: " + event.data);
+			if (verbose) Debug.debug(_debugPrefix, "JS MESSAGE: " + event.data);
 			PippoFlashEventsMan.broadcastInstanceEvent(this, EVT_JS_MESSAGE, this, event.data);
 			//trace( "message from JS: " + event.data );
 			//if (_paWebViewConnected) _paWebViewConnected.checkLocation(event.data);

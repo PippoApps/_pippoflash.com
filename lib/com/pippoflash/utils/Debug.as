@@ -36,10 +36,10 @@ package com.pippoflash.utils {
 		private static const TEXTFORMAT_SOURCE:Object = {ERROR:{color:0xff0000}, ALL:{color:0x444444}, WARNING:{color:0x0000ff}, SCREAM:{bold:true, color:0x000000}}; // Colors for type of messages in console
 		private static const EVT_UPDATED_PREFIX:String = "onNewDebugLine"; // This gets triggered when you add a listener to an event with setListenerFor(_debugPrefix:String, f:Funtcion); - This sets ONE listener for each debugPrefix
 		private static const LINE_SOURCE:String = "-------------------------------------------<[ID]>-------------------------------------------";
-		private static const ERROR_DISPLAY_PREFIX:String = "\n********|********************************************************************************\nERROR |\t"; // Prefix error line
-		private static const ERROR_DISPLAY_POSTFIX:String = "\n********|********************************************************************************"; // Postfix after entire error line
-		private static const WARNING_DISPLAY_PREFIX:String = "\n---------|----------------------------------------------------------------------------------------------------\nWARNING |\t"; // Prefix error line
-		private static const WARNING_DISPLAY_POSTFIX:String = "\n---------|----------------------------------------------------------------------------------------------------"; // Postfix after entire error line
+		private static const ERROR_DISPLAY_PREFIX:String = "\n**********************************************************************\nERROR |\t"; // Prefix error line
+		private static const ERROR_DISPLAY_POSTFIX:String = "\n**********************************************************************"; // Postfix after entire error line
+		private static const WARNING_DISPLAY_PREFIX:String = "\n---------------------------------------------------------\nWARNING |\t"; // Prefix error line
+		private static const WARNING_DISPLAY_POSTFIX:String = "\n---------------------------------------------------------"; // Postfix after entire error line
 		private static const OBJECT_STRING_EOF:String = ""; // Set this to "\n" to have line feed on each object property
 		private static const _debugPrefix:String = "Debug";
 // 		private static const DUMMY_FUNCTION			:Function = new Function():void {}; // Dummy function to be used (without ...rest to allocate an array)
@@ -77,6 +77,9 @@ package com.pippoflash.utils {
 		static private var _addTimer:Boolean = false;
 		private static var _initialized:Boolean;
 		static private var _traceOut:Boolean = true; // If tracing output messages
+		// SPECIAL METHODS
+		static private var _additionalMethods:Vector.<Function> = new Vector.<Function>(); // Additional methods to be called on trace
+		static private var _idsToExcludeFromAdditionalMethods:Vector.<String> = new Vector.<String>(); // These IDs will be excluded from tracing additional methods
 		//private static var DEBUG:Boolean = true; // Set from MainApp when present. defaults to true.
 // DUMMIES //////////////////////////////////////////////////////////////////////////////
 // 		public static var _dummyTextField				:TextField = new TextField();
@@ -278,6 +281,21 @@ package com.pippoflash.utils {
 				Debug.debug					(_debugPrefix, "Cannot output last event to browser console since ExternalInterface is not available.");
 			}
 		}
+// METHODS FOR SPECIAL EXTERNAL FUNCTIONS ///////////////////////////////////////////////////////////////////////////////////////
+		/**
+		 * Adds a method that will be called each time a new debug entry is added
+		 * @param	f
+		 */
+		static public function addExternalMethod(f:Function):void {
+			if (_additionalMethods.indexOf(f) == -1) _additionalMethods.push(f);
+		}
+		/**
+		 * Adds an ID that will not trigger additional methods
+		 * @param	id
+		 */
+		static public function addExternalMethodExcludedId(id:String):void {
+			if (_idsToExcludeFromAdditionalMethods.indexOf(id) == -1) _idsToExcludeFromAdditionalMethods.push(id);
+		}
 // METHODS UTY ///////////////////////////////////////////////////////////////////////////////////////
 		/**
 		 * Returns and resets a partial version of console with the last additions from last call, or from normal console reset.
@@ -375,13 +393,23 @@ package com.pippoflash.utils {
 			traceNormal(_s, id);
 		}
 		private static function windowDebug(id:String = "Debug", t:String = "") {
-			if (_addTimer) _s	= UText.getFormattedTime() + " [" +id + "]\t\t" + t;
-			else _s = _counter + " [" +id + "]\t\t" + t;
-			_allEntries.push						(_s);
-			addToPartialEntries(_s);
-			addFilter(id.toUpperCase(), _s);
-			if (_prefixListeners[id])				_prefixListeners[id](t);
-			traceDebug							(_s, id);
+			var debugLog:String;
+			if (_addTimer) debugLog	= UText.getFormattedTime() + " [" +id + "]\t\t" + t;
+			else debugLog = _counter + " [" +id + "]\t\t" + t;
+			_allEntries.push(debugLog);
+			addToPartialEntries(debugLog);
+			addFilter(id.toUpperCase(), debugLog);
+			if (_prefixListeners[id]) _prefixListeners[id](t);
+			traceDebug(debugLog, id);
+			if (_additionalMethods.length && _idsToExcludeFromAdditionalMethods.indexOf(id) == -1) {
+				for (var i:int = 0; i < _additionalMethods.length; i++) _additionalMethods[i](debugLog);
+				//{
+					//
+				//}
+				//for each (var f:Function in _additionalMethods) {
+					//f(_s);
+				//}
+			}
 		}
 		// TRACE MANAGEMENT ACCORDING TO SETTINGS
 		private static var traceDebug:Function = traceNormal;
