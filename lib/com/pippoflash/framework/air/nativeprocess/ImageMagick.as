@@ -35,9 +35,8 @@ package com.pippoflash.framework.air.nativeprocess
 			}
 			UFile.init();
 			_imageMagickPath = imageMagickPath;
-			
 			_startupInfo:NativeProcessStartupInfo = new NativeProcessStartupInfo(); 
-		
+			_startupInfo.executable = file;
 		}
 		
 				

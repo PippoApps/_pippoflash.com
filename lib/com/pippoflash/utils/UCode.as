@@ -360,7 +360,7 @@ package com.pippoflash.utils {
 		public static function getArrayRandom(a:Array):* {
 			return a[Math.floor(Math.random()*a.length)];
 		}
-		public static function removeArrayRandom(a:Array):* {
+ 		public static function removeArrayRandom(a:Array):* {
 			return a.splice(Math.floor(Math.random()*a.length), 1)[0];
 		}
 		public static function duplicateArray(a:Array):Array {
@@ -412,6 +412,9 @@ package com.pippoflash.utils {
 			return a.indexOf(item) != -1;
 		}
 // VECTOR ///////////////////////////////////////////////////////////////////////////////////////
+		public static function getVectorRandom(a:*):* {
+			return a[Math.floor(Math.random()*a.length)];
+		}
 		public static function removeVectorItem(a:*, item:*):void {
 			var pos:Number = a.indexOf(item);
 			if (pos != -1) removeVectorItemAt(a, pos);
