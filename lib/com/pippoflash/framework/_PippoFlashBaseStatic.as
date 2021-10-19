@@ -15,7 +15,7 @@ package com.pippoflash.framework {
 		protected static var _config					:*; // Stores a reference to a ConfigProj instance
 		// SYSTEM
 		protected static var _pfId					:String = "_PippoFlashBaseStatic";
-		protected static var _debugPrefix				:String = "_PippoFlashBaseStatic";
+		//protected static var _debugPrefix				:String = "_PippoFlashBaseStatic";
 		// STATIC UTY
 // INIT //////////////////////////////////////////////////////////////////////////////////////////
 		public function _PippoFlashBaseStatic			(id:String=null) {
@@ -33,9 +33,9 @@ package com.pippoflash.framework {
 		protected static function error				(...rest):void {
 			Debug.error						(_pfId, rest.join(" "));						
 		}
-		protected static function setId				(id:String):void {
-			_pfId = _debugPrefix					= id; 
-		}
+		//protected static function setId				(id:String):void {
+			//_pfId = _debugPrefix					= id; 
+		//}
 // EVENTS ///////////////////////////////////////////////////////////////////////////////////////
 // 		public function resetListeners				():void {
 // 			_listeners							= [];
