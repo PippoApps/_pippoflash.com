@@ -215,8 +215,8 @@ package com.pippoflash.framework.air {
 		public static function getActiveWindow			():NativeWindow {
 			return							_nativeWindow;
 		}
-		public static function getApplication			():NativeApplication {
-			return							_nativeApplication;
+		public static function getApplication():NativeApplication {
+			return _nativeApplication;
 		}
 		public static function getId					():String {
 			if (_nativeApplication) return							_nativeApplication.applicationID;
@@ -350,14 +350,14 @@ package com.pippoflash.framework.air {
 			return							"NoNetworkInterfaceFound_"+Math.random();
 		}
 	// WINDOWS ///////////////////////////////////////////////////////////////////////////////////////	
-		private static var _htmlListeners				:Array = []; // Stores the listeners for HTMLs
-		public static function getNativeWindow			(pars:Object=null, options:String="default", listener:*=null):NativeWindow {
+		private static var _htmlListeners:Array = []; // Stores the listeners for HTMLs
+		public static function getNativeWindow(pars:Object=null, options:String="default", listener:*=null):NativeWindow {
 			// options can be a string with some predefined IDs of window options, or
-			_w								= new NativeWindow(NATIVE_WINDOW_OPTIONS[options]);
-			UCode.setParameters					(_w, pars);
-			_w.stage.align						= "TL";
-			_w.stage.scaleMode					= "noScale";
-			return							_w;
+			_w = new NativeWindow(NATIVE_WINDOW_OPTIONS[options]);
+			UCode.setParameters(_w, pars);
+			_w.stage.align = "TL";
+			_w.stage.scaleMode = "noScale";
+			return _w;
 		}
 		public static function getHtmlWindow			(pars:Object=null, options:String="default", listener:*=null):NativeWindow { // returns a window with on depth 0 has as child and HTMLLoader object
 // 			_j								= new HTMLLoader();

@@ -205,10 +205,13 @@ package com.pippoflash.framework.air.webview
 			else _webView.loadURL(_nativeUrl);
 		}
 		
-		public function callJavaScriptMethodSimple(methodName:String, param1:*=null, param2:*=null):void {
+		public function callJavaScriptMethodSimple(methodName:String, param1:*=null, param2:*=null, param3:*=null, param4:*=null,  param5:*=null):void {
 			var method:String = methodName + "(";
 			if (param1) method += (param1 is String ? "'"+param1+"'" : param1);
 			if (param2) method += ", " + (param2 is String ? "'" + param2 + "'" : param2);
+			if (param3) method += ", " + (param3 is String ? "'" + param3 + "'" : param3);
+			if (param4) method += ", " + (param4 is String ? "'" + param4 + "'" : param4);
+			if (param5) method += ", " + (param5 is String ? "'" + param5 + "'" : param5);
 			method += ");";
 			callJavaScriptMethod(method);
 		}
@@ -223,8 +226,8 @@ package com.pippoflash.framework.air.webview
 			_webView.loadURL(u);
 		}
 		
-		public function callJSAirApplicationMethod(methodName:String, param1:*=null, param2:*=null):void {
-			callJavaScriptMethodSimple("window._airApplication." + methodName, param1, param2);
+		public function callJSAirApplicationMethod(methodName:String, param1:*=null, param2:*=null, param3:*=null, param4:*=null, param5:*=null):void {
+			callJavaScriptMethodSimple("window._airApplication." + methodName, param1, param2, param3, param4, param5);
 		}
 		/**
 		 * Seta a property in _airApplication instance in HTML
@@ -278,7 +281,11 @@ package com.pippoflash.framework.air.webview
 				return true;
 			}
 			else if (UText.stringContains(location, COMMAND_TRACE)) {
-				Debug.debug(_debugPrefix, "JS CONSOLE> " + UText.removeTextUpTo(decodeURI(location), COMMAND_TRACE));
+				// Substitute <brwith \n
+				const joiner:String = "\n\t\t[JS]";
+				var txt:String = UText.removeTextUpTo(decodeURI(location), COMMAND_TRACE);
+				txt = joiner + UText.substituteInString(txt, "<br>", joiner);
+				Debug.debug(_debugPrefix, "JS CONSOLE> " + txt);
 				return true;
 			}
 			else if (UText.stringContains(location, COMMAND_EXTERNALBROWSER)) {
@@ -290,7 +297,12 @@ package com.pippoflash.framework.air.webview
 			}
 			else if (UText.stringContains(location, COMMAND_AS)) { // AcrtionScript command
 				const splitted:Array = location.split("__ALL_PARAMETERS__");
-				_PippoFlashBase.callPippoFlashInstanceMethod(splitted[0], splitted[1].split("__PARAM__"));
+				trace(location);
+				trace(splitted);
+				trace(splitted.length);
+				splitted[0] = UText.removeTextUpTo(splitted[0], COMMAND_AS); // Remove suffix "actionscript:" from isntance id
+				if (splitted.length > 1) _PippoFlashBase.callPippoFlashInstanceMethod(splitted[0], splitted[1].split("__PARAM__"));
+				else _PippoFlashBase.callPippoFlashInstanceMethod(splitted[0]);
 				return true;
 			}
 			Debug.debug(_debugPrefix, "No Javascript Command recognized in: " + location);
@@ -371,9 +383,9 @@ package com.pippoflash.framework.air.webview
 		private function activateHTMLLogTunnel():void {
 			Debug.addExternalMethodExcludedId(_debugPrefix);
 			if (_distriqtWebView) Debug.addExternalMethodExcludedId(_distriqtWebView._debugPrefix);
-			var startLog:String = Debug.getAllConsoleString("<br>");
+			//var startLog:String = Debug.getAllConsoleString("<br>");
 			//var startLog:String = "<hr><br>INITIAL APP LOG<br><hr><br>" + UText.substituteInString(startLog, "\n", "<br>") + "<br><hr>";
-			UExec.addSequence(printToHtmlLog, "<hr><br>INITIAL APP LOG<br><hr><br>" + UText.substituteInString(startLog, "\n", "<br>") + "<br><hr>");
+			//UExec.addSequence(printToHtmlLog, "<hr><br>INITIAL APP LOG<br><hr><br>" + UText.substituteInString(startLog, "\n", "<br>") + "<br><hr>");
 			Debug.addExternalMethod(printToHtmlLog);
 		}
 		private function updateViewport():void {

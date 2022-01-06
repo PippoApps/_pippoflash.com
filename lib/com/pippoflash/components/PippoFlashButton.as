@@ -1,4 +1,4 @@
-
+﻿
 // Date(yearOrTimevalue:Object, month:Number, date:Number = 1, hour:Number = 0, minute:Number = 0, second:Number = 0, millisecond:Number = 0)
 
 package com.pippoflash.components {
@@ -357,7 +357,7 @@ package com.pippoflash.components {
 				UCode.setParameters(_button[_instanceList[i]], {width:_w, height:_h, visible:false});
 			}
 			Buttonizer.setupButton						(_button, this, "Button", USystem.isDevice() ? "onPress" : "onPress,onRollOver,onRollOut");
-			_button["_up"].visible							= true;
+			if (_button["_up"]) _button["_up"].visible							= true;
 			if (!_active)								setActive(_active);
 			if (UCode.exists(_iconAttachment) && _iconAttachment != "NO ICON") positionForIcon();
 			if (USystem.isDevice()) {

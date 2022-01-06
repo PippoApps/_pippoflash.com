@@ -131,6 +131,7 @@ package com.pippoflash.framework {
 			Debug.debug("_PippoFlashBase", "Calling instance method: " + idAndMethod);
 			var el:Array = idAndMethod.split(".");
 			const instance:* = getInstanceStatic(el[0]);
+			//trace(instance, el[0]);
 			if (instance) {
 				UMethod.callMethodNameWithParamsArray(instance, el[1], pars ? pars : []);
 			} else Debug.error("_PippoFlashBase", "callPippoFlashInstanceMethod() cannot find " + idAndMethod);

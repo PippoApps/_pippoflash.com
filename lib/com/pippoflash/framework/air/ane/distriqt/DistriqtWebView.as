@@ -63,6 +63,7 @@ package com.pippoflash.framework.air.ane.distriqt
 				_nativeOptions.setUserAgent(USER_AGENT);
 				if (USystem.isWin()) {
 					var windowsOptions = new WindowsOptions();
+					
 					// Set to a value between 1024 and 65535 to enable remote debugging on the specified port. For example, if 8080 is specified the remote debugging URL will be http://localhost:8081. CEF can be remotely debugged from any CEF or Chrome browser window.
 					//windowsOptions.setRemoteDebuggingPort(8081);
 					_nativeOptions.setWindowsOptions(windowsOptions);
@@ -122,6 +123,7 @@ package com.pippoflash.framework.air.ane.distriqt
 				_options.bounces = false;
 				_options.mediaPlaybackRequiresUserAction = false;
 				_options.backgroundEnabled = true;
+				//_options.autoScale = false;
 			} else _options = options;
 			try {
 				_webView = NativeWebView.service.createWebView( _rect, _options) ;
