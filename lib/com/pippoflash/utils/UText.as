@@ -395,7 +395,11 @@ package com.pippoflash.utils {
 		public static function exists(s:String=null):Boolean {
 			return s && s != "";
 		}
-		
+		static public function stringContainsHowmany(source:String, key:String):int {
+			if (source.indexOf(key) == -1) return 0; // No instances of the string found
+			const split:Array = source.split(key);
+			return split.length -1;
+		}
 		
 		
 		

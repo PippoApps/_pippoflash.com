@@ -6,7 +6,7 @@ package com.pippoflash.framework.air.ane.distriqt
 	import com.distriqt.extension.bluetoothle.utils.*;
 	import com.pippoflash.framework.air.UAir;
 	import com.pippoflash.utils.UExec;
-	
+	import com.pippoflash.utils.UText;
 	import com.distriqt.extension.nativewebview.platform.WindowsOptions;
 	import com.pippoflash.framework.PippoFlashEventsMan;
 	import com.pippoflash.framework.air.ane._PippoAppsANE;
@@ -60,12 +60,14 @@ package com.pippoflash.framework.air.ane.distriqt
 		static private var _writeCharacteristics:Vector.<Characteristic>; // List of Characteristic to send data to, writeWithoutResponse
 		// Bluetooth communication
 		static private var _textBufferPerCharacteristicByUuid:Object = {}; // udid:String
- 		// EVENTS
+ 		// EVENTS - INITIALIZATION AND CONNECTION
 		public static const EVT_SCAN_START:String = "onBluetoothLEScanStart";
 		public static const EVT_SCAN_STOP:String = "onBluetoothLEScanStop";
 		public static const EVT_ELIGIBLE_PERIPHERAL_FOUND:String = "onBluetoothLEEligiblePeripheralFound";
 		public static const EVT_PERIPHERAL_PAIRED:String = "onBluetoothLEPeripheralPaired"; // uuid:String
 		public static const EVT_FIRST_SERVICE_SETUP:String = "onBluetoothLEFirstServiceSetup";
+		// EVENTS - COMMUNICATION
+		public static const EVT_COMMAND_RECEIVED:String = "onBluetoothLECommandReceived"; // command:String
 		//public static const EVT_CHANGE:String = "onNativeWebViewHtmlChanged";
 		//public static const EVT_ERROR:String = "onNativeWebViewHtmlError";
 		//public static const EVT_JS_RESPONSE:String = "onNativeWebViewHtmlJSResponse";
@@ -306,24 +308,80 @@ package com.pippoflash.framework.air.ane.distriqt
 				// VALUE RECEIVED ANALISYS ///////////////////////////////////////////////////////////////////////////////////////
 				static private function addNotificationValue(uuid:String, value:String ):void { // Adds value to buffer
 					//if (_textBufferPerCharacteristicByUuid[uuid] != null) {
-						_textBufferPerCharacteristicByUuid[uuid] = analyzeTextCommandBuffer(_textBufferPerCharacteristicByUuid[uuid] + value);
+						_textBufferPerCharacteristicByUuid[uuid] = processTextCommandBuffer(_textBufferPerCharacteristicByUuid[uuid] + value);
 					//} else Debug.error(_debugPrefix, "Cannot add value: " +value+" to uuid: " + uuid + " because text buffer was not found");
 					//trace(Debug.object(_textBufferPerCharacteristicByUuid));
 					//trace("14e49b6a-7cd1-482c-848b-bc77682172a6");
 					//trace(_textBufferPerCharacteristicByUuid["14e49b6a-7cd1-482c-848b-bc77682172a6"]);
 				}
-				static private function analyzeTextCommandBuffer(t:String):String { // Analyzes command and checks whether to start new, end old, or continue
+				static private function processTextCommandBuffer(t:String):String { // Analyzes command and checks whether to start new, end old, or continue
 					Debug.debug(_debugPrefix, "Analyzing text: " + t);
-					const startIndex:int = t.indexOf(CHARACTER_COMMAND_START);
-					const stopIndex:int = t.indexOf(CHARACTER_COMMAND_STOP);
-					if (startIndex == -1) {
-						Debug.error(_debugPrefix, "No start index detected. Discarding text.");
+					// Check for start index character
+					const startOccurrences:int = UText.stringContainsHowmany(t, CHARACTER_COMMAND_START);
+					// No start command occurrances
+					if (startOccurrences == 0) {
+						Debug.debug(_debugPrefix, "No start index detected. Discarding text.");
 						return "";
-					} else if (startIndex == 0) { // All regular, command is just started
-						Debug.debug(_debugPrefix, "Found command start");
 					}
+					// Continue with stop check
+					const stopOccurrences:int = UText.stringContainsHowmany(t, CHARACTER_COMMAND_STOP);
+					if (stopOccurrences == 0) { // No stop occurrances, waiting for one
+						//Debug.error(_debugPrefix, "No stop index detected. Discarding text.");
+						return t;
+					}
+					// There is a stop, process whatever is before the stop and return whatever is left afterwards for further checks
+					const stopIndex:int = t.indexOf(CHARACTER_COMMAND_STOP);
+					const splitStop:Array = t.split(CHARACTER_COMMAND_STOP);
+					const textUntilStop:String = splitStop.shift();
+					const textAfterStop:String = splitStop.join(CHARACTER_COMMAND_STOP); // Rejoin since there might be more than one stop afterwards
+					if (textUntilStop.indexOf(CHARACTER_COMMAND_START) != -1) { // There is a command start in the first sentence, so it is a candidate for a command
+						// Process only the last slot after command start and before first command stop. Avoind empty strings ""
+						const command:String = textUntilStop.split(CHARACTER_COMMAND_START).pop();
+						if (command.length) PippoFlashEventsMan.broadcastStaticEvent(DistriqtBluetoothLE, EVT_COMMAND_RECEIVED, command);
+					}
+					return textAfterStop; // Continue analyzing whatever was after the first stop
+					//
+					//
+					//
+					//const textUntilStop:String = t.substring(0, stopIndex);
+					//const textAfterStop:String = stopIndex == t.length - 1 ? "" : t.substr(stopIndex + 1); // If stop is the last letter save an empty string, else whatever is behind
+					
+					
+					
+					//const startIndex:int = t.indexOf(CHARACTER_COMMAND_START);
+					//// one start occurrance
+					//if (startOccurrences == 1 && startIndex == 0) { // Only one at the beginning of the word, check as a single command
+						//return _processTextCommandBufferSingleSlotWithoutStart(t);
+					//}
+					//// More than one start. > 1 occurrences. Only process and remove the first occurrance and leave whatever is left
+					//Debug.debug(_debugPrefix, "More than one start index found. Processing only first word.");
+					//const splitStart:Array = t.split(CHARACTER_COMMAND_START);
+					//_processTextCommandBufferSingleSlotWithoutStart(splitStart.shift());
+					//return CHARACTER_COMMAND_START + splitStart.join(CHARACTER_COMMAND_START); // Leave whatever is left afterwards putting again start command at the beginning
 				}
+				//private function _processTextCommandBufferSingleSlotWithoutStart(t:String):String {
+					//// Check fro end command
+					//var commandComplete:String;
+					//if (stopIndex != -1) { // There is a command stop
+						//if (stopIndex == t.length -1) {
+							//Debug.debug(_debugPrefix, "Command is complete!");
+							//commandComplete = t;
+							//t = "";
+						//} else {
+							//const splitStop:Array = t.split(CHARACTER_COMMAND_STOP);
+							//commandComplete = splitStop.shift();
+							//t = splitStop.length ? splitStop.join(CHARACTER_COMMAND_STOP) : "";
+							//Debug.debug(_debugPrefix, "Command is complete but there is something else afterwards: " + t);
+						//}
+						//PippoFlashEventsMan.broadcastStaticEvent(DistriqtBluetoothLE, EVT_COMMAND_RECEIVED, commandComplete);
+					//}
+					//// Return the initial text or whatever is left
+					//return t;
+				//}
 				
+				
+				
+	
 				
 		// UTILS
 		static private function doStopScan():void { // Stops scanning and broadcasts
