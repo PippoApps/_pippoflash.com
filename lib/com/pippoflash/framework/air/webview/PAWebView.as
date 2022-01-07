@@ -277,7 +277,7 @@ package com.pippoflash.framework.air.webview
 			const COMMAND_EXTERNALBROWSER:String = "externalbrowser:";
 			if (location.indexOf(COMMAND_READY) == 0) {
 				Debug.debug(_debugPrefix, "HTML Page reported Air Features in JavaScript READY!");
-				PippoFlashEventsMan.broadcastInstanceEvent(this, EVT_REPORTED_READY);
+				PippoFlashEventsMan.broadcastInstanceEvent(this, EVT_REPORTED_READY, this);
 				return true;
 			}
 			else if (UText.stringContains(location, COMMAND_TRACE)) {
@@ -356,10 +356,6 @@ package com.pippoflash.framework.air.webview
 		public function onNativeWebViewHtmlJSMessage(v:DistriqtWebView, msg:String):void {
 			processJavaScriptMessage(msg);
 		}
-		
-		
-		
-		
 		
 		
 		
