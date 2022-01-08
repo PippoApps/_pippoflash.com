@@ -44,7 +44,6 @@ package com.pippoflash.framework.air.bluetooth
 		}
 		// COMMANDS
 		public function getSettings():Boolean {
-			trace("FREGNAAAAAAAAFREGNAAAAAAAAFREGNAAAAAAAAFREGNAAAAAAAAFREGNAAAAAAAAFREGNAAAAAAAAFREGNAAAAAAAA");
 			return sendCommand("g");
 		}
 		
@@ -67,6 +66,9 @@ package com.pippoflash.framework.air.bluetooth
 				var commandId:String = UText.getRandomString(2);
 				_activeCommandId = commandId;
 				commandParameters.push(commandId);
+			}
+			for (var i:int = 0; i < _customAdds.length; i++) {
+				commandParameters.push(_customAdds[i]);
 			}
 			commandParameters.push(cmd);
 			if (data) commandParameters.push(data);
