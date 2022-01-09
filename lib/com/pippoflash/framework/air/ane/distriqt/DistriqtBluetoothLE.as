@@ -365,7 +365,9 @@ package com.pippoflash.framework.air.ane.distriqt
 					if (textUntilStop.indexOf(CHARACTER_COMMAND_START) != -1) { // There is a command start in the first sentence, so it is a candidate for a command
 						// Process only the last slot after command start and before first command stop. Avoind empty strings ""
 						const command:String = textUntilStop.split(CHARACTER_COMMAND_START).pop();
-						if (command.length) PippoFlashEventsMan.broadcastStaticEvent(DistriqtBluetoothLE, EVT_COMMAND_RECEIVED, command);
+						if (command.length) { 
+							PippoFlashEventsMan.broadcastStaticEvent(DistriqtBluetoothLE, EVT_COMMAND_RECEIVED, command);
+						}
 					}
 					return textAfterStop; // Continue analyzing whatever was after the first stop
 				}
