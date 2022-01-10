@@ -30,6 +30,19 @@ package com.pippoflash.framework.air.webview
 			callJSAirApplicationMethod("triggerError", errorCode);
 		}
 		
+		// Data settings
+		public function setFullSettings(settings:String):void {
+			callJSAirApplicationMethod("setFullSettings", settings);
+		}
+		public function setLed(led:String):void {
+			
+		}
+		public function setWeekly(weekly:String):void {
+			
+		}
+		public function setTime(time:String):void {
+			
+		}
 		
 		
 	}
