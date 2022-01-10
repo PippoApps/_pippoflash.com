@@ -26,7 +26,9 @@ package com.pippoflash.framework.air.webview
 			Debug.debug(_debugPrefix, "Prompting: " + promptId);
 			callJSAirApplicationMethod("triggerPrompt", promptId, okFuncID, cancelFuncID, okFuncParam, cancelFuncParam);
 		}
-		
+		public function notifyDeviceCommandError(errorCode:uint):void {
+			callJSAirApplicationMethod("triggerError", errorCode);
+		}
 		
 		
 		

@@ -121,10 +121,14 @@ package com.pippoflash.string {
 		}
 		public static function convertMilitaryStringToDate	(s:String, format:String="yyyymmddhhmmss"):Date {
 			// 19710816000530
-			_o								= {year:s.substr(0,4), month:s.substr(4,2), day:s.substr(6,2), hour:s.substr(8,2), minute:s.substr(10,2), second:s.substr(12,2)};
-			// yyyymmddhhmmss
-			_s								= "Sat "+_standardMonths[Number(_o.month)-1]+" "+_o.day+" "+_o.hour+":"+_o.minute+":"+_o.second+" GMT+0200 "+_o.year;
-			return							new Date(_s);
+			const o:Object = {year:s.substr(0, 4), month:s.substr(4, 2), day:s.substr(6, 2), hour:s.substr(8, 2), minute:s.substr(10, 2), second:s.length == 14 ? s.substr(12, 2) : "00"};
+			Debug.debug(_debugPrefix, "converting date: " + s + " : " + Debug.object(o));
+			const d:Date = new Date();
+			d.setFullYear(Number(o.year));
+			d.setMonth(Number(o.month)-1); // Date object has months starting from 0
+			d.setDate(Number(o.day));
+			d.setHours(Number(o.hour), Number(o.minute), Number(o.second));
+			return d;
 		}
 		public static function formatMilitaryDate			(s:String, seq:String):String {
 			return							convertDateToString(convertMilitaryStringToDate(s), seq);
