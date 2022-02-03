@@ -437,10 +437,10 @@ package com.pippoflash.utils {
 			traceDebug = a ? traceWithFilters : traceNormal;
 		}
 	// PROCESS DEBUGS
-		private static function processError			(id:String, ...rest):void {
-			_s								= rest.join(REST_JOINER);
-			addError							(id, _s);
-			forceDebug							(id, ERROR_DISPLAY_PREFIX + _s + ERROR_DISPLAY_POSTFIX);
+		private static function processError(id:String, ...rest):void {
+			_s = rest.join(REST_JOINER);
+			addError(id, _s);
+			forceDebug(id, ERROR_DISPLAY_PREFIX + _s + ERROR_DISPLAY_POSTFIX);
 			
 			if (_debugConsole && _textFormats) {
 				var initIndex						:uint = _debugConsole.length;

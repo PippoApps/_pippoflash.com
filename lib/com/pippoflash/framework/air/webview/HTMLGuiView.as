@@ -30,6 +30,31 @@ package com.pippoflash.framework.air.webview
 			callJSAirApplicationMethod("triggerError", errorCode);
 		}
 		
+		
+		
+		// System
+		public function confirmDataUpdate(id:String):void { // when GUI sends a data update, this confirms data has been updated successfully
+			callJSAirApplicationMethod("confirmDataUpdate", id);
+		}
+		
+		
+		// Pin management
+		public function setPin(pin:String):void {
+			callJSAirApplicationMethod("setPin", pin);
+		}
+		public function promptInitialPin():void {
+			callJSAirApplicationMethod("choosePin");
+		}
+		public function promptWrongPin():void {
+			
+		}
+		public function promptNewPin():void {
+			
+		}
+		
+		
+		
+		
 		// Data settings
 		public function setFullSettings(settings:String):void {
 			callJSAirApplicationMethod("setFullSettings", settings);

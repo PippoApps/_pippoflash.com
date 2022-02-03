@@ -43,6 +43,7 @@ package com.pippoflash.framework.air.ane.distriqt
 		public static const EVT_JS_RESPONSE:String = "onNativeWebViewHtmlJSResponse";
 		public static const EVT_JS_MESSAGE:String = "onNativeWebViewHtmlJSMessage";
 		
+		static private var EXCLUDE_TRACE_JS_CALLS:Array = [];
 		private static var _nativeOptions:NativeWebViewOptions;
 		static private var _initCallback:Function;
 		// STATIC METHODS ///////////////////////////////////////////////////////////////////////////////////////
@@ -145,7 +146,9 @@ package com.pippoflash.framework.air.ane.distriqt
 		public function loadHtmlFile(u:String, additionalHeaders:Vector.<Header>=null):void {
 			_webView.loadURL(u, additionalHeaders);
 		}
-		
+		public function addExcludeJsTrace(cmd:String):void {
+			EXCLUDE_TRACE_JS_CALLS.push(cmd);
+		}
 		public function callJavaScriptMethod(method:String):void {
 			var u:String = "javascript:" + method;
 			Debug.debug(_debugPrefix, "CallingJS: " + method);
@@ -227,7 +230,7 @@ package com.pippoflash.framework.air.ane.distriqt
 		} //end function
 				 
 		private  function javascriptResponseHandler( event:NativeWebViewEvent ):void{
-			if (event.data) {
+			if (event.data && event.data != "(null)") {
 				if (verbose) Debug.debug(_debugPrefix, "JS RESPONSE: " + event.data);
 				PippoFlashEventsMan.broadcastInstanceEvent(this, EVT_JS_RESPONSE, this, event.data);
 			}
@@ -236,7 +239,8 @@ package com.pippoflash.framework.air.ane.distriqt
 		private  function javascriptMessageHandler( event:NativeWebViewEvent ):void{
 			// This is the message sent from the javascript 
 			// AirBridge.message i.e. 'content-for-air' 
-			if (verbose) Debug.debug(_debugPrefix, "JS MESSAGE: " + event.data);
+			// DO NOT TRACE trace:
+			if (verbose && event.data.indexOf("trace:") != 0) Debug.debug(_debugPrefix, "JS MESSAGE: " + event.data);
 			PippoFlashEventsMan.broadcastInstanceEvent(this, EVT_JS_MESSAGE, this, event.data);
 			//trace( "message from JS: " + event.data );
 			//if (_paWebViewConnected) _paWebViewConnected.checkLocation(event.data);

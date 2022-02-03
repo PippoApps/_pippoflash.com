@@ -153,29 +153,31 @@ package com.pippoflash.framework.air.ane.distriqt
 			scanForDevices(devicesNamesToPair);
 			//traceDebug();
 		}
-		static public function scanForDevices(devicesNamesToPair:Vector.<String> = null, timeout:uint=4):void {
+		static public function scanForDevices(devicesNamesToPair:Vector.<String> = null, timeout:uint=15):void {
 			if (devicesNamesToPair) _devicesNamesToPair = devicesNamesToPair;
 			_eligiblePeripherals = {};
-			Debug.debug(_debugPrefix, "Looking for devices: " + _devicesNamesToPair);
-			if (BluetoothLE.service.centralManager.isScanning) return; // Scanning is already active
+			Debug.debug(_debugPrefix, "Looking for devices now: " + _devicesNamesToPair + " is scalling: "  + BluetoothLE.service.centralManager.isScanning + " peripherals: " + BluetoothLE.service.centralManager.peripherals.length + " state: " + BluetoothLE.service.centralManager.state);
+			if (BluetoothLE.service.centralManager.state == BluetoothLEState.STATE_UNKNOWN) {
+				Debug.warning(_debugPrefix, "State is UnKNOWN - retrying in 3 seconds.");
+				UExec.time(3, scanForDevices, devicesNamesToPair, timeout);
+				return;
+			}
+			if (BluetoothLE.service.centralManager.isScanning) {
+				Debug.debug(_debugPrefix, "Scanning is already active. Aborting.");
+				return; // Scanning is already active
+			}
 			
 			if (!BluetoothLE.service.centralManager.scanForPeripherals()) {
 				Debug.error(_debugPrefix, "Bluetooth cannot scan for peripherals.");
 			} else {
-				UExec.time(timeout, doStopScan);
+				UExec.time(timeout, stopScan);
+				Debug.debug(_debugPrefix, "Starting scan...");
 				PippoFlashEventsMan.broadcastStaticEvent(DistriqtBluetoothLE, EVT_SCAN_START);
 			}
 		}
 		static public function stopScan():void {
 			Debug.debug(_debugPrefix, "Stopping scan.");
-			if (BluetoothLE.service.centralManager.isScanning) {
-				BluetoothLE.service.centralManager.stopScan();
-				// Setup eligible peripherals list
-				_eligiblePeripheralsList = new Vector.<com.distriqt.extension.bluetoothle.objects.Peripheral>();
-				for (var u:String in _eligiblePeripherals) {
-					_eligiblePeripheralsList.push(_eligiblePeripherals[u]);
-				}
-			}
+			doStopScan();
 		}
 		static public function connectToEligiblePeripheral(uuid:String = null):Boolean { // If only one, it connects directly, otherwise returns false and I need the uuid
 			_pairingComplete = false;
@@ -214,18 +216,22 @@ package com.pippoflash.framework.air.ane.distriqt
 			_activePeripheral.discoverServices();
 		}
 	// COMMUNICATION
-		static public function write(t:String, writeCharacteristicIndex:uint = 0):Boolean {
-			t = CHARACTER_COMMAND_START + t + CHARACTER_COMMAND_STOP;
+		static public function write(t:String, writeCharacteristicIndex:uint = 0, encloseInBrackets:Boolean=true):Boolean {
+			if (encloseInBrackets) t = encloseInCommandBrackets(t);
 			Debug.debug(_debugPrefix, "Writing to Characteristic " + writeCharacteristicIndex + " : " + t);
 			if (!_pairingComplete) {
-				Debug.error(_debugPrefix, "Cannot write. Bluetooth not paired ocmpletely.");
+				Debug.error(_debugPrefix, "Cannot write. Bluetooth not paired completely.");
 				return false;
 			}
 			var value:ByteArray = new ByteArray();
 			value.writeUTFBytes( t);
 			var success:Boolean = activePeripheral.writeValueForCharacteristic(_writeCharacteristics[writeCharacteristicIndex], value);
-			if (!success) Debug.error(_debugPrefix, "Error writing to Characteristic!");
+			if (success) Debug.debug(_debugPrefix, "Message sent: " + t);
+			else Debug.error(_debugPrefix, "Message sending error: " + t);
 			return success;
+		}
+		static public function encloseInCommandBrackets(t:String):String {
+			return CHARACTER_COMMAND_START + t + CHARACTER_COMMAND_STOP;
 		}
 // SCANNING HANDLERS ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 				static private function central_peripheralDiscoveredHandler( event:PeripheralEvent ):void{
@@ -376,8 +382,12 @@ package com.pippoflash.framework.air.ane.distriqt
 		// UTILS
 		static private function doStopScan():void { // Stops scanning and broadcasts
 			if (BluetoothLE.service.centralManager.isScanning) {
-				Debug.debug(_debugPrefix, "Stopping scan due to timeout.");
-				stopScan();
+				BluetoothLE.service.centralManager.stopScan();
+				// Setup eligible peripherals list
+				_eligiblePeripheralsList = new Vector.<com.distriqt.extension.bluetoothle.objects.Peripheral>();
+				for (var u:String in _eligiblePeripherals) {
+					_eligiblePeripheralsList.push(_eligiblePeripherals[u]);
+				}
 				PippoFlashEventsMan.broadcastStaticEvent(DistriqtBluetoothLE, EVT_SCAN_STOP);
 			} else Debug.debug(_debugPrefix, "Scanning timeout. Scan was already stopped.");
 		}

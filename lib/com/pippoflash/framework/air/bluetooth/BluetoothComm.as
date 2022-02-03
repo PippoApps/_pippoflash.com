@@ -28,6 +28,8 @@ package com.pippoflash.framework.air.bluetooth
 		public var MAX_COMMANS_STORED:uint = 100; // Maximum
 		public var WAIT_MESSAGE_CONFIRMATION:Boolean = true; // Commander hangs until a reply is received or timeout
 		public var WAIT_TIMEOUT:uint = 5000; // Timeout when waiting for command in milliseconds
+		public var MAX_MESSAGE_WRITE_LENGTH:uint = 20; // If messages are longer that this, message is splitted in subsequent calls 
+		public var LONG_MESSAGE_SPLIT_INTERVAL:Number = 0.2; // Seconds interval used to split message into longer intervals
 //		Risposta comando OK
 //<31|xy|000|0202112222310|1|data>
 //31 : numero totale di caratteri tra < e >
@@ -45,12 +47,16 @@ package com.pippoflash.framework.air.bluetooth
 
 		// Replies simulation
 		public var SIMULATE_BLUETOOTH_REPLIES:Boolean = true;
-		public var SIMULATED_REPLIES_PREFIX:String = "000|0202112222310|1|"; // Prefix to all simulated replies
+		public var SIMULATED_REPLIES_PREFIX:String = "000|0202112222310|"; // Prefix to all simulated replies
 		public var SIMULATED_REPLIES:Object = { // Replies aare simulated here. Command ID is created accordingly.
-			g:"BLE_Caos|1,255-0.3,16777215-1|13183060-132200120,13123090,130720120-13193045,,,131030200,,",
+			// If a reply is an array, a random message will be selected
+			g:["1|BLE_Caos|1,255-0.3,16777215-1|13183060-132200120,13123090,130720120-13193045,,,131030200,,"],
+			p:"1", // Set pin, nothing to return
 			empty:null
 		}
-		
+		// STOPPER DEBUGS
+		public var DETECT_MAXIMUM_SEND_LENGTH:Boolean = false; // This makes so that the frist message is overwritten by a 0 to max length string to test the amount of allowed characters
+		public var SIMULATE_LONG_MESSAGES:Boolean = false; // This sends ONE single message simulated and splits it into smaller strings
 		
 		// SYSTEM
 		private var _customAdds:Vector.<String> = new Vector.<String>(); // Adds custom content to every call
@@ -98,6 +104,7 @@ package com.pippoflash.framework.air.bluetooth
 		
 		
 		// METHODS - SEND COMMANDS
+		private var _debugTestLength:String = ""; // Use donly for debugging maximum sendable string
 		public function resendLastCommand(force:Boolean=false):Boolean {
 			if (!ready && !force) {
 				Debug.error(_debugPrefix, "Not ready toresend last command " + _activeCommand);
@@ -110,18 +117,54 @@ package com.pippoflash.framework.air.bluetooth
 				Debug.error(_debugPrefix, "Not ready to issue a new command: " + cmd + ". Still waiting for command: " + _activeCommand);
 				return false;
 			}
-			_timeoutTimer.reset();
-			if (WAIT_MESSAGE_CONFIRMATION) {
-				_timeoutTimer.start();
-				_commandStatus = 2;
-			}
+			resetTimeout(WAIT_MESSAGE_CONFIRMATION);
+			if (WAIT_MESSAGE_CONFIRMATION) _commandStatus = 2;
 			_activeCommand = createCommand(cmd, data);
-			const sentOk:Boolean = DistriqtBluetoothLE.write(_activeCommand);
-			if (sentOk) Debug.debug(_debugPrefix, "Command sent: " + _activeCommand);
-			else Debug.error(_debugPrefix, "Command sending error: " + _activeCommand);
-			PippoFlashEventsMan.broadcastInstanceEvent(this, sentOk ? EVT_COMMAND_SENT : EVT_COMMAND_SEND_ERROR, _activeMessage);
+			if (DETECT_MAXIMUM_SEND_LENGTH) { // Breaking debug 1 - just for debugging purposes
+				_debugTestLength = UText.getRandomString(_debugTestLength.length + 1);
+				Debug.debug(_debugPrefix, "Testing sending a string long: " + _debugTestLength.length);
+				UExec.time(0.5, sendCommand, cmd, data, true);
+				return DistriqtBluetoothLE.write(_debugTestLength);
+			}
+			// Proceed with normal sending
+			if (_activeCommand.length < MAX_MESSAGE_WRITE_LENGTH) { // Normal sending in one shot
+				return doWriteMessage(_activeCommand, true, true);
+			} 
+			return _sendCommandInChunks(); // Send in chunks
+		}
+		
+		// Split send chunks utilities
+		private function _sendCommandInChunks():Boolean {
+			_activeCommand = DistriqtBluetoothLE.encloseInCommandBrackets(_activeCommand);
+			const chunksNum:uint = Math.ceil(_activeCommand.length/MAX_MESSAGE_WRITE_LENGTH);
+			_splitCommandChunks = new Vector.<String>(chunksNum);
+			for (var i:int = 0; i < chunksNum; i++) {
+				_splitCommandChunks[i] = _activeCommand.substr(i * MAX_MESSAGE_WRITE_LENGTH, MAX_MESSAGE_WRITE_LENGTH);
+			}
+			Debug.debug(_debugPrefix, "Sending a command longer than maximum lenght, splitted in several chunks: " + chunksNum + "\n" + _splitCommandChunks);
+			return _sendNextChunk();
+		}
+		private function _sendNextChunk():Boolean {
+			resetTimeout(WAIT_MESSAGE_CONFIRMATION); // Resets timeout timer for each chunk and eventually starts timer
+			const chunk:String = _splitCommandChunks.shift();
+			Debug.debug(_debugPrefix, "Sending command chunk: " + chunk + " - remaining: " + _splitCommandChunks.length);
+			if (_splitCommandChunks.length == 0) return doWriteMessage(chunk, true, false);  // Last command, sent complete
+			// Proceed sending next chunk
+			doWriteMessage(chunk, false, false);
+			UExec.time(LONG_MESSAGE_SPLIT_INTERVAL, _sendNextChunk);
+			return false;
+		}
+		private var _splitCommandChunks:Vector.<String>;
+		
+		// Do send command
+		private function doWriteMessage(msg:String, broadcastComplete:Boolean=true, encloseInCommandBrackets:Boolean=true):Boolean {
+			const sentOk:Boolean = DistriqtBluetoothLE.write(msg, 0, encloseInCommandBrackets);
+			if (broadcastComplete) UExec.next(PippoFlashEventsMan.broadcastInstanceEvent, this, sentOk ? EVT_COMMAND_SENT : EVT_COMMAND_SEND_ERROR, _activeMessage);
 			return sentOk;
 		}
+		
+		
+		
 		
 		// COMMAND UTY
 		private function createCommand(cmd:String, data:String=null):String {
@@ -141,6 +184,11 @@ package com.pippoflash.framework.air.bluetooth
 			if (ADD_CHARACTER_COUNT) fullCommand = addCharacterCount(fullCommand);
 			if (_activeMessage) UMem.storeInstance(_activeMessage);
 			_activeMessage = UMem.getInstance(BluetoothMessage, _activeCommandId, cmd, data);
+			if (SIMULATE_LONG_MESSAGES) { // Breaking debug 2
+				const randomStringLength:uint = 1024; // Math.ceil(Math.random() * 200) + MAX_MESSAGE_WRITE_LENGTH;
+				Debug.warning(_debugPrefix, "Simulating a longer command to test split string. Length = " + randomStringLength);				
+				fullCommand += "Random:" + UText.getRandomString(randomStringLength);
+			}
 			return fullCommand;
 		}
 		private function addCharacterCount(t:String, addDivider:Boolean=true):String {
@@ -152,6 +200,11 @@ package com.pippoflash.framework.air.bluetooth
 			else if (count < 10000) count += count >= 9996 ? 5 : 4;
 			t = String(count) + t;
 			return t;
+		}
+		private function resetTimeout(andStart:Boolean=false):void {
+			_timeoutTimer.reset();
+			if (andStart) _timeoutTimer.start();
+			else _timeoutTimer.stop();
 		}
 		private function setTimedout():void {
 			_activeMessage.setTimedout();
@@ -170,7 +223,7 @@ package com.pippoflash.framework.air.bluetooth
 			var reply:String = "";
 			if (ADD_COMMAND_ID) reply += _activeCommandId + CHARACTER_MAIN_DIVIDER;
 			reply += SIMULATED_REPLIES_PREFIX;
-			reply += SIMULATED_REPLIES[_activeMessage.cmd];
+			reply += SIMULATED_REPLIES[_activeMessage.cmd] is String ? SIMULATED_REPLIES[_activeMessage.cmd] : UCode.getArrayRandom(SIMULATED_REPLIES[_activeMessage.cmd]);
 			if (ADD_CHARACTER_COUNT) reply = addCharacterCount(reply, true);
 			Debug.debug(_debugPrefix, "Triggering simulated reply: " + reply);
 			UExec.next(onBluetoothLECommandReceived, reply);

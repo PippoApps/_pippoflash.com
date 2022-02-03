@@ -37,8 +37,13 @@ package com.pippoflash.framework.air.webview
 		
 		
 		//static private var _nativeWebViewDistriqtClass:DistriqtWebView; // Use an external native webview class to initialize (no OOP so it can work on desktop)
-		static private var _addAdditionalTunnelMethod:Boolean = true;
-		static private var _useDistriqtAne:Boolean;
+		static private var ADD_JS_TRACE_METHOD:Boolean = true;
+		static private var STACK_JS_TRACES:Boolean = true;
+		static private var USE_DISTRIQT_ANE:Boolean;
+		
+		
+		
+		static private var _jsTraceStack:Array = []; // Stores an array of strings to be sent stacked each frame
 		static private var _initialized:Boolean;
 		static private var _initCallback:Function;
 		
@@ -102,12 +107,12 @@ package com.pippoflash.framework.air.webview
 		
 		static public function set useDistriqtAne(value:Boolean):void 
 		{
-			_useDistriqtAne = value;
+			USE_DISTRIQT_ANE = value;
 		}
 		static public function init(initCallback:Function):void {
 			Debug.debug("PAWebView", "Static initialization.");
 			_initCallback = initCallback;
-			if (_useDistriqtAne) DistriqtWebView.init(distriqtInitialized);
+			if (USE_DISTRIQT_ANE) DistriqtWebView.init(distriqtInitialized);
 			else {
 				Debug.debug("PAWebView", "Initializing with regular StageWebView.");
 				_initCallback();
@@ -144,7 +149,7 @@ package com.pippoflash.framework.air.webview
 			_openHttpLinksExternally = OPEN_HTTP_LINKS_EXTERNALLY;
 		}
 		private function createNativeWebView(id:String):Boolean {
-			if (_useDistriqtAne && DistriqtWebView.initialized) {
+			if (USE_DISTRIQT_ANE && DistriqtWebView.initialized) {
 				Debug.debug(_debugPrefix, "Creating native web view: " + DistriqtWebView);
 				_distriqtWebView = new DistriqtWebView("DistriqtWebView_"+id, null, this);
 				//_distriqtWebView.setViewport(_rect);
@@ -240,9 +245,15 @@ package com.pippoflash.framework.air.webview
 			callJavaScriptMethod(method);
 		}
 		public function printToHtmlLog(msg:String):void {
-			callJSAirApplicationMethod(HTML_LOG_METHOD_NAME, encodeURI(msg), true);
+			_jsTraceStack.push(msg);
+			UExec.next(checkJsTraceStack);
 		}
-		
+		private function checkJsTraceStack():void {
+			if (_jsTraceStack.length) {
+				callJSAirApplicationMethod(HTML_LOG_METHOD_NAME, encodeURI(_jsTraceStack.shift()), true);
+				if (_jsTraceStack.length) UExec.next(checkJsTraceStack);
+			}
+		}
 		
 		
 		// JAVASCRIPT MESSAGES PROCESSING ///////////////////////////////////////////////////////////////////////////////////////
@@ -373,7 +384,7 @@ package com.pippoflash.framework.air.webview
 			if (USystem.isIOS()) systemProperties.isIOS = true;
 			UExec.resetSequence();
 			UExec.addSequence(callJavaScriptMethod, "window.intializeAirFeatures(true, " + String(USystem.isDesktop()) + ", "+Debug.object(_defaultWindowValues)+", " + Debug.object(systemProperties)+ ")");
-			if (_addAdditionalTunnelMethod) UExec.addSequence(activateHTMLLogTunnel);
+			if (ADD_JS_TRACE_METHOD) UExec.addSequence(activateHTMLLogTunnel);
 			UExec.addSequence(PippoFlashEventsMan.broadcastInstanceEvent, this, EVT_READY, this);
 		}
 		private function activateHTMLLogTunnel():void {
@@ -383,6 +394,7 @@ package com.pippoflash.framework.air.webview
 			//var startLog:String = "<hr><br>INITIAL APP LOG<br><hr><br>" + UText.substituteInString(startLog, "\n", "<br>") + "<br><hr>";
 			//UExec.addSequence(printToHtmlLog, "<hr><br>INITIAL APP LOG<br><hr><br>" + UText.substituteInString(startLog, "\n", "<br>") + "<br><hr>");
 			Debug.addExternalMethod(printToHtmlLog);
+			
 		}
 		private function updateViewport():void {
 			_rect = new Rectangle();
@@ -484,7 +496,7 @@ package com.pippoflash.framework.air.webview
 		
 		static public function set addAdditionalTunnelMethod(value:Boolean):void 
 		{
-			_addAdditionalTunnelMethod = value;
+			ADD_JS_TRACE_METHOD = value;
 		}
 		
 		
