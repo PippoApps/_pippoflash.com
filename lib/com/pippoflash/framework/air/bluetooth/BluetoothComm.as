@@ -47,11 +47,14 @@ package com.pippoflash.framework.air.bluetooth
 
 		// Replies simulation
 		public var SIMULATE_BLUETOOTH_REPLIES:Boolean = true;
-		public var SIMULATED_REPLIES_PREFIX:String = "000|0202112222310|"; // Prefix to all simulated replies
+		public var SIMULATED_REPLIES_PREFIX:String = "100|0202112222310|"; // Prefix to all simulated replies
 		public var SIMULATED_REPLIES:Object = { // Replies aare simulated here. Command ID is created accordingly.
 			// If a reply is an array, a random message will be selected
-			g:["1|BLE_Caos|1,255-0.3,16777215-1|13183060-132200120,13123090,130720120-13193045,,,131030200,,"],
-			p:"1", // Set pin, nothing to return
+			g:["1|BLE_Caos|1,255-0.3,16777215-1|13183060-132200120,13123090,130720120-13193045,,,131030200,,","0|0"],
+			p:["1"], // Set pin, nothing to return
+			"0":["1","0|0","0|1","0|2","0|3"], // Power OFF
+			"1":["1"], // Power ON
+			"c":["1","0|0"], // Check PIN
 			empty:null
 		}
 		// STOPPER DEBUGS

@@ -293,10 +293,10 @@ package com.pippoflash.framework.air.webview
 			}
 			else if (UText.stringContains(location, COMMAND_TRACE)) {
 				// Substitute <brwith \n
-				const joiner:String = "\n\t\t[JS]";
+				const joiner:String = "\t\t[JS]";
 				var txt:String = UText.removeTextUpTo(decodeURI(location), COMMAND_TRACE);
 				txt = joiner + UText.substituteInString(txt, "<br>", joiner);
-				Debug.debug(_debugPrefix, "JS CONSOLE> " + txt);
+				Debug.debug(_debugPrefix,txt);
 				return true;
 			}
 			else if (UText.stringContains(location, COMMAND_EXTERNALBROWSER)) {

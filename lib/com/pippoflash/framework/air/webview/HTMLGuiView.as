@@ -26,14 +26,14 @@ package com.pippoflash.framework.air.webview
 			Debug.debug(_debugPrefix, "Prompting: " + promptId);
 			callJSAirApplicationMethod("triggerPrompt", promptId, okFuncID, cancelFuncID, okFuncParam, cancelFuncParam);
 		}
-		public function notifyDeviceCommandError(errorCode:uint):void {
+		public function notifyDeviceCommandError(errorCode:String):void {
 			callJSAirApplicationMethod("triggerError", errorCode);
 		}
 		
 		
 		
 		// System
-		public function confirmDataUpdate(id:String):void { // when GUI sends a data update, this confirms data has been updated successfully
+		public function confirmDataUpdate(id:String):void { // when GUI sends a data update, DEVICE responds correctly, this confirms data has been updated successfully
 			callJSAirApplicationMethod("confirmDataUpdate", id);
 		}
 		
@@ -46,12 +46,16 @@ package com.pippoflash.framework.air.webview
 			callJSAirApplicationMethod("choosePin");
 		}
 		public function promptWrongPin():void {
-			
+			callJSAirApplicationMethod("promptPin");
 		}
 		public function promptNewPin():void {
-			
+			callJSAirApplicationMethod("changePin");
 		}
 		
+		// Date / time
+		public function promptDateTime():void {
+			callJSAirApplicationMethod("changeDateTime");
+		}
 		
 		
 		
