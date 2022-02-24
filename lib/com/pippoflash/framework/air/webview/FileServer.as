@@ -72,8 +72,14 @@ package  com.pippoflash.framework.air.webview
 
                 // Initialize the web server directory (in applicationStorageDirectory) with sample files
 				
-				
+				Debug.debug(_debugPrefix, "Querying File referencing for ",_assetsFolder, _storageId);
 				_fileStorage = UFile.referenceFile(_assetsFolder, _storageId);
+				Debug.debug(_debugPrefix, "Found: " + _fileStorage.url);
+					var indexUrl:String = UFile.getDestinationPath(_assetsFolder, "application", true, true, true);
+				Debug.debug(_debugPrefix, "Local URL of destination file: " + indexUrl);
+				//var ff:File = new File(new File(indexUrl).nativePath);
+				//Debug.debug(_debugPrefix, ff.url);
+				//new File(new File(indexUrl).nativePath).url;
 				
                 //var webroot:File = File.applicationDirectory.resolvePath("_assets");
 				
@@ -82,7 +88,7 @@ package  com.pippoflash.framework.air.webview
                     //File.applicationDirectory.resolvePath("_assets").copyTo(webroot);
                 } else {
 					//Debug.debug(_debugPrefix, "Found data folder in: " + _fileStorage.url);
-					Debug.debug(_debugPrefix, "Content: \n" + UFile.getDirectoryListingStrings("_assets"));
+					Debug.debug(_debugPrefix, "Content: \n" + UFile.getDirectoryListingStrings(_fileStorage.url));
 					//DebuUFile.getDirectoryListingStrings("_assets");
 				}
 				listen();

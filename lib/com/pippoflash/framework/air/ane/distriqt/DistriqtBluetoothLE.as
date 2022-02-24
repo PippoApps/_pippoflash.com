@@ -55,6 +55,7 @@ package com.pippoflash.framework.air.ane.distriqt
 		static private var _devicesNamesToPair:Vector.<String> = new Vector.<String>();
 		static private var _pairingComplete:Boolean;
 		// Bluetooth connection
+		static private var _discoveredPeripherals:Object; // Stores peripherals already discovered to avoid infinite trace in Android (keeps discovering the same peripherals all the time)
 		static private var _activePeripheral:Peripheral;
 		static private var _periferalNameFound:Boolean;
 		static private var _eligiblePeripherals:Object; // Peripherals by uuid
@@ -156,6 +157,7 @@ package com.pippoflash.framework.air.ane.distriqt
 		static public function scanForDevices(devicesNamesToPair:Vector.<String> = null, timeout:uint=15):void {
 			if (devicesNamesToPair) _devicesNamesToPair = devicesNamesToPair;
 			_eligiblePeripherals = {};
+			_discoveredPeripherals = {};
 			Debug.debug(_debugPrefix, "Looking for devices now: " + _devicesNamesToPair + " is scalling: "  + BluetoothLE.service.centralManager.isScanning + " peripherals: " + BluetoothLE.service.centralManager.peripherals.length + " state: " + BluetoothLE.service.centralManager.state);
 			if (BluetoothLE.service.centralManager.state == BluetoothLEState.STATE_UNKNOWN) {
 				Debug.warning(_debugPrefix, "State is UnKNOWN - retrying in 3 seconds.");
@@ -224,7 +226,11 @@ package com.pippoflash.framework.air.ane.distriqt
 				return false;
 			}
 			var value:ByteArray = new ByteArray();
-			value.writeUTFBytes( t);
+			value.writeUTFBytes(t);
+			/* SOMETIMES THERES AN ERROR HERE */
+			if (!activePeripheral) Debug.error(_debugPrefix, "activePeripheral NOT FOUND.");
+			if (!_writeCharacteristics) Debug.error(_debugPrefix, "_writeCharacteristics NOT FOUND.");
+			if (!_writeCharacteristics[writeCharacteristicIndex]) Debug.error(_debugPrefix, "_writeCharacteristics[writeCharacteristicIndex] NOT FOUND.");
 			var success:Boolean = activePeripheral.writeValueForCharacteristic(_writeCharacteristics[writeCharacteristicIndex], value);
 			if (success) Debug.debug(_debugPrefix, "Message sent: " + t);
 			else Debug.error(_debugPrefix, "Message sending error: " + t);
@@ -235,8 +241,13 @@ package com.pippoflash.framework.air.ane.distriqt
 		}
 // SCANNING HANDLERS ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 				static private function central_peripheralDiscoveredHandler( event:PeripheralEvent ):void{
+					if (_discoveredPeripherals[event.peripheral.uuid]) {
+						/* PERIPHERAL ALREADY DISCOVERED */
+						return;
+					}
 					// event.peripheral will contain a Peripheral object with information about the Peripheral
 					Debug.debug(_debugPrefix,  "peripheral discovered: " + event.peripheral, event.peripheral.identifier, event.peripheral.name, event.peripheral.uuid);
+					_discoveredPeripherals[event.peripheral.uuid] = event.peripheral;
 					if (_devicesNamesToPair.indexOf(event.peripheral.name) != -1) {
 						if (event.peripheral.name == "" && DO_NOT_ADD_PERIPHERALS_WITH_BLANK_NAME) {
 							Debug.warning(_debugPrefix, "Eligible peripheral found but name is blank, therefore it is not added to list.");

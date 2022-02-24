@@ -184,11 +184,14 @@ package com.pippoflash.framework.air {
 		}
 		public static function getDestinationPath(fileName:String, target:String = "storage", isUrl:Boolean = true, canonicalize:Boolean = true, verbose:Boolean=false):String { // To load file (i.e. from an image conponent) the url must be used instead of nativePath
 			//trace("1");
-			Debug.debug(_debugPrefix, "Returning destination path for: ", _filePaths[target], fileName);
-			Debug.scream(_debugPrefix, "Prova per urls!!!", _filePaths.application.url, _filePaths.application.nativePath);
 			var f:File = _filePaths[target].resolvePath(fileName);
-			Debug.debug(_debugPrefix, "Container  : " + (_filePaths[target] as File).isDirectory);
-			Debug.debug(_debugPrefix, "Container file path: " + (_filePaths[target] as File).url);
+			if (_verbose || verbose) {
+				Debug.debug(_debugPrefix, "Returning destination path for: ", _filePaths[target], fileName);
+				Debug.scream(_debugPrefix, "Prova per urls!!!", _filePaths.application.url, _filePaths.application.nativePath);
+				Debug.debug(_debugPrefix, "File founbd? " + f.exists);
+				Debug.debug(_debugPrefix, "Container  : " + (_filePaths[target] as File).isDirectory);
+				Debug.debug(_debugPrefix, "Container file path: " + (_filePaths[target] as File).url);
+			}
 			//trace("2");
 			if (canonicalize) {
 				Debug.warning(_debugPrefix, fileName + " File path has been canonicalized: " + fileName);

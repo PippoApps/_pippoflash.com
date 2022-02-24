@@ -169,7 +169,7 @@ package com.pippoflash.framework.air {
 				if (FRAMERATE_CHECK_ACTIVE)		setFrameRatecheckActive(true);
 			}
 		}
-			public static function setFrameRatecheckActive(a:Boolean):void {
+			public static function setFrameRatecheckActive(a:Boolean, traceFramerateSeconds:uint=0):void {
 				if (FORCE_FRAMERATE_LEVEL) {
 					_framerateLevel				= FORCE_FRAMERATE_LEVEL_MODE;
 					_isShitFramerate				= _framerateLevel == "WORSE";
@@ -182,6 +182,10 @@ package com.pippoflash.framework.air {
 				else {
 					UExec.removeEnterFrameListener	(onEnterFrame);
 				}
+				if (traceFramerateSeconds) traceAverageFramerate(traceFramerateSeconds);
+			}
+			public function get averageFramerate():Number {
+				return _averageFramerate;
 			}
 			private static function onEnterFrame		(e:Event):void {
 				_framesCounter					++;
@@ -203,6 +207,10 @@ package com.pippoflash.framework.air {
 				private static function resetFrameRateCheck():void {
 					_lastCheckTimer				= getTimer();
 					_framesCounter				= 0;
+				}
+				static private function traceAverageFramerate(secs:uint = 0):void {
+					Debug.debug(_debugPrefix, "Average framerate: " + _averageFramerate);
+					if (secs) UExec.time(secs, traceAverageFramerate, secs);
 				}
 	// SYSTEM ///////////////////////////////////////////////////////////////////////////////////////
 		public static function addNativeWindowOptions		(id:String, options:Object):void {

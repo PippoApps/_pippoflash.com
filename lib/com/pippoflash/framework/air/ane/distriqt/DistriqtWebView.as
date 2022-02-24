@@ -42,8 +42,9 @@ package com.pippoflash.framework.air.ane.distriqt
 		public static const EVT_ERROR:String = "onNativeWebViewHtmlError";
 		public static const EVT_JS_RESPONSE:String = "onNativeWebViewHtmlJSResponse";
 		public static const EVT_JS_MESSAGE:String = "onNativeWebViewHtmlJSMessage";
-		
-		static private var EXCLUDE_TRACE_JS_CALLS:Array = [];
+		static private var EXCLUDE_TRACE_JS_CALLS_ROOT:Array = ["window._airApplication.addToHTMLLog"]; // JS methods not to be traced if they start with these sentences
+
+		public static const DO_NOT_TRACE_NULL_JS_RESPONSE:Boolean = true;
 		private static var _nativeOptions:NativeWebViewOptions;
 		static private var _initCallback:Function;
 		// STATIC METHODS ///////////////////////////////////////////////////////////////////////////////////////
@@ -109,6 +110,7 @@ package com.pippoflash.framework.air.ane.distriqt
 			super(id, cl ? cl : DistriqtWebView);
 			if (!initialized) Debug.error(_debugPrefix, "NativeWebView must be initialized with init() before using.");
 			//_paWebViewConnected = paWebViewConnected;
+			
 		}
 		public function setViewport(r:Rectangle):void {
 			_x = r.x; _y = r.y; _w = r.width; _h = r.height; _rect = r;
@@ -146,12 +148,19 @@ package com.pippoflash.framework.air.ane.distriqt
 		public function loadHtmlFile(u:String, additionalHeaders:Vector.<Header>=null):void {
 			_webView.loadURL(u, additionalHeaders);
 		}
-		public function addExcludeJsTrace(cmd:String):void {
-			EXCLUDE_TRACE_JS_CALLS.push(cmd);
+		public function addExcludeJsMethodRootTrace(cmd:String):void {
+			EXCLUDE_TRACE_JS_CALLS_ROOT.push(cmd);
 		}
 		public function callJavaScriptMethod(method:String):void {
-			var u:String = "javascript:" + method;
-			Debug.debug(_debugPrefix, "CallingJS: " + method);
+			//const u:String = "javascript:" + method;
+			var doTrace:Boolean = true;
+			for (var i:int = 0; i <EXCLUDE_TRACE_JS_CALLS_ROOT.length ; i++) {
+				if (method.indexOf(EXCLUDE_TRACE_JS_CALLS_ROOT[i]) == 0) {
+					doTrace = false;
+					break;
+				}
+			}
+			if (doTrace) Debug.debug(_debugPrefix, "CallingJS: " + method);
 			_webView.evaluateJavascript(method);
 			//_webView.evaluateJavascript("window.IS_DESKTOP=" + String(USystem.isDesktop()));
 		}
@@ -230,7 +239,7 @@ package com.pippoflash.framework.air.ane.distriqt
 		} //end function
 				 
 		private  function javascriptResponseHandler( event:NativeWebViewEvent ):void{
-			if (event.data && event.data != "(null)") {
+			if (!DO_NOT_TRACE_NULL_JS_RESPONSE || event.data && event.data != "(null)" && event.data != "null") {
 				if (verbose) Debug.debug(_debugPrefix, "JS RESPONSE: " + event.data);
 				PippoFlashEventsMan.broadcastInstanceEvent(this, EVT_JS_RESPONSE, this, event.data);
 			}
