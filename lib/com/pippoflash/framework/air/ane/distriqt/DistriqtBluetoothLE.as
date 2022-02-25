@@ -63,6 +63,7 @@ package com.pippoflash.framework.air.ane.distriqt
 		static private var _serviceToScan:Service;
 		static private var _notificationCharacteristics:Vector.<Characteristic>; // List of Characteristic subscribed for notification, read, notify
 		static private var _writeCharacteristics:Vector.<Characteristic>; // List of Characteristic to send data to, writeWithoutResponse
+		static private var _targetServiceID:String; // The service ID I want to connect to (first one in list if blank)
 		// Bluetooth communication
 		static private var _textBufferPerCharacteristicByUuid:Object = {}; // udid:String
  		// EVENTS - INITIALIZATION AND CONNECTION
@@ -181,32 +182,47 @@ package com.pippoflash.framework.air.ane.distriqt
 			Debug.debug(_debugPrefix, "Stopping scan.");
 			doStopScan();
 		}
-		static public function connectToEligiblePeripheral(uuid:String = null):Boolean { // If only one, it connects directly, otherwise returns false and I need the uuid
+		/**
+		 * Connects one of the eligible peripherals. 
+		 * @param	uuid The uuid of peripheral to conect to (otherwise will be the first)
+		 * @param	targetServiceId The udid of service to subscribe to (otherwise first will be used)
+		 * @return 	Returns true if it can connect to an eligible peripheral or fals eif no eligible peripherals are there
+		 */
+		static public function connectToEligiblePeripheral(uuid:String = null, targetServiceId:String=null):Boolean { 
 			_pairingComplete = false;
+			_targetServiceID = targetServiceId;
 			Debug.debug(_debugPrefix, "Connecting to eligible peripheral.: ", Debug.object(_eligiblePeripherals));
 			if (_eligiblePeripheralsList.length == 0) {
 				Debug.error(_debugPrefix, "No eligible peripherals.");
+				return false;
+			}
+			if (_eligiblePeripheralsList.length == 0) {
+				Debug.error(_debugPrefix, "No eligible peripherals in list. Cannot connect.");
 				return false;
 			}
 			var peripheral:Peripheral;
 			if (uuid) {
 				peripheral = _eligiblePeripherals[uuid];
 				if (!peripheral) {
-					Debug.error(_debugPrefix, "No peripheral found with uuid: " + uuid);
-					return false;
+					Debug.warning(_debugPrefix, "No peripheral found with uuid: " + uuid + " - connecting to the first one found.");
 				}
-			} else if (_eligiblePeripheralsList.length > 1) {
-				Debug.error(_debugPrefix, "No uuid provided and more than one eligible peripherals found.");
-				return false;
-			} else peripheral = _eligiblePeripheralsList[0];
+			}
+			if (!peripheral && _eligiblePeripheralsList.length > 1) {
+				Debug.warning(_debugPrefix, "Several eligible peripherals found: " + _eligiblePeripheralsList.length);
+			}
+			if (!peripheral) {
+				Debug.debug(_debugPrefix, "Connecting to the first peripheral in list.");
+				peripheral = _eligiblePeripheralsList[0];
+			}
 			// Connect to the only peripheral available
 			Debug.debug(_debugPrefix, "Connecting to peripheral: " + peripheral.name);
 			BluetoothLE.service.centralManager.connect(peripheral );
 			return true;
 			
 		}
-		static public function scanFirstServiceOfConnectedPeripheral():void {
+		static private function scanFirstServiceOfConnectedPeripheral():void {
 			Debug.debug(_debugPrefix, "Scanning first service of peripheral.");
+			if (_targetServiceID) Debug.debug(_debugPrefix, "Will try to connect to service: " + _targetServiceID);
 			if (!_activePeripheral) {
 				Debug.error(_debugPrefix, "Aborted: No active peripheral set.");
 				return;
@@ -220,6 +236,8 @@ package com.pippoflash.framework.air.ane.distriqt
 	// COMMUNICATION
 		static public function write(t:String, writeCharacteristicIndex:uint = 0, encloseInBrackets:Boolean=true):Boolean {
 			if (encloseInBrackets) t = encloseInCommandBrackets(t);
+			/* PROVO AD ACCORCIARE LA STRINGA */
+			t = "ff";
 			Debug.debug(_debugPrefix, "Writing to Characteristic " + writeCharacteristicIndex + " : " + t);
 			if (!_pairingComplete) {
 				Debug.error(_debugPrefix, "Cannot write. Bluetooth not paired completely.");
@@ -231,6 +249,7 @@ package com.pippoflash.framework.air.ane.distriqt
 			if (!activePeripheral) Debug.error(_debugPrefix, "activePeripheral NOT FOUND.");
 			if (!_writeCharacteristics) Debug.error(_debugPrefix, "_writeCharacteristics NOT FOUND.");
 			if (!_writeCharacteristics[writeCharacteristicIndex]) Debug.error(_debugPrefix, "_writeCharacteristics[writeCharacteristicIndex] NOT FOUND.");
+			Debug.debug(_debugPrefix, "Writing to charateristic: peripheral: " + activePeripheral.uuid + ",  characteristic("+_writeCharacteristics[writeCharacteristicIndex]+"): " + _writeCharacteristics[writeCharacteristicIndex].uuid + " : " + _writeCharacteristics[writeCharacteristicIndex].permissions + " : " + _writeCharacteristics[writeCharacteristicIndex].properties+ " : " + _writeCharacteristics[writeCharacteristicIndex].value);
 			var success:Boolean = activePeripheral.writeValueForCharacteristic(_writeCharacteristics[writeCharacteristicIndex], value);
 			if (success) Debug.debug(_debugPrefix, "Message sent: " + t);
 			else Debug.error(_debugPrefix, "Message sending error: " + t);
@@ -277,12 +296,22 @@ package com.pippoflash.framework.air.ane.distriqt
 // SCANNING SERVICES AND CHARACTERISTIC SUBSCRIPTION ////////////////////////////////////////////////////////////////////////
 				static private function peripheral_discoverServicesHandler( event:PeripheralEvent ):void {
 					Debug.debug(_debugPrefix, "Discovered peripheral services: " + event.peripheral.services.length);
+					//var serviceFoundForTargetID:Service;
 					if (event.peripheral.services.length > 0) {
 						for each (var service:Service in event.peripheral.services){
-							Debug.debug(_debugPrefix, "Found service: " + service.uuid);
+							Debug.debug(_debugPrefix, "Discovered service: " + service.uuid);
+							if (_targetServiceID == service.uuid) {
+								Debug.debug(_debugPrefix, "Found target service ID. Subscribing.");
+								event.peripheral.discoverCharacteristics(service);
+								return; // Break cycle since target service has been found
+							}
 						}
-						Debug.debug(_debugPrefix, "Subscribing to characteristics only for the first service.");
-						event.peripheral.discoverCharacteristics(event.peripheral.services[0]);
+						if (_targetServiceID) {
+							Debug.error(_debugPrefix, "Target service Id not found: " + _targetServiceID + ", aborting.");
+						} else {
+							Debug.debug(_debugPrefix, "Subscribing to characteristics for the first service in list: " + event.peripheral.services[0].uuid);
+							event.peripheral.discoverCharacteristics(event.peripheral.services[0]);
+						}
 					}
 				}
 				static private function peripheral_discoverCharacteristicsHandler( event:PeripheralEvent ):void {
@@ -295,9 +324,10 @@ package com.pippoflash.framework.air.ane.distriqt
 								subscribeToCharacteristicCommonEvents(event.peripheral, ch);
 								subscribeToCharacteristicNotificationEvents(event.peripheral, ch);
 							}
-							if (ch.properties.indexOf("writeWithoutResponse") != -1) {
+							if (ch.properties.indexOf("writeWithoutResponse") != -1 || ch.properties.indexOf("write") != -1) {
 								subscribeToCharacteristicCommonEvents(event.peripheral, ch);
 								subscribeToCharacteristicWritableEvents(event.peripheral, ch);
+								subscribeToCharacteristicNotificationEvents(event.peripheral, ch);
 							}
 						}
 					}
@@ -309,7 +339,7 @@ package com.pippoflash.framework.air.ane.distriqt
 					}
 				}
 				static private function subscribeToCharacteristicNotificationEvents(peripheral:Peripheral, ch:Characteristic):void {
-					Debug.debug(_debugPrefix, "Subscribing to notifications for characteristic.");
+					Debug.debug(_debugPrefix, "Subscribing to notifications for characteristic: " + ch.uuid);
 					_notificationCharacteristics.push(ch);
 					_textBufferPerCharacteristicByUuid[ch.uuid] = ""; // Create text buffer for each characteristic
 					peripheral.addEventListener( CharacteristicEvent.UPDATE, peripheral_characteristic_updatedHandler );
@@ -319,7 +349,7 @@ package com.pippoflash.framework.air.ane.distriqt
 					}
 				}
 				static private function subscribeToCharacteristicWritableEvents(peripheral:Peripheral, ch:Characteristic):void {
-					Debug.debug(_debugPrefix, "Subscribing to a writable characteristic.");
+					Debug.debug(_debugPrefix, "Subscribing to a writable characteristic: " + ch.uuid);
 					_writeCharacteristics.push(ch);
 					peripheral.addEventListener( CharacteristicEvent.WRITE_SUCCESS, peripheral_characteristic_writeHandler  );
 					peripheral.addEventListener( CharacteristicEvent.WRITE_ERROR, peripheral_characteristic_writeErrorHandler  );
@@ -332,7 +362,7 @@ package com.pippoflash.framework.air.ane.distriqt
 // CHARACTERISTIC HANDLERS AND UTY ///////////////////////////////////////////////////////////////////////////////////////
 		// SUBSCRIPTION HANDLERS
 				static private function peripheral_characteristic_subscribeHandler( event:CharacteristicEvent ):void {
-					trace( "peripheral characteristic subscribe: " + event.peripheral.name, event.characteristic.uuid);
+					Debug.debug(_debugPrefix, "Successfully subscribed to characteristic: "+ event.peripheral.name, event.characteristic.uuid);
 					PippoFlashEventsMan.broadcastStaticEvent(DistriqtBluetoothLE, EVT_PERIPHERAL_CHARACTERISTIC_SUBSCRIBED, event.characteristic);
 				}       
 				static private function peripheral_characteristic_subscribeErrorHandler( event:CharacteristicEvent ):void {
@@ -350,10 +380,10 @@ package com.pippoflash.framework.air.ane.distriqt
 				}
 		// WRITING HANDLERS
 				static private function peripheral_characteristic_writeHandler( event:CharacteristicEvent ):void {
-					 trace( "peripheral characteristic write success: " + event.peripheral.name );
+					Debug.debug(_debugPrefix, "peripheral characteristic write success." );
 				}
 				static private function peripheral_characteristic_writeErrorHandler( event:CharacteristicEvent ):void {
-					trace( "peripheral characteristic write error: [" + event.errorCode +"] "+event.error );
+					Debug.debug(_debugPrefix, "peripheral characteristic write error: [" + event.errorCode +"] "+event.error );
 				}
 		// NOTIFICATION ANALISYS ///////////////////////////////////////////////////////////////////////////////////////
 				static private function addNotificationValue(uuid:String, value:String ):void { // Adds value to buffer

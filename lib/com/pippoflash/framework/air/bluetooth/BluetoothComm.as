@@ -163,7 +163,10 @@ package com.pippoflash.framework.air.bluetooth
 		// Do send command
 		private function doWriteMessage(msg:String, broadcastComplete:Boolean=true, encloseInCommandBrackets:Boolean=true):Boolean {
 			const sentOk:Boolean = DistriqtBluetoothLE.write(msg, 0, encloseInCommandBrackets);
-			if (broadcastComplete) UExec.next(PippoFlashEventsMan.broadcastInstanceEvent, this, sentOk ? EVT_COMMAND_SENT : EVT_COMMAND_SEND_ERROR, _activeMessage);
+			if (broadcastComplete) {
+				resetTimeout();
+				UExec.next(PippoFlashEventsMan.broadcastInstanceEvent, this, sentOk ? EVT_COMMAND_SENT : EVT_COMMAND_SEND_ERROR, _activeMessage);
+			}
 			return sentOk;
 		}
 		
@@ -242,6 +245,7 @@ package com.pippoflash.framework.air.bluetooth
 				Debug.error(_debugPrefix, "Command received but I was not waiting, therefore it gets discarded.");
 				return false;
 			}
+			resetTimeout();
 			const mainSplit:Array = cmd.split(CHARACTER_MAIN_DIVIDER);
 			if (ADD_CHARACTER_COUNT && !forceDebugAcceptanceWithoutCountAndId) { // Check characters count
 				const charsData:uint = uint(mainSplit.shift());
