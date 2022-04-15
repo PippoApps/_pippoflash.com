@@ -47,7 +47,8 @@ package com.pippoflash.framework.air.ane.distriqt
 		// STATIC ///////////////////////////////////////////////////////////////////////////////////////
 		static private var  _initialized:Boolean;
 		static private var _hasPermission:Boolean;
-		static private var _authorizationType:String;
+		static private var _isOn:Boolean;
+		//static private var _authorizationType:String;
 		static private var _debugPrefix:String = "BluetoothLE";
 		static private var _initCallback:Function;
 		// Bluetooth system
@@ -63,10 +64,20 @@ package com.pippoflash.framework.air.ane.distriqt
 		static private var _serviceToScan:Service;
 		static private var _notificationCharacteristics:Vector.<Characteristic>; // List of Characteristic subscribed for notification, read, notify
 		static private var _writeCharacteristics:Vector.<Characteristic>; // List of Characteristic to send data to, writeWithoutResponse
+		// Target elements to connect to
 		static private var _targetServiceID:String; // The service ID I want to connect to (first one in list if blank)
+		static private var _targetReadNotifyCharacteristic:String; // UYdid of the read/noitify characteristic to subscribe to
+		static private var _targetWriteCharacteristic:String; // Udid of the write or writewithoutResponse characteristic to subscribe to
+		
 		// Bluetooth communication
 		static private var _textBufferPerCharacteristicByUuid:Object = {}; // udid:String
  		// EVENTS - INITIALIZATION AND CONNECTION
+		public static const EVT_HARDWARE_STATE_ON:String = "onBluetoothHardwareStateOn";
+		public static const EVT_HARDWARE_STATE_OFF:String = "onBluetoothHardwareStateOff";
+		public static const EVT_AUTHORIZATION_CHANGE:String = "onBluetoothAuthorizationChange";
+		public static const EVT_AUTHORIZATION_PROVIDED:String = "onBluetoothAuthorizationProvided";
+		public static const EVT_AUTHORIZATION_SHOULDEXPLAIN:String = "onBluetoothAuthorizationShouldExplain";
+		public static const EVT_AUTHORIZATION_DENIED:String = "onBluetoothAuthorizationDenied";
 		public static const EVT_SCAN_START:String = "onBluetoothLEScanStart";
 		public static const EVT_SCAN_STOP:String = "onBluetoothLEScanStop";
 		public static const EVT_ELIGIBLE_PERIPHERAL_FOUND:String = "onBluetoothLEEligiblePeripheralFound";
@@ -95,43 +106,97 @@ package com.pippoflash.framework.air.ane.distriqt
 		}
 		static public function init():Boolean {
 			if (isSupported) {
-				_DistriqtAne.initCore();
+				//_DistriqtAne.initCore();
 				//BluetoothLE.init();
 				Debug.debug(_debugPrefix, "Initializing ver " + BluetoothLE.VERSION);
 				_initialized = true;
-				setupAuthorizationStatus(BluetoothLE.service.authorisationStatus());
+				updateHardwareState(false, "init");
+				updateAuthorizationStatus(false, false, "init");
+				BluetoothLE.service.addEventListener(BluetoothLEEvent.STATE_CHANGED, stateChangedHandler);
 				//_authorizationType = BluetoothLE.service.authorisationStatus();
 				//analyzeAuthorization(false);
 			} else Debug.error(_debugPrefix, "NOT SUPPORTED ON THIS PLATFORM");
 			return _initialized;
 		}
-		static private function setupAuthorizationStatus(auth:String):void {
-			_authorizationType = auth;
-			switch (_authorizationType) {
-				case AuthorisationStatus.AUTHORISED:
-						_hasPermission = true;
-						return;
-			}
-		}
 		
-		static private var _authorizationCallback:Function; // True or false whether authorization is requested
-		static public function requestAuthorization(authorizationCallback:Function):void {
+		
+		// BLE HARDWARE STATE ///////////////////////////////////////////////////////////////////////////////////////
+		static private function stateChangedHandler(event:BluetoothLEEvent):void {
+			Debug.debug(_debugPrefix, "Hardware State Changed");
+			updateHardwareState(true, "stateChangedHandler");
+			//if (USystem.isAndroid() && BluetoothLE.service.state == BluetoothLEState.STATE_UNAUTHORISED)
+		}
+		static private function updateHardwareState(broadcast:Boolean=true, msg:String="no msg", forceOn:Boolean=false):void {
+			//_authorizationType = BluetoothLE.service.authorisationStatus();
+			Debug.debug(_debugPrefix, "updateHardwareState: "+BluetoothLE.service.state+" (" + msg + ")");
+			_isOn = forceOn;
+			switch (BluetoothLE.service.state) {
+				case BluetoothLEState.STATE_ON: 
+					_isOn = true;
+					break;
+				case BluetoothLEState.STATE_OFF:
+					break;
+				case BluetoothLEState.STATE_RESETTING:  
+					break;
+				case BluetoothLEState.STATE_UNAUTHORISED:   
+					//_isOn = true; // This still means hardware is ON. Authorisation will be asked for later.
+					break;
+				case BluetoothLEState.STATE_UNSUPPORTED:    
+					break;
+				case BluetoothLEState.STATE_UNKNOWN:
+					break;
+			}
+			if (broadcast) PippoFlashEventsMan.broadcastStaticEvent(DistriqtBluetoothLE, _isOn ? EVT_HARDWARE_STATE_ON : EVT_HARDWARE_STATE_OFF);
+		}
+		// BLE AUTHORIZATION ///////////////////////////////////////////////////////////////////////////////////////
+		static public function requestAuthorization():void {
 			Debug.debug(_debugPrefix, "Requesting Bluetooth Authorisation.");
-			setupAuthorizationStatus(BluetoothLE.service.authorisationStatus());
+			// Proceed requesting authorisation
+			updateAuthorizationStatus(false, false, "requestAuthorization"); // Update authorisation before checking
 			if (hasPermission) {
 				Debug.debug(_debugPrefix, "Bluetooth already authorised.");
-				authorizationCallback(true);
+				updateAuthorizationStatus(false, true, "hasPermission"); // Broadcasts permissions without asking for auth changed
 				return;
 			}
 			// Proceed requesting authorisation
-			_authorizationCallback = authorizationCallback;
-			BluetoothLE.service.addEventListener(AuthorisationEvent.CHANGED, authorisationChangedHandler);
-			BluetoothLE.service.requestAuthorisation();
+			else {
+				BluetoothLE.service.addEventListener(AuthorisationEvent.CHANGED, authorisationChangedHandler);
+				UExec.next(BluetoothLE.service.requestAuthorisation);
+			}
 		}
 		static private function authorisationChangedHandler( event:AuthorisationEvent ):void {
-			setupAuthorizationStatus(event.status);
-			if (_authorizationCallback) _authorizationCallback(_hasPermission);
-			_authorizationCallback = null;			//_authorizationType = event.status;
+			BluetoothLE.service.removeEventListener(AuthorisationEvent.CHANGED, authorisationChangedHandler);
+			updateAuthorizationStatus(false, true, "authorisationChangedHandler");
+		}
+		static private function updateAuthorizationStatus(askAgain:Boolean=false, broadcast:Boolean=false, msg:String="no msg"):void {
+			//_authorizationType = BluetoothLE.service.authorisationStatus();
+			Debug.debug(_debugPrefix, "updateAuthorizationStatus: "+BluetoothLE.service.authorisationStatus()+" (" + msg + ")");
+			_hasPermission = false;
+			switch (BluetoothLE.service.authorisationStatus()) {
+				case AuthorisationStatus.AUTHORISED:
+					_hasPermission = true;
+					if (broadcast) PippoFlashEventsMan.broadcastStaticEvent(DistriqtBluetoothLE, EVT_AUTHORIZATION_PROVIDED);
+					break;
+				case AuthorisationStatus.NOT_DETERMINED:
+					break;
+				case AuthorisationStatus.SHOULD_EXPLAIN:
+					// The user has not yet been asked or 
+					// has denied once and you should explain
+					if (broadcast) PippoFlashEventsMan.broadcastStaticEvent(DistriqtBluetoothLE, EVT_AUTHORIZATION_SHOULDEXPLAIN);
+					break;
+				case AuthorisationStatus.DENIED:
+					if (broadcast) PippoFlashEventsMan.broadcastStaticEvent(DistriqtBluetoothLE, EVT_AUTHORIZATION_DENIED);
+					break;
+				case AuthorisationStatus.RESTRICTED:
+					break;
+				case AuthorisationStatus.UNKNOWN:
+					break;
+			}
+			if (broadcast) PippoFlashEventsMan.broadcastStaticEvent(DistriqtBluetoothLE, EVT_AUTHORIZATION_CHANGE);
+			if (!_hasPermission && askAgain) {
+				Debug.debug(_debugPrefix, "Authorization not granted, I ask again.");
+				requestAuthorization();
+			}
 		}
 		
 		
@@ -155,7 +220,7 @@ package com.pippoflash.framework.air.ane.distriqt
 			scanForDevices(devicesNamesToPair);
 			//traceDebug();
 		}
-		static public function scanForDevices(devicesNamesToPair:Vector.<String> = null, timeout:uint=15):void {
+		static public function scanForDevices(devicesNamesToPair:Vector.<String> = null, timeout:uint=30):void {
 			if (devicesNamesToPair) _devicesNamesToPair = devicesNamesToPair;
 			_eligiblePeripherals = {};
 			_discoveredPeripherals = {};
@@ -237,7 +302,7 @@ package com.pippoflash.framework.air.ane.distriqt
 		static public function write(t:String, writeCharacteristicIndex:uint = 0, encloseInBrackets:Boolean=true):Boolean {
 			if (encloseInBrackets) t = encloseInCommandBrackets(t);
 			/* PROVO AD ACCORCIARE LA STRINGA */
-			t = "ff";
+			//t = "ff";
 			Debug.debug(_debugPrefix, "Writing to Characteristic " + writeCharacteristicIndex + " : " + t);
 			if (!_pairingComplete) {
 				Debug.error(_debugPrefix, "Cannot write. Bluetooth not paired completely.");
@@ -248,8 +313,18 @@ package com.pippoflash.framework.air.ane.distriqt
 			/* SOMETIMES THERES AN ERROR HERE */
 			if (!activePeripheral) Debug.error(_debugPrefix, "activePeripheral NOT FOUND.");
 			if (!_writeCharacteristics) Debug.error(_debugPrefix, "_writeCharacteristics NOT FOUND.");
-			if (!_writeCharacteristics[writeCharacteristicIndex]) Debug.error(_debugPrefix, "_writeCharacteristics[writeCharacteristicIndex] NOT FOUND.");
-			Debug.debug(_debugPrefix, "Writing to charateristic: peripheral: " + activePeripheral.uuid + ",  characteristic("+_writeCharacteristics[writeCharacteristicIndex]+"): " + _writeCharacteristics[writeCharacteristicIndex].uuid + " : " + _writeCharacteristics[writeCharacteristicIndex].permissions + " : " + _writeCharacteristics[writeCharacteristicIndex].properties+ " : " + _writeCharacteristics[writeCharacteristicIndex].value);
+			try { // These traces are error prone
+				Debug.debug(_debugPrefix, "Writing to charateristic: peripheral: " + activePeripheral.uuid + ",  characteristic("+_writeCharacteristics[writeCharacteristicIndex]+"): " + _writeCharacteristics[writeCharacteristicIndex].uuid + " : " + _writeCharacteristics[writeCharacteristicIndex].permissions + " : " + _writeCharacteristics[writeCharacteristicIndex].properties+ " : " + _writeCharacteristics[writeCharacteristicIndex].value);
+			}
+			catch (e:Error) {};
+			if (!_writeCharacteristics[writeCharacteristicIndex]) {
+				Debug.error(_debugPrefix, "_writeCharacteristics[writeCharacteristicIndex] NOT FOUND.");
+				return false;
+			}
+			if (!activePeripheral) {
+				Debug.error(_debugPrefix, "activePeripheral NOT FOUND.");
+				return false;
+			}
 			var success:Boolean = activePeripheral.writeValueForCharacteristic(_writeCharacteristics[writeCharacteristicIndex], value);
 			if (success) Debug.debug(_debugPrefix, "Message sent: " + t);
 			else Debug.error(_debugPrefix, "Message sending error: " + t);
@@ -300,6 +375,7 @@ package com.pippoflash.framework.air.ane.distriqt
 					if (event.peripheral.services.length > 0) {
 						for each (var service:Service in event.peripheral.services){
 							Debug.debug(_debugPrefix, "Discovered service: " + service.uuid);
+							//event.peripheral.discoverCharacteristics(service);
 							if (_targetServiceID == service.uuid) {
 								Debug.debug(_debugPrefix, "Found target service ID. Subscribing.");
 								event.peripheral.discoverCharacteristics(service);
@@ -319,15 +395,33 @@ package com.pippoflash.framework.air.ane.distriqt
 					for each (var service:Service in event.peripheral.services) {
 						for each (var ch:Characteristic in service.characteristics)
 						{
+							var connect:Boolean = true;
 							Debug.debug(_debugPrefix, "Checking characteristic with properties: ",ch.uuid,ch.properties);
 							if (ch.properties.indexOf("read") != -1 && ch.properties.indexOf("notify") != -1) {
-								subscribeToCharacteristicCommonEvents(event.peripheral, ch);
-								subscribeToCharacteristicNotificationEvents(event.peripheral, ch);
+								if (_targetReadNotifyCharacteristic) {
+									if (_targetReadNotifyCharacteristic == ch.uuid) Debug.debug(_debugPrefix, "Characteristic read & notify matches target UDID.");
+									else {
+										Debug.debug(_debugPrefix, "Characteristic read & notify does not match target UDID.");
+										connect = false;
+									}
+								} else Debug.debug(_debugPrefix, "No target UDID set for read & notify characteristic, subscribing.");
+								if (connect) {
+									subscribeToCharacteristicCommonEvents(event.peripheral, ch);
+									subscribeToCharacteristicNotificationEvents(event.peripheral, ch);
+								}
 							}
 							if (ch.properties.indexOf("writeWithoutResponse") != -1 || ch.properties.indexOf("write") != -1) {
-								subscribeToCharacteristicCommonEvents(event.peripheral, ch);
-								subscribeToCharacteristicWritableEvents(event.peripheral, ch);
-								subscribeToCharacteristicNotificationEvents(event.peripheral, ch);
+								if (_targetWriteCharacteristic) {
+									if (_targetWriteCharacteristic == ch.uuid) Debug.debug(_debugPrefix, "Characteristic write or writeWithoutResponse matches target UDID.");
+									else {
+										Debug.debug(_debugPrefix, "Characteristic write or writeWithoutResponse does not match target UDID.");
+										connect = false;
+									}
+								} else Debug.debug(_debugPrefix, "No target UDID set for write or writeWithoutResponse characteristic, subscribing.");
+								if (connect) {
+									subscribeToCharacteristicCommonEvents(event.peripheral, ch);
+									subscribeToCharacteristicWritableEvents(event.peripheral, ch);
+								}
 							}
 						}
 					}
@@ -366,7 +460,7 @@ package com.pippoflash.framework.air.ane.distriqt
 					PippoFlashEventsMan.broadcastStaticEvent(DistriqtBluetoothLE, EVT_PERIPHERAL_CHARACTERISTIC_SUBSCRIBED, event.characteristic);
 				}       
 				static private function peripheral_characteristic_subscribeErrorHandler( event:CharacteristicEvent ):void {
-					trace( "peripheral characteristic error: [" + event.errorCode +"] "+event.error );
+					trace( "peripheral characteristic subscribe error: [" + event.errorCode +"] "+event.error );
 				}       
 				static private function peripheral_characteristic_unsubscribeHandler( event:CharacteristicEvent ):void {
 					trace( "peripheral characteristic unsubscribe: " + event.peripheral.name );
@@ -442,6 +536,10 @@ package com.pippoflash.framework.air.ane.distriqt
 		static public function get initialized():Boolean {
 			return _initialized;
 		}
+		static public function get isOn():Boolean {
+			updateHardwareState(false, "_isOn getter");
+			return _isOn;
+		}
 		static public function get hasPermission():Boolean {
 			return _hasPermission;
 		}
@@ -464,5 +562,16 @@ package com.pippoflash.framework.air.ane.distriqt
 			}
 			return names;
 		}		
+		// SETTERS ///////////////////////////////////////////////////////////////////////////////////////
+		static public function set targetReadNotifyCharacteristic(value:String):void 
+		{
+			_targetReadNotifyCharacteristic = value;
+		}
+		
+		static public function set targetWriteCharacteristic(value:String):void 
+		{
+			_targetWriteCharacteristic = value;
+		}
+		
 	}
 }

@@ -385,28 +385,6 @@ package com.pippoflash.framework.air.webview
 			UExec.resetSequence();
 			if (ADD_JS_TRACE_METHOD) UExec.addSequence(activateHTMLLogTunnel);
 			UExec.addSequence(PippoFlashEventsMan.broadcastInstanceEvent, this, EVT_READY, this);
-			UExec.addSequence(trace, ("wait"));
-			UExec.addSequence(trace, ("wait"));
-			UExec.addSequence(trace, ("wait"));
-			UExec.addSequence(trace, ("wait"));
-			UExec.addSequence(trace, ("wait"));
-			UExec.addSequence(trace, ("wait"));
-			UExec.addSequence(trace, ("wait"));
-			UExec.addSequence(trace, ("wait"));
-			UExec.addSequence(trace, ("wait"));
-			UExec.addSequence(trace, ("wait"));
-			UExec.addSequence(trace, ("wait"));
-			UExec.addSequence(trace, ("wait"));
-			UExec.addSequence(trace, ("wait"));
-			UExec.addSequence(trace, ("wait"));
-			UExec.addSequence(trace, ("wait"));
-			UExec.addSequence(trace, ("wait"));
-			UExec.addSequence(trace, ("wait"));
-			UExec.addSequence(trace, ("wait"));
-			UExec.addSequence(trace, ("wait"));
-			UExec.addSequence(trace, ("wait"));
-			UExec.addSequence(trace, ("wait"));
-			UExec.addSequence(trace, ("wait"));
 			UExec.addSequence(callJavaScriptMethod, "window.intializeAirFeatures(true, " + String(USystem.isDesktop()) + ", "+Debug.object(_defaultWindowValues)+", " + Debug.object(systemProperties)+ ")");
 		}
 		private function activateHTMLLogTunnel():void {

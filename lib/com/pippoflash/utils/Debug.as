@@ -72,7 +72,7 @@ package com.pippoflash.utils {
 		private static var d:Function = debug;
 		private static var go:Function = debug;
 		private static var t:Function = debug;
-		private static var _debugToExternalMethod:Function = UCode.dummyFunction; // This can be used to browser console, or any other method
+		//private static var _debugToExternalMethod:Function = UCode.dummyFunction; // This can be used to browser console, or any other method
 		// MARKERS
 		static private var _addTimer:Boolean = false;
 		private static var _initialized:Boolean;
@@ -106,31 +106,31 @@ package com.pippoflash.utils {
 			// Setup debugging
 			if (_mainApp && _mainApp.isDebug) debugDebugging = _mainApp.isDebug() ? doDebugDebugging : UCode.dummyFunction; // Switch off debug methods in deploy mode
 		}
-		static public function outputToExternalMethod(method:Function, exportLevel:uint=0, comment:String="External Method", switchOffInternalTrace:Boolean=false):void {
-			EXPORT_TO_CONSOLE.ALL = exportLevel == 0;
-			EXPORT_TO_CONSOLE.WARNING = exportLevel <= 1;
-			EXPORT_TO_CONSOLE.ERRORS = exportLevel <= 2;
-			_debugToExternalMethod =  method;
-			_traceOut = !switchOffInternalTrace;
-			debug(_debugPrefix, "Extra output set to: " + comment + " at level " +  object(EXPORT_TO_CONSOLE));
-			if (exportLevel > 2) warning(_debugPrefix, "Nothing will be logged. Set log level to less than 3");
-		}
-		public static function outputToBrowserConsole(exportLevel:uint, switchOffInternalTrace:Boolean=false):void { // 0 = all, 1 = errors + warnings, 2 = errors only, >= 3 = nothing
-			if (ExternalInterface.available) {
-				EXPORT_TO_CONSOLE.ALL = exportLevel == 0;
-				EXPORT_TO_CONSOLE.WARNING = exportLevel <= 1;
-				EXPORT_TO_CONSOLE.ERRORS = exportLevel <= 2;
-			}
-			else {
-				EXPORT_TO_CONSOLE.ALL = false;
-				EXPORT_TO_CONSOLE.WARNING = false;
-				EXPORT_TO_CONSOLE.ERRORS = false;
-				warning(_debugPrefix, "Cannot activate exportToConsole() since ExternalInterface is not available.");
-			}
-			_debugToExternalMethod = exportLevel < 3 ? outputToConsole : UCode.dummyFunction;
-			_traceOut = !switchOffInternalTrace;
-			debug(_debugPrefix, "Output to browser console status: " + object(EXPORT_TO_CONSOLE));
-		}
+		//static public function outputToExternalMethod(method:Function, exportLevel:uint=0, comment:String="External Method", switchOffInternalTrace:Boolean=false):void {
+			//EXPORT_TO_CONSOLE.ALL = exportLevel == 0;
+			//EXPORT_TO_CONSOLE.WARNING = exportLevel <= 1;
+			//EXPORT_TO_CONSOLE.ERRORS = exportLevel <= 2;
+			//_debugToExternalMethod =  method;
+			//_traceOut = !switchOffInternalTrace;
+			//debug(_debugPrefix, "Extra output set to: " + comment + " at level " +  object(EXPORT_TO_CONSOLE));
+			//if (exportLevel > 2) warning(_debugPrefix, "Nothing will be logged. Set log level to less than 3");
+		//}
+		//public static function outputToBrowserConsole(exportLevel:uint, switchOffInternalTrace:Boolean=false):void { // 0 = all, 1 = errors + warnings, 2 = errors only, >= 3 = nothing
+			//if (ExternalInterface.available) {
+				//EXPORT_TO_CONSOLE.ALL = exportLevel == 0;
+				//EXPORT_TO_CONSOLE.WARNING = exportLevel <= 1;
+				//EXPORT_TO_CONSOLE.ERRORS = exportLevel <= 2;
+			//}
+			//else {
+				//EXPORT_TO_CONSOLE.ALL = false;
+				//EXPORT_TO_CONSOLE.WARNING = false;
+				//EXPORT_TO_CONSOLE.ERRORS = false;
+				//warning(_debugPrefix, "Cannot activate exportToConsole() since ExternalInterface is not available.");
+			//}
+			//_debugToExternalMethod = exportLevel < 3 ? outputToConsole : UCode.dummyFunction;
+			//_traceOut = !switchOffInternalTrace;
+			//debug(_debugPrefix, "Output to browser console status: " + object(EXPORT_TO_CONSOLE));
+		//}
 		public static function setupConsole(t:*) { // TextField or Console Component. As long as it has TextField methods.
 			// This sets up a textfield to use as debug
 			traceDebug("Debug console initialized on "+t+".");
@@ -401,15 +401,6 @@ package com.pippoflash.utils {
 			addFilter(id.toUpperCase(), debugLog);
 			if (_prefixListeners[id]) _prefixListeners[id](t);
 			traceDebug(debugLog, id);
-			if (_additionalMethods.length && _idsToExcludeFromAdditionalMethods.indexOf(id) == -1) {
-				for (var i:int = 0; i < _additionalMethods.length; i++) _additionalMethods[i](debugLog);
-				//{
-					//
-				//}
-				//for each (var f:Function in _additionalMethods) {
-					//f(_s);
-				//}
-			}
 		}
 		// TRACE MANAGEMENT ACCORDING TO SETTINGS
 		private static var traceDebug:Function = traceNormal;
@@ -419,7 +410,10 @@ package com.pippoflash.utils {
 				_debugConsole.appendText("\n"+t);
 				_debugConsole.scrollV = _debugConsole.maxScrollV;
 			}
-			_debugToExternalMethod(t);
+			//_debugToExternalMethod(t);
+			if (_additionalMethods.length && _idsToExcludeFromAdditionalMethods.indexOf(id) == -1) {
+				for (var i:int = 0; i < _additionalMethods.length; i++) _additionalMethods[i](t);
+			}
 			postTrace();
 		}
 		private static function traceWithFilters(t:String, id:String="Debug"):void {

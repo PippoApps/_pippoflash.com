@@ -105,6 +105,13 @@ package com.pippoflash.framework.air.bluetooth
 		//public function getSettings():Boolean {
 			//return sendCommand("g");
 		//}
+		public function resetMessageAndStatus():void {
+			if (waiting) {
+				Debug.debug(_debugPrefix, "Resetting messages status.");
+				if (_activeMessage) _activeMessage.setTimedout();
+				resetStatus();
+			}
+		}
 		
 		
 		// METHODS - SEND COMMANDS
@@ -241,24 +248,24 @@ package com.pippoflash.framework.air.bluetooth
 		private function processReceivedCommand(cmd:String, forceDebugAcceptanceWithoutCountAndId:Boolean = false):Boolean { // 
 			// forceDebugAcceptanceWithoutCountAndId - commands are accepted WITHOUT characters count and command ID
 			// A command is received, I need to do all checks here
-			if (!waiting) {
+			if (forceDebugAcceptanceWithoutCountAndId) Debug.warning(_debugPrefix, "Command is forced to be accepted even without char count and command id. Command will be processed  as if expected. Beware.");
+			if (!waiting && !forceDebugAcceptanceWithoutCountAndId) {
 				Debug.error(_debugPrefix, "Command received but I was not waiting, therefore it gets discarded.");
 				return false;
 			}
 			resetTimeout();
 			const mainSplit:Array = cmd.split(CHARACTER_MAIN_DIVIDER);
-			if (ADD_CHARACTER_COUNT && !forceDebugAcceptanceWithoutCountAndId) { // Check characters count
+			if (ADD_CHARACTER_COUNT) { // Check characters count
 				const charsData:uint = uint(mainSplit.shift());
 				const charsNum:uint = cmd.length; // Adding the main divider at the beginning
 				Debug.debug(_debugPrefix, "Checking character count, variable says " + charsData + " count is " + charsNum);
-				if (charsData != charsNum) return doCommandSyntaxError("Number of characters received not correspondant to string length.");
+				if (charsData != charsNum && !forceDebugAcceptanceWithoutCountAndId) return doCommandSyntaxError("Number of characters received not correspondant to string length.");
 			}
-			if (ADD_COMMAND_ID && !forceDebugAcceptanceWithoutCountAndId) { // Check for msg id
+			if (ADD_COMMAND_ID) { // Check for msg id
 				const id:String = mainSplit.shift();
 				Debug.debug(_debugPrefix, "Checking message ID, received: " + id + " stored: " + _activeMessage.id);
-				if (id != _activeMessage.id) return doCommandSyntaxError("Wrong message ID received.");
+				if (id != _activeMessage.id && !forceDebugAcceptanceWithoutCountAndId) return doCommandSyntaxError("Wrong message ID received."); // check force acceptance needs to be here
 			}
-			if (forceDebugAcceptanceWithoutCountAndId) Debug.warning(_debugPrefix, "Command is forced to be accepted even without char count and command id.");
 			// Chars were right and message id correct, therefore message is replied!
 			_activeMessage.setReplied(mainSplit.join(CHARACTER_MAIN_DIVIDER));
 			PippoFlashEventsMan.broadcastInstanceEvent(this, EVT_COMMAND_REPLIED, _activeMessage);
@@ -289,8 +296,8 @@ package com.pippoflash.framework.air.bluetooth
 		}
 		public function onBluetoothLECommandReceived(cmd:String):void {
 			Debug.debug(_debugPrefix, "Received bluetooth reply: " + cmd + " : " + cmd.charAt(0));
-			if (cmd.charAt(0) == "*") {
-				Debug.warning(_debugPrefix, "COMMAND HAS A * THEREFORE IS ACCEPTED ANYWAY.");
+			if (cmd.charAt(0) == "*" || cmd.indexOf("$$") != -1) {
+				Debug.warning(_debugPrefix, "COMMAND STARTS WITH A * OR HAS A $$ THEREFORE IS ACCEPTED ANYWAY.");
 				cmd = cmd.substr(1);
 				processReceivedCommand(cmd, true);
 			}
