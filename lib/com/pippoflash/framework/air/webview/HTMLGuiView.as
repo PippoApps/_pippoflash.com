@@ -29,8 +29,8 @@ package com.pippoflash.framework.air.webview
 		public function notifyDeviceCommandError(errorCode:String):void {
 			callJSAirApplicationMethod("triggerError", errorCode);
 		}
-		public function promptBluetoothSystemError():void {
-			callJSAirApplicationMethod("triggerBluetoothSystemError");
+		public function promptBluetoothSystemError(okFuncID:String=null):void {
+			callJSAirApplicationMethod("triggerBluetoothSystemError", okFuncID);
 		}
 		public function setMainButtonsVisible(v:Boolean):void {
 			callJSAirApplicationMethod("setMainButtonsVisible",v);

@@ -119,15 +119,18 @@ package com.pippoflash.string {
 			}
 			return							_s;
 		}
-		public static function convertMilitaryStringToDate	(s:String, format:String="yyyymmddhhmmss"):Date {
+		public static function convertMilitaryStringToDate	(s:String, format:String = "yyyymmddhhmm"):Date {
+			Debug.warning(_debugPrefix, "Date conversion only works for yyyymmddhhmm or yymmddhhmm");
 			// 19710816000530
-			const o:Object = {year:s.substr(0, 4), month:s.substr(4, 2), day:s.substr(6, 2), hour:s.substr(8, 2), minute:s.substr(10, 2), second:s.length == 14 ? s.substr(12, 2) : "00"};
+			//const startCount:uint = format == "yymmddhhmm" ? 2 : 0;
+			const yearLength:uint = format == "yymmddhhmm" ? 2 : 4;
+			const o:Object = {year:s.substr(0, yearLength), month:s.substr(yearLength, 2), day:s.substr(yearLength+2, 2), hour:s.substr(yearLength+4, 2), minute:s.substr(yearLength+6, 2)};
 			Debug.debug(_debugPrefix, "converting date: " + s + " : " + Debug.object(o));
 			const d:Date = new Date();
 			d.setFullYear(Number(o.year));
 			d.setMonth(Number(o.month)-1); // Date object has months starting from 0
 			d.setDate(Number(o.day));
-			d.setHours(Number(o.hour), Number(o.minute), Number(o.second));
+			d.setHours(Number(o.hour), Number(o.minute), 0);
 			return d;
 		}
 		public static function formatMilitaryDate			(s:String, seq:String):String {

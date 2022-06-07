@@ -444,6 +444,7 @@ package com.pippoflash.framework.air.ane.distriqt
 				}
 				static private function subscribeToCharacteristicWritableEvents(peripheral:Peripheral, ch:Characteristic):void {
 					Debug.debug(_debugPrefix, "Subscribing to a writable characteristic: " + ch.uuid);
+					Debug.debug(_debugPrefix, "Characteristic properties are: " + ch.properties);
 					_writeCharacteristics.push(ch);
 					peripheral.addEventListener( CharacteristicEvent.WRITE_SUCCESS, peripheral_characteristic_writeHandler  );
 					peripheral.addEventListener( CharacteristicEvent.WRITE_ERROR, peripheral_characteristic_writeErrorHandler  );
