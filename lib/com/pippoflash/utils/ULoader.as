@@ -40,6 +40,11 @@ package com.pippoflash.utils {
 // SETUP ///////////////////////////////////////////////////////////////////////////////////////
 		public static function setMainLoaderClassId(id:String):void {
 			_defaultLoaderId = id;
+			if (_stageLoaderInstance) {
+				UMem.killInstance(_stageLoaderInstance);
+				UDisplay.removeClip(_stageLoaderInstance);
+				_stageLoaderInstance = null;
+			}
 		}
 // MAIN LOADER ///////////////////////////////////////////////////////////////////////////////////////
 		public static function setLoader(v:Boolean, t:String = "", shield:Boolean = true, onArrivedOrHidden:Function = null):_LoaderBase {

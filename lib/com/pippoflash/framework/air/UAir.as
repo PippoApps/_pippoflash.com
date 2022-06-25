@@ -66,8 +66,8 @@ package com.pippoflash.framework.air {
 		public static function init					(mainApp:_Application, newSize:Rectangle=null):void {
 			Debug.debug(_debugPrefix, "Initializing UAir");
 			// This has to be called by Air application elements to initiazlize to initialize this object
-			addNativeWindowOptions("default", {maximizable:false, minimizable:false, resizable:false, transparent:false, systemChrome:"standard", type:"utility"});
-			addNativeWindowOptions("minimal", {maximizable:false, minimizable:false, resizable:false, transparent:false, systemChrome:"none", type:"lightweight"});
+			addNativeWindowOptions("default", {maximizable:true, minimizable:false, resizable:false, transparent:false, systemChrome:"standard", type:"utility"});
+			addNativeWindowOptions("minimal", {maximizable:true, minimizable:false, resizable:false, transparent:false, systemChrome:"none", type:"lightweight"});
 			addNativeWindowOptions("full", {maximizable:true, minimizable:true, resizable:true, transparent:false, systemChrome:"standard", type:"normal"});
 			// Create references
 			_nativeWindow = UGlobal.stage.nativeWindow;

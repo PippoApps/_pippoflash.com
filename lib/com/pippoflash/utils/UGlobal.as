@@ -649,28 +649,34 @@ package com.pippoflash.utils {
 				UDisplay.removeClip(_shield);
 			}
 		}
-				public static function onPressAutomaticShield(c:DisplayObject):void {
-					// Method can be called several times. Shield must be manually switched off.
-					if (Boolean(_shieldMethod)) {
-						_shieldMethod();
-					}
-				}
-		public static function setStageShieldColor(b:Boolean, col:uint=0xffffff, fade:Boolean=false, alpha:Number=1, frames:uint=10):void {
+		public static function setStageShieldColor(b:Boolean, col:uint=0xffffff, fade:Boolean=false, alpha:Number=1, frames:uint=10, onClick:Function=null):void {
 			if (b) {
 				updateShieldSize();
 				UDisplay.setClipColor(_colorShield, col);
 				_colorShield.alpha = alpha;
 				stage.addChild(_colorShield);
+				if (Boolean(onClick)) {
+					_shieldMethod = onClick;
+					Buttonizer.setupButton(_colorShield, UGlobal, "AutomaticShield", "onPress");
+				}
 				if (fade) {
 					_colorShield.alpha = 0;
 					PFMover.fadeTo(_colorShield, alpha, frames);
 				}
 			}
 			else {
+				Buttonizer.removeButton(_colorShield);
+				_shieldMethod = null;
 				if (fade) PFMover.fadeOutAndKill(_colorShield, frames);
 				else UDisplay.removeClip(_colorShield);
 			}
 		}
+				public static function onPressAutomaticShield(c:DisplayObject):void {
+					// Method can be called several times. Shield must be manually switched off.
+					if (Boolean(_shieldMethod)) {
+						_shieldMethod();
+					}
+				}
 		private static function initShields				():void {
 			_colorShield						= UDisplay.getSquareMovieClip(_sw, _sh);
 			_shield							= UDisplay.getSquareMovieClip(_sw, _sh);

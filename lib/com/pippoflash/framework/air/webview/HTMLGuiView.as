@@ -35,12 +35,11 @@ package com.pippoflash.framework.air.webview
 		public function setMainButtonsVisible(v:Boolean):void {
 			callJSAirApplicationMethod("setMainButtonsVisible",v);
 		}
-		
-		
 		// System
 		public function confirmDataUpdate(id:String):void { // when GUI sends a data update, DEVICE responds correctly, this confirms data has been updated successfully
 			callJSAirApplicationMethod("confirmDataUpdate", id);
 		}
+		
 		
 		
 		// Pin management

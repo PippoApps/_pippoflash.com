@@ -80,6 +80,9 @@ package com.pippoflash.utils {
 		// SPECIAL METHODS
 		static private var _additionalMethods:Vector.<Function> = new Vector.<Function>(); // Additional methods to be called on trace
 		static private var _idsToExcludeFromAdditionalMethods:Vector.<String> = new Vector.<String>(); // These IDs will be excluded from tracing additional methods
+		// FILTERS - WHAT TO TRACE OR NOT TO TRACE - JUST SET THOSE VARIABLES EXTERNALLY
+		static public var _showOnlyIDSContaining:Vector.<String>; 
+		static public var _hideIDSContaining:Vector.<String>; /* not yet implemente */
 		//private static var DEBUG:Boolean = true; // Set from MainApp when present. defaults to true.
 // DUMMIES //////////////////////////////////////////////////////////////////////////////
 // 		public static var _dummyTextField				:TextField = new TextField();
@@ -223,11 +226,8 @@ package com.pippoflash.utils {
 			}
 		}
 	// FILTERS
-		public static function setFilterIn(s:String):void {
-			_filterIn = new Vector.<String>();
-			addFilterIn(s);
-		}
 		public static function addFilterIn(s:String):void {
+			if (!_filterIn) _filterIn = new Vector.<String>();
 			if (_filterIn.indexOf(s) == -1) _filterIn.push(s);
 			setFiltersActive(true);
 		}
@@ -235,6 +235,9 @@ package com.pippoflash.utils {
 			_filterOut = new Vector.<String>();
 			_filterIn = new Vector.<String>();
 			setFiltersActive(false);
+		}
+		static public function filterAlsoWarning(a:Boolean):void {
+			traceWarning = a ? traceWithFilters : traceNormal;
 		}
 	// LINE
 		public static function line(id:String=""):void {
@@ -390,7 +393,7 @@ package com.pippoflash.utils {
 			addToPartialEntries(_s);
 			addFilter(id.toUpperCase(), _s);
 			if (_prefixListeners[id]) _prefixListeners[id](t);
-			traceNormal(_s, id);
+			traceWarning(_s, id);
 		}
 		private static function windowDebug(id:String = "Debug", t:String = "") {
 			var debugLog:String;
@@ -404,6 +407,7 @@ package com.pippoflash.utils {
 		}
 		// TRACE MANAGEMENT ACCORDING TO SETTINGS
 		private static var traceDebug:Function = traceNormal;
+		static private var traceWarning:Function = traceNormal;
 		private static function traceNormal(t:String, id:String="") { // Only traces to debug windows
 			if (_traceOut) trace(_mainPrefix + t);
 			if (_debugConsole) {
@@ -416,11 +420,16 @@ package com.pippoflash.utils {
 			}
 			postTrace();
 		}
-		private static function traceWithFilters(t:String, id:String="Debug"):void {
-			if (_filterIn.indexOf(id) != -1) {
-				traceNormal(t, id);
-				postTrace();
+		private static function traceWithFilters(t:String, id:String = "Debug"):void {
+			for (var i:int = 0; i < _filterIn.length; i++) {
+				if (id.indexOf(_filterIn[i]) != -1) {
+					traceNormal(t, id);
+					postTrace();
+					return;
+				};
 			}
+			//if (_filterIn.indexOf(id) != -1) {
+			//}
 		}
 		private static function postTrace				():void {
 			_counter							++;

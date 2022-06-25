@@ -5,18 +5,22 @@ package com.pippoflash.framework.air.bluetooth
 	/**
 	 * ...
 	 * @author Pippo Gregoretti
+	 * This is only a message vector. It doesn't do any check internally and is controlled from exterior
 	 */
 	public class BluetoothMessage extends _PippoFlashBaseNoDisplayUMem 
 	{
 		private static const STATUSES:Array = ["IDLE", "SENT", "REPLIED", "TIMED OUT", "SYNTAX ERROR"];
 		private var _id:String;
 		private var _cmd:String;
-		private var _data:String;
+		private var _sentData:String;
 		private var _sent:Date;
 		private var _msgStatus:uint; // 0 idle, 1 sent, 2 replied, 3 timed out, 4 syntax error
 		private var _reply:String;
 		private var _metadata:*; // Manually set
 		private var _errorDescription:String;
+		
+		private var _receivedData:*; // This is setup externally once message has been replied and data extracted
+		
 		public function BluetoothMessage(id:String, cmd:String, data:String=null) {
 			super("BluetoothMessage");
 			recycle(id, cmd, data);
@@ -26,14 +30,14 @@ package com.pippoflash.framework.air.bluetooth
 		public function recycle(id:String, cmd:String, data:String):void {
 			_id = id;
 			_cmd = cmd;
-			_data = data;
+			_sentData = data;
 			_sent = new Date();
 			_msgStatus = 1;
 			_errorDescription = null;
 		}
 		override public function release():void {
 			_msgStatus = 0;
-			_cmd = _data = _reply = _id = _metadata = null;
+			_cmd = _sentData = _reply = _id = _metadata = null;
 			super.release();
 		}
 		
@@ -45,7 +49,7 @@ package com.pippoflash.framework.air.bluetooth
 		public function setTimedout():void {
 			_msgStatus = 3;
 		}
-		public function setToSyntaxError(desc:String):void {
+		public function setToError(desc:String):void {
 			_errorDescription = desc;
 			_msgStatus = 4;
 			Debug.debug(_debugPrefix, "Set to Syntax error: " + desc);
@@ -59,15 +63,15 @@ package com.pippoflash.framework.air.bluetooth
 		public function get id():String {
 			return _id;
 		}
-		public function get data():String {
-			return _data;
+		public function get sentData():String {
+			return _sentData;
 		}
 		public function get reply():String {
 			return _reply;
 		}
 		
 		
-		// METADATA GET SET
+		// EXTERNAL DATA GET SET
 		public function get metadata():* 
 		{
 			return _metadata;
@@ -77,7 +81,15 @@ package com.pippoflash.framework.air.bluetooth
 		{
 			_metadata = value;
 		}
+		public function get receivedData():* 
+		{
+			return _receivedData;
+		}
 		
+		public function set receivedData(value:*):void 
+		{
+			_receivedData = value;
+		}
 		
 		
 		// GET STATUS
@@ -98,9 +110,10 @@ package com.pippoflash.framework.air.bluetooth
 		}
 		
 		
+		
 		// SYSTEM
 		public function toString():String {
-			return "BluetoothMessage ID: " + id + ", status: " + STATUSES[_msgStatus] + ", cmd & data: " + (_cmd + "|" + _data) + ", reply: " + _reply;
+			return "BluetoothMessage ID: " + id + ", status: " + STATUSES[_msgStatus] + ", cmd & data: " + (_cmd + "|" + _sentData) + ", reply: " + _reply;
 		}
 		
 	}

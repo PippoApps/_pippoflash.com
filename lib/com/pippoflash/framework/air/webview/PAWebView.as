@@ -33,6 +33,8 @@ package com.pippoflash.framework.air.webview
 		static private var DEFAULT_HTML_FOLDER:String = "_assets/html/";
 		static private var OPEN_HTTP_LINKS_EXTERNALLY:Boolean = true; // Default. Set this with openHttpLinksExternally
 		static private var HTML_LOG_METHOD_NAME:String = "addToHTMLLog"; // Method to be called by Debug in HTML AirApplication in order to trace flash events in html output
+		static private var ACTIVATE_CONSOLE_RE_IF_DEBUG:Boolean = true; // Activates console.re debugging ib AirApplication.js
+		static public var CONSOLE_RE_DATA_CHANNEL:String = "CAOS-BLUETOOTH-TEST";
 		//static public var VERBOSE:Boolean = false;
 		
 		
@@ -193,7 +195,12 @@ package com.pippoflash.framework.air.webview
 			const fullUrl:String = skipBaseFolder ? u : _htmlFolder + u; // With or without base folder
 			_isOnline = checkIfOnlineUrl(fullUrl);
 			Debug.debug(_debugPrefix, "Opening html: " + fullUrl + " - " + (_isOnline ? "ONLINE" : "LOCAL"));
+			// Create default window values
 			_defaultWindowValues = defaultWindowValues ? defaultWindowValues : {};
+			if (_MainAppBase.instance.isDebug() && ACTIVATE_CONSOLE_RE_IF_DEBUG) { // Activating CONSOLE.RE remote debugging system.
+				_defaultWindowValues.USE_CONSOLE_RE = true;
+				_defaultWindowValues.CONSOLE_RE_DATA_CHANNEL = CONSOLE_RE_DATA_CHANNEL;
+			}
 			// Creating target path according to online or offline status
 			const targetHtmlPath:String = fullUrl;
 			if (!_isOnline) { // Loding from local folder
@@ -287,8 +294,7 @@ package com.pippoflash.framework.air.webview
 			const COMMAND_AS:String = "actionscript:";
 			const COMMAND_EXTERNALBROWSER:String = "externalbrowser:";
 			if (location.indexOf(COMMAND_READY) == 0) {
-				Debug.debug(_debugPrefix, "HTML Page reported Air Features in JavaScript READY!");
-				PippoFlashEventsMan.broadcastInstanceEvent(this, EVT_REPORTED_READY, this);
+				onWepPageInitialized();
 				return true;
 			}
 			else if (UText.stringContains(location, COMMAND_TRACE)) {
@@ -319,7 +325,10 @@ package com.pippoflash.framework.air.webview
 			Debug.debug(_debugPrefix, "No Javascript Command recognized in: " + location);
 			return false;
 		}
-		
+		protected function onWepPageInitialized() { // This can be extended to intercept initialization
+				Debug.debug(_debugPrefix, "HTML Page reported Air Features in JavaScript READY!");
+				PippoFlashEventsMan.broadcastInstanceEvent(this, EVT_REPORTED_READY, this);
+		}
 		
 		
 		

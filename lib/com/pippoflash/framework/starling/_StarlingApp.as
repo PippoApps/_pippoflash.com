@@ -40,6 +40,7 @@ package com.pippoflash.framework.starling
 			//_starling = new Starling(StarlingApp, UGlobal.stage);
 			//_starling.start();
 			Starling.current.nativeStage.frameRate = framerate;
+			Starling.current.showStats = true;
 			_instance = this;
 			//UExec.next(initStarlingApp);
 		}

@@ -32,7 +32,7 @@ package com.pippoflash.utils {
 		public static var _internalListeners				:Object = new Object(); // Stores the internal sound listeners
 		public static var _soundMixerTransform			:SoundTransform = new SoundTransform(1, 0); // The global soundtransform object to use for mixer
 		public static var _loadedSoundId				:String; // Marks a sound which is actually loading or playing
-		public static const FADE_SOUND_FRAMES		:uint = 30;
+		public static var FADE_SOUND_FRAMES		:uint = 30;
 		// SYSTEM SOUNDS LIST
 		public static var _soundLists					:Object = {DEFAULT:{active:true, soundsById:[]}}; // this stores special sound lists
 		private static var _soundListsIdToAttachId		:Object = {}; // Stores a direct connection to sound saved with custom ID, so that they can be played with playSound

@@ -27,7 +27,7 @@ package com.pippoflash.framework.air.bluetooth
 		public var ADD_COMMAND_ID:Boolean = true; // Adds command ID as a second parameter
 		public var MAX_COMMANS_STORED:uint = 100; // Maximum
 		public var WAIT_MESSAGE_CONFIRMATION:Boolean = true; // Commander hangs until a reply is received or timeout
-		public var WAIT_TIMEOUT:uint = 15000; // Timeout when waiting for command in milliseconds
+		public static var WAIT_TIMEOUT:uint = 10000; // Timeout when waiting for command in milliseconds - controlled by _MainAppBase
 		public var MAX_MESSAGE_WRITE_LENGTH:uint = 20; // If messages are longer that this, message is splitted in subsequent calls 
 		public var LONG_MESSAGE_SPLIT_INTERVAL:Number = 0.2; // Seconds interval used to split message into longer intervals
 //		Risposta comando OK
@@ -57,6 +57,7 @@ package com.pippoflash.framework.air.bluetooth
 			"c":["1"], // Check PIN
 			"t":["1"], // Set Date/Time
 			"l":["1"], // Set LED
+			"w":["1"], // Set CALENDAR
 			empty:null
 		}
 		// STOPPER DEBUGS
@@ -121,7 +122,7 @@ package com.pippoflash.framework.air.bluetooth
 				Debug.error(_debugPrefix, "Not ready toresend last command " + _activeCommand);
 				return false;
 			}
-			return sendCommand(_activeMessage.cmd, _activeMessage.data, force);
+			return sendCommand(_activeMessage.cmd, _activeMessage.sentData, force);
 		}
 		public function sendCommand(cmd:String, data:String=null, force:Boolean=false):Boolean {
 			if (!ready && !force) {
@@ -171,7 +172,7 @@ package com.pippoflash.framework.air.bluetooth
 		private function doWriteMessage(msg:String, broadcastComplete:Boolean=true, encloseInCommandBrackets:Boolean=true):Boolean {
 			const sentOk:Boolean = DistriqtBluetoothLE.write(msg, 0, encloseInCommandBrackets);
 			if (broadcastComplete) {
-				resetTimeout();
+				resetTimeout(WAIT_MESSAGE_CONFIRMATION);
 				UExec.next(PippoFlashEventsMan.broadcastInstanceEvent, this, sentOk ? EVT_COMMAND_SENT : EVT_COMMAND_SEND_ERROR, _activeMessage);
 			}
 			return sentOk;
@@ -257,8 +258,9 @@ package com.pippoflash.framework.air.bluetooth
 			const mainSplit:Array = cmd.split(CHARACTER_MAIN_DIVIDER);
 			if (ADD_CHARACTER_COUNT) { // Check characters count
 				const charsData:uint = uint(mainSplit.shift());
-				const charsNum:uint = cmd.length; // Adding the main divider at the beginning
+				const charsNum:uint = cmd.length;
 				Debug.debug(_debugPrefix, "Checking character count, variable says " + charsData + " count is " + charsNum);
+				Debug.debug(_debugPrefix, "Cmd consistency: " + (charsData != charsNum ? "NUMBERS DO NOT CORRESPOND" : "CONSISTENCY OK"));
 				if (charsData != charsNum && !forceDebugAcceptanceWithoutCountAndId) return doCommandSyntaxError("Number of characters received not correspondant to string length.");
 			}
 			if (ADD_COMMAND_ID) { // Check for msg id
@@ -274,7 +276,7 @@ package com.pippoflash.framework.air.bluetooth
 			return true;
 		}
 		private function doCommandSyntaxError(msg:String):Boolean {
-			_activeMessage.setToSyntaxError(msg);
+			_activeMessage.setToError(msg);
 			PippoFlashEventsMan.broadcastInstanceEvent(this, EVT_COMMAND_SYNTAX_ERROR, _activeMessage);
 			return false;
 		}
@@ -296,9 +298,8 @@ package com.pippoflash.framework.air.bluetooth
 		}
 		public function onBluetoothLECommandReceived(cmd:String):void {
 			Debug.debug(_debugPrefix, "Received bluetooth reply: " + cmd + " : " + cmd.charAt(0));
-			if (cmd.charAt(0) == "*" || cmd.indexOf("$$") != -1) {
+			if (cmd.indexOf("$$") != -1) {
 				Debug.warning(_debugPrefix, "COMMAND STARTS WITH A * OR HAS A $$ THEREFORE IS ACCEPTED ANYWAY.");
-				cmd = cmd.substr(1);
 				processReceivedCommand(cmd, true);
 			}
 			else processReceivedCommand(cmd);
