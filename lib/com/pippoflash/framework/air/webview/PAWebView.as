@@ -201,6 +201,8 @@ package com.pippoflash.framework.air.webview
 				_defaultWindowValues.USE_CONSOLE_RE = true;
 				_defaultWindowValues.CONSOLE_RE_DATA_CHANNEL = CONSOLE_RE_DATA_CHANNEL;
 			}
+			// Add language node
+			_defaultWindowValues.DEVICE_LANGUAGE = USystem.getLanguage();
 			// Creating target path according to online or offline status
 			const targetHtmlPath:String = fullUrl;
 			if (!_isOnline) { // Loding from local folder
@@ -394,7 +396,8 @@ package com.pippoflash.framework.air.webview
 			UExec.resetSequence();
 			if (ADD_JS_TRACE_METHOD) UExec.addSequence(activateHTMLLogTunnel);
 			UExec.addSequence(PippoFlashEventsMan.broadcastInstanceEvent, this, EVT_READY, this);
-			UExec.addSequence(callJavaScriptMethod, "window.intializeAirFeatures(true, " + String(USystem.isDesktop()) + ", "+Debug.object(_defaultWindowValues)+", " + Debug.object(systemProperties)+ ")");
+			//UExec.addSequence(callJavaScriptMethod, "window.intializeAirFeatures(true, " + String(USystem.isDesktop()) + ", "+Debug.object(_defaultWindowValues)+", " + Debug.object(systemProperties)+ ")");
+			UExec.addSequence(callJavaScriptMethod, "window.intializeAirFeatures(true, " + String(USystem.isDesktop()) + ", "+JSON.stringify(_defaultWindowValues)+", " + JSON.stringify(systemProperties)+ ")");
 		}
 		private function activateHTMLLogTunnel():void {
 			Debug.addExternalMethodExcludedId(_debugPrefix);

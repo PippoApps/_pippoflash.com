@@ -269,8 +269,8 @@ package com.pippoflash.utils {
 			return							udid;
 		}
 	// localization
-		public static function getLanguage			():String {
-			return							_language ? _language : Capabilities["language"].substr(0,2);
+		public static function getLanguage():String {
+			return _language ? _language : Capabilities["languages"][0].substr(0,2); // This one works on AIR only
 		}
 	// DPI
 		public static function getDPI				():uint {
