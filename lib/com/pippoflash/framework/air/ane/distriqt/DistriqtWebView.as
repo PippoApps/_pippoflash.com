@@ -126,7 +126,7 @@ package com.pippoflash.framework.air.ane.distriqt
 				_options.bounces = false;
 				_options.mediaPlaybackRequiresUserAction = false;
 				_options.backgroundEnabled = true;
-				//_options.autoScale = false;
+				_options.autoScale = false;
 			} else _options = options;
 			try {
 				_webView = NativeWebView.service.createWebView( _rect, _options) ;

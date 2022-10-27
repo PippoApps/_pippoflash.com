@@ -634,7 +634,7 @@ package com.pippoflash.framework {
 // 						_preferences.appendChild	(nn.copy());
 // 					}
 // 				}
-				if (_verbose)					Debug.debug(_debugPrefix, "--------- LOADED PREFERENCES ------------\n" + _preferences.toXMLString());
+				if (_verbose)					Debug.debug(_debugPrefix, "--------- PREFERENCES LOADED FROM SHARED OBJECT ------------\n" + _preferences.toXMLString());
 			}
 			else { // No saved preferences, just set the dafaultNode and save it
 				if (_verbose)					Debug.debug(_debugPrefix, "Saved preferences not found. Saving default preferences.");

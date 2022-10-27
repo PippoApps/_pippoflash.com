@@ -610,22 +610,23 @@ package com.pippoflash.framework {
 // SHARED OBJECT MANAGEMENT ///////////////////////////////////////////////////////////////////////////////////////
 		public function setSharedObject(varName:String, value:*):void {
 			Debug.debug(_debugPrefix, "Saving shared object",varName,typeof value);
-			if (!_sharedObject) initializeSharedObject();
+			initializeSharedObject();
 			_sharedObject.data[varName] = value;
 			_sharedObject.flush();
 		}
 		public function getSharedObject(varName:String):* {
-			if (!_sharedObject) initializeSharedObject();
+			initializeSharedObject();
 			return _sharedObject.data[varName];
 		}
 			protected function initializeSharedObject():void {
+				if (_sharedObject) return;
 				Debug.debug(_debugPrefix, "Initializing shared object:",_sharedObjectId);
 				_sharedObject = SharedObject.getLocal(_sharedObjectId, "/");
 				_sharedObject.addEventListener(NetStatusEvent.NET_STATUS, onSOStatus);
 				_sharedObject.addEventListener(AsyncErrorEvent.ASYNC_ERROR, onSOAsyncError);
 			}
 		public function clearSharedObject():void { // This clears the application shared object
-			if (!_sharedObject) initializeSharedObject();
+			initializeSharedObject();
 			_sharedObject.clear();
 		}
 		private function onSOAsyncError				(e:AsyncErrorEvent):void {
