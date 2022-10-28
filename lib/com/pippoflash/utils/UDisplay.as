@@ -16,6 +16,7 @@ package com.pippoflash.utils {
 	import									flash.text.TextField;
 	import 									fl.motion.Color; 
 	
+	
 	public class UDisplay {
 		
 // UTILITIES ////////////////////////////////////////////////////////////////////////////
@@ -58,7 +59,7 @@ package com.pippoflash.utils {
 		public static function alignToStage(c:DisplayObject, halign:String="CENTER", valign:String="MIDDLE"):void {
 			alignSpriteTo(c, UGlobal.getStageRect(), halign, valign);
 		}
-		public static function resizeToStage(c:DisplayObject) { // Sets the size exactly like it is the stage
+		public static function resizeToStage(c:DisplayObject):void { // Sets the size exactly like it is the stage
 			c.width = UGlobal._sw; c.height = UGlobal._sh;
 		}
 		static public function resizeToStageProportions(c:DisplayObject, onlyIfLarger:Boolean = true):void {
@@ -100,10 +101,10 @@ package com.pippoflash.utils {
 		public static function centerToArea			(c:DisplayObject, w:Number, h:Number):void {
 			centerV(c, h); centerH(c, w);
 		}
-		public static function centerV				(c, h:Number):void {
+		public static function centerV				(c:*, h:Number):void {
 			c.y								= c is TextField ? centerAmount(UCode.getHeight(c), h) : centerAmount(UCode.getHeight(c), h);
 		}
-		public static function centerH				(c, w:Number):void {
+		public static function centerH				(c:*, w:Number):void {
 			c.x								= c is TextField ? centerAmount(UCode.getWidth(c), w) : centerAmount(UCode.getWidth(c), w);
 		}
 			public static function centerAmount		(w:Number, a:Number):Number {
@@ -121,7 +122,7 @@ package com.pippoflash.utils {
 			c.scaleX							= scale;
 			c.scaleY							= scale;
 		}
-		public static function roundPosition			(c:DisplayObject) {
+		public static function roundPosition			(c:DisplayObject):void {
 			c.x = Math.round(c.x); c.y = Math.round(c.y); 
 		}
 		public static function roundSize				(c:DisplayObject):void {
@@ -138,7 +139,7 @@ package com.pippoflash.utils {
 		}
 	// AUTO RESIZING ///////////////////////////////////////////////////////////////////////////////////////
 		public static var resizeTo					:Function = resizeSpriteTo;
-		public static function resizeSpriteTo(c:*, rect:*, myMode:String="NORMAL", useBounds:Boolean=false, useRect:Boolean=false) {
+		public static function resizeSpriteTo(c:*, rect:*, myMode:String="NORMAL", useBounds:Boolean=false, useRect:Boolean=false):void {
 			const mode:String = myMode.toUpperCase();
 			// Check if it is with bounds
 			if (useBounds) {
@@ -193,11 +194,11 @@ package com.pippoflash.utils {
 		}
 	// ALIGNMENT ///////////////////////////////////////////////////////////////////////////////////////
 		public static var alignTo					:Function = alignSpriteTo;
-		public static function alignSpriteTo			(c:*, rect:*, horiz:String="CENTER", vert:String="MIDDLE", useBounds:Boolean=false, useRect:Boolean=false) {
+		public static function alignSpriteTo			(c:*, rect:*, horiz:String="CENTER", vert:String="MIDDLE", useBounds:Boolean=false, useRect:Boolean=false):void {
 			alignSpriteHorizTo					(c, rect, horiz, useBounds, useRect);
 			alignSpriteVertTo						(c, rect, vert, useBounds, useRect);
 		}
-		public static function alignSpriteHorizTo			(c:*, rect:*, m:String="CENTER", useBounds:Boolean=false, useRect:Boolean=false) {
+		public static function alignSpriteHorizTo			(c:*, rect:*, m:String="CENTER", useBounds:Boolean=false, useRect:Boolean=false):void {
 			if (useBounds) {
 				// Element bounds can be measure ONLY if element is positioned at 0.
 				c.x = 0;
@@ -211,13 +212,13 @@ package com.pippoflash.utils {
 				m 							= m.toUpperCase();
 // 				trace("ALLINEO ORIZZONTALE ", m);
 
-				//trace("Cazzo sprite è largo: ",c.width);
+				//trace("Cazzo sprite ï¿½ largo: ",c.width);
 				if (m == "CENTER")				c.x = rect.x + ((rect.width-ww)/2);
 				else if (m == "RIGHT")			c.x = rect.x + (rect.width-ww);
 				else if (m == "LEFT")				c.x = rect.x;
 			}
 		}
-		public static function alignSpriteVertTo			(c:*, rect:*, m:String="MIDDLE", useBounds:Boolean=false, useRect:Boolean=false) {
+		public static function alignSpriteVertTo			(c:*, rect:*, m:String="MIDDLE", useBounds:Boolean=false, useRect:Boolean=false):void {
 			if (useBounds) {
 				c.y 							= 0;
 				const bounds					:Rectangle = useRect ? c.getRect(c.parent) : c.getBounds(c.parent);
@@ -232,7 +233,7 @@ package com.pippoflash.utils {
 				else if (m == "BOTTOM")			c.y = rect.y + (rect.height-hh);
 				else if (m == "TOP")				c.y = rect.y;
 // 				if (m == "TOP") {
-// 					trace("Cazzo questa è TOOOOOOOOOOOOOOOOOOOPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP");
+// 					trace("Cazzo questa ï¿½ TOOOOOOOOOOOOOOOOOOOPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP");
 // 					c.y += 1000;
 // 				}
 			}
@@ -248,12 +249,12 @@ package com.pippoflash.utils {
 			return							c.getRect(UGlobal.stage);
 		}
 		
-		public static function setClipToPoint			(c, p:Point) {
+		public static function setClipToPoint			(c:*, p:Point):void {
 			c.x								= p.x;
 			c.y								= p.y;
 // 			UCode.setParameters				(c, {x:p.x, y:p.y});
 		}
-		public static function positionRelativeTo			(clip, relClip, point:Point):Point {
+		public static function positionRelativeTo			(clip:*, relClip:*, point:Point):Point {
 			// This positions a clip to a coordinate space relativve to another clip
 			if (!clip.parent) {
 				Debug.error					(_debugPrefix, "positionRelativeTo",clip,"but clip.parent not defined.");
@@ -278,16 +279,16 @@ package com.pippoflash.utils {
 			positionRelativeTo					(c, newContainer, p);
 		}
 // DISPLAY OBJECT CONTAINER ///////////////////////////////////////////////////////////////////////////
-		public static function removeChild				(container:DisplayObjectContainer, child:DisplayObject) {
+		public static function removeChild				(container:DisplayObjectContainer, child:DisplayObject):void {
 			if (container.contains(child))			container.removeChild(child);
 		}
-		public static function addNewClip				(container:DisplayObjectContainer, par:Object=null) {
+		public static function addNewClip				(container:DisplayObjectContainer, par:Object=null):DisplayObject {
 			return							addChild(container, new MovieClip(), par);
 		}
 		public static function wrapInNewSprite			(c:DisplayObject):Sprite {
 			var s:Sprite = new Sprite(); s.addChild(c); return s;
 		}
-		public static function addChild				(container:DisplayObjectContainer, child, par:Object=null) {
+		public static function addChild				(container:DisplayObjectContainer, child:DisplayObject, par:Object=null):DisplayObject {
 			container.addChild					(child);
 			if (par)							UCode.setParametersForced(child, par);
 			return							child;
@@ -298,7 +299,7 @@ package com.pippoflash.utils {
 		public static function removeClips				(a:Array):void {
 			for each (_c in a)					removeClip(_c);
 		}
-		public static function resetClip				(container:DisplayObjectContainer, c:MovieClip, par:Object=null):MovieClip {
+		public static function resetClip				(container:DisplayObjectContainer, c:MovieClip, par:Object=null):DisplayObject {
 			// This function removes the MovieClip and replace it with a new one (returning it)
 			// If the movieclip doesnt exist, it creates a new one and adds it to container (thats why I need container)
 			removeClip						(c);
@@ -307,10 +308,10 @@ package com.pippoflash.utils {
 		public static function clipIsRemovable(c:DisplayObject):Boolean {
 			return c != null && c.hasOwnProperty("parent");
 		}
-		public static function moveToTop(c:DisplayObject) { // Moves selected sprite to higher depth
+		public static function moveToTop(c:DisplayObject):void { // Moves selected sprite to higher depth
 			if (clipIsRemovable(c)) c.parent.addChild(c);
 		}
-		public static function moveToBottom(c:DisplayObject) { // Moves selected sprite to lowest depth
+		public static function moveToBottom(c:DisplayObject):void { // Moves selected sprite to lowest depth
 			
 		}
 		public static function getChildren(c:DisplayObjectContainer):Array { // Gets an array with all children
@@ -356,7 +357,7 @@ package com.pippoflash.utils {
 			}
 			return o;
 		}
-		public static function listChildren(c:DisplayObjectContainer) {
+		public static function listChildren(c:DisplayObjectContainer):void {
 			_n = c.numChildren;
 			_s = "";
 			for (_i=0; _i<_n; _i++) {
@@ -419,16 +420,16 @@ package com.pippoflash.utils {
 			return							_standardShield;
 		}
 // COLORING ////////////////////////////////////////////////////////////////////////////////////////
-		public static function setClipColor						(clip:DisplayObject, col:uint, amount:Number=1) {
-			var c										:Color = new Color();
-			c.setTint									(col, amount);
-			clip.transform.colorTransform						= c;
+		public static function setClipColor(clip:DisplayObject, col:uint, amount:Number=1):void {
+			var c:Color = new Color();
+			c.setTint(col, amount);
+			clip.transform.colorTransform = c;
 		}
-		public static function setClipsColor					(clips:*, col:uint, amount:Number=1) { // Gets an Array, a Vector, or a hash
-			var c										:Color = new Color();
-			c.setTint									(col, amount);
-			var clip									:DisplayObject;
-			for each (clip in clips)							clip.transform.colorTransform = c;
+		public static function setClipsColor(clips:*, col:uint, amount:Number=1):void { // Gets an Array, a Vector, or a hash
+			var c:Color = new Color();
+			c.setTint(col, amount);
+			var clip:DisplayObject;
+			for each (clip in clips) clip.transform.colorTransform = c;
 		}
 // GEOMETRY //////////////////////////////////////////////////////////////////////////////////////////
 		// Returns a rectangle from a sprite

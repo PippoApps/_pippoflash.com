@@ -116,7 +116,7 @@ package com.pippoflash.motion {
 					if (c is DisplayObject) UDisplay.removeClip(c);
 					else c.removeFromParent(); // this is for starling display object
 				}
-				private var emd_REMOVE = emd_KILL;
+				private var emd_REMOVE:Function = emd_KILL;
 				private function emd_DESTROY(c:*):void {
 					UMem.killClip(c);
 				}

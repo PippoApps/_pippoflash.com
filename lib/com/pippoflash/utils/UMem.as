@@ -223,20 +223,20 @@ package com.pippoflash.utils {
 				return 						o;
 		}
 		private static function createInstance0			(id:String, a:Array=null) {
-			return							new _classes[id]._class();
+			return							new _classes[id]["_class"]();
 		}
 		private static function createInstance1			(id:String, a:Array) {
-			return							new _classes[id]._class(a[0]);
+			return							new _classes[id]["_class"](a[0]);
 		}
 		private static function createInstance2			(id:String, a:Array) {
 // 			trace("CAZZO QUESTAAAAAAAAAAAAAAAAAAAAAAAAA");
-			return							new _classes[id]._class(a[0], a[1]);
+			return							new _classes[id]["_class"](a[0], a[1]);
 		}
 		private static function createInstance3			(id:String, a:Array) {
-			return							new _classes[id]._class(a[0], a[1], a[2]);
+			return							new _classes[id]["_class"](a[0], a[1], a[2]);
 		}
 		private static function createInstance4		(id:String, a:Array) {
-			return							new _classes[id]._class(a[0], a[1], a[2], a[3]);
+			return							new _classes[id]["_class"](a[0], a[1], a[2], a[3]);
 		}
 	// RECYCLE - Grabs an instance from the _free list
 		private static function recycleInstance			(id:String, a:Array) { // Gets a free instance and launches a recycle

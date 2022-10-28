@@ -21,19 +21,19 @@ package com.pippoflash.movieclips.loaders {
 		public function CircleLoader					() {
 			super							();
 		}
-		public function rotateMyself					(e:Event) {
-			_rotator.rotation 						+= 4;
+		public function rotateMyself					(e:Event):void {
+			this["_rotator"].rotation 						+= 4;
 		}
 // RENDER //////////////////////////////////////////////////////////////////////////////////////////
 // METHODS //////////////////////////////////////////////////////////////////////////////////////
 		public override function setText				(t:String):void {
 			super.setText						(t);
-			_txt.text							= _text;
+			this["_txt"].text							= _text;
 		}
 		public override function setPercent(n:Number):void {
 			//trace("PERCENT " + n);
 			super.setPercent(n);
-			_txtPercent.text = n ? Math.floor(n)+"%" : "";
+			this["_txtPercent"].text = n ? Math.floor(n)+"%" : "";
 		}
 		//protected override function appear				(instant:Boolean=true, onArrived:Function=null):void {
 			//visible							= true;

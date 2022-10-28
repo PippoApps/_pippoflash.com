@@ -234,7 +234,7 @@ package com.pippoflash.framework {
 			Debug.debug						(_debugPrefix, "Checking location nodes...");
 			// SETUP LOCATION
 			if (_dynamic_settings && _dynamic_settings_conditions) {
-				_locationCode = _dynamic_settings_conditions.@default;
+				_locationCode = _dynamic_settings_conditions.@["default"];
 				var loc:String = UGlobal.getUrl();
 				var appId:String = _Application.instance.getAppId();
 				Debug.debug(_debugPrefix, "Checking for dynamic config nodes. App id: " + appId+", location: "+loc+", default dynamic node: "+_locationCode);

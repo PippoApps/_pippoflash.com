@@ -156,7 +156,7 @@ package com.pippoflash.framework {
 				Debug.error(_debugPrefix, "PROMPT OK NOT AVAILABLE, PLEASE LOOK INTO ERROR:\n" + t);
 			}
 		}
-			protected final function setRef(ref:Ref) { // Has to be called by MainApp to setup the correct reference to Ref object, or extender Ref
+			protected final function setRef(ref:Ref):void { // Has to be called by MainApp to setup the correct reference to Ref object, or extender Ref
 				_ref = ref;
 				_PippoFlashBaseUMem._ref = ref;
 				_PippoFlashBaseNoDisplayUMem._ref	= ref;

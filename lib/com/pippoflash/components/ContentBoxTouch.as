@@ -138,7 +138,7 @@ public function set containerZoomFactor(value:Number):void {
 			if (_coverBg)								renderBgCover();
 		}
 			private function renderBgCover					() {
-				_bgClip								= UDisplay.addChild(this, UDisplay.getSquareClip({width:_w, height:_h, alpha:0}));
+				_bgClip								= UDisplay.addChild(this, UDisplay.getSquareClip({width:_w, height:_h, alpha:0})) as MovieClip;
 			}
 			private function setupScrollBarLink				(link:String, funcPost:String):MovieClip {
 				var sb = this.parent[link];

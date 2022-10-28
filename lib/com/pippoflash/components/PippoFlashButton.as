@@ -250,7 +250,7 @@ package com.pippoflash.components {
 // ICON PLACEMENT ///////////////////////////////////////////////////////////////////////////////////////
 		private function positionForIcon						() {
 			if (_icon)									UDisplay.removeClip(_icon);
-			_icon										= UDisplay.addChild(this, UCode.getInstance(_iconAttachment));
+			_icon										= UDisplay.addChild(this, UCode.getInstance(_iconAttachment)) as MovieClip;
 			_icon.gotoAndStop							(_iconFrame);
 			Buttonizer.setClickThrough						(_icon);
 			// Resize icon
@@ -393,7 +393,7 @@ package com.pippoflash.components {
 			_clickTimerOffset							= getTimer() + _doubleClickPreventOffset;
 		}
 // LISTENERS //////////////////////////////////////////////////////////////////////////////////////
-		public function onPressButton(c:DisplayObject, internal:Boolean=false) { // This is to set button selected
+		public function onPressButton(c:DisplayObject, isInternal:Boolean=false) { // This is to set button selected
 			if (doubleClickPrevented()) {
 				Debug.warning(_debugPrefix, "Press blocked. Double click prevention timer not elapsed.");
 				return;
