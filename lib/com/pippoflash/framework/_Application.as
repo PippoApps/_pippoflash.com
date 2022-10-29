@@ -377,9 +377,12 @@ package com.pippoflash.framework {
 			if (_config._application) {
 				// Setup main SHARED OBJECT
 				if (UXml.hasFullAttribute(_config._application, "sharedObjectName")) {
-					_sharedObjectId = _config._application.@sharedObjectName;
-					if (UCode.isTrue(_config._application.@addVersionNumber)) {
-						_sharedObjectId += "/" + (_applicationVersion.split(".").join("_").split(" ").join("_"));
+					// If attribute does not exist (backwards compatible) or atrribute is true, initiazlize SO
+					if (!UXml.hasFullAttribute(_config._application, "initializeSharedObjectOnLoad") || UXml.isTrue(_config._application, "initializeSharedObjectOnLoad")) {
+						_sharedObjectId = _config._application.@sharedObjectName;
+						if (UCode.isTrue(_config._application.@addVersionNumber)) {
+							_sharedObjectId += "/" + (_applicationVersion.split(".").join("_").split(" ").join("_"));
+						}
 					}
 				}
 			}
@@ -618,8 +621,17 @@ package com.pippoflash.framework {
 			initializeSharedObject();
 			return _sharedObject.data[varName];
 		}
-			protected function initializeSharedObject():void {
-				if (_sharedObject) return;
+			protected function initializeSharedObject(sharedObjectId:String=null):void {
+				if (_sharedObject) {
+					if (!sharedObjectId || _sharedObjectId == sharedObjectId) return; 
+					else {
+						_sharedObject.removeEventListener(NetStatusEvent.NET_STATUS, onSOStatus);
+						_sharedObject.removeEventListener(AsyncErrorEvent.ASYNC_ERROR, onSOAsyncError);
+						_sharedObject = null;
+					}
+				}
+				if (sharedObjectId) Debug.debug(_debugPrefix, "Request to init SO: " + sharedObjectId);
+				if (sharedObjectId) _sharedObjectId = sharedObjectId;
 				Debug.debug(_debugPrefix, "Initializing shared object:",_sharedObjectId);
 				_sharedObject = SharedObject.getLocal(_sharedObjectId, "/");
 				_sharedObject.addEventListener(NetStatusEvent.NET_STATUS, onSOStatus);

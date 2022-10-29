@@ -135,7 +135,7 @@ package com.pippoflash.framework {
 		static public function get skipUnchangedFrames():Boolean {
 			return _starling.skipUnchangedFrames;
 		}
-		static public function set skipUnchangedFrames(skip:Boolean) {
+		static public function set skipUnchangedFrames(skip:Boolean):void {
 			_starling.skipUnchangedFrames = skip;
 		}
 
