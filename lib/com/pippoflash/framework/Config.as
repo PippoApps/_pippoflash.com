@@ -794,7 +794,7 @@ package com.pippoflash.framework {
 			return word;
 		}
 		
-		var _numberPositioningPostfix:Array; // This stores specific positioning for a number. If specific positioning is not found, it will be calculated with usual routine.
+		private var _numberPositioningPostfix:Array; // This stores specific positioning for a number. If specific positioning is not found, it will be calculated with usual routine.
 		public function getNumberPositioning(num:uint):String {
 			// Returns the formatted positioning taken from config
 			/* It uses a node stored in VOCBULARY.PIPPOFLASH.
@@ -822,7 +822,7 @@ package com.pippoflash.framework {
 				// Retrieve value of last digit
 				var n:String = String(num).charAt(String(num).length - 1);
 				// Add 2 so it becomes a digit of 20
-				var nn = int("2" + n);
+				var nn:int = int("2" + n);
 				return UText.insertParams(_numberPositioningPostfix[nn], {NUM:nn}); 
 			}
 			// Number is not pre-defined, proceed computing

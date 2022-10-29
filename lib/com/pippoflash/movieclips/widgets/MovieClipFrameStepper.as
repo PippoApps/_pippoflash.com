@@ -1,6 +1,7 @@
 
 /* _LoaderBase - (c) Filippo Gregoretti - PippoFlash.com */
 /* This is the base class for all Loaders */
+/* INCOMPLETO!!!! E' stato cambiato con il renderer si può anche cancellare */
 
 package com.pippoflash.movieclips.widgets {
 	import com.pippoflash.utils.*;
@@ -19,6 +20,7 @@ package com.pippoflash.movieclips.widgets {
 	import com.pippoflash.utils.Debug;
 	import com.pippoflash.utils.UDisplay;
 	import com.pippoflash.motion.PFMover;
+	import flash.text.TextField;
 
 	
 	
@@ -43,6 +45,7 @@ package com.pippoflash.movieclips.widgets {
 		private var _timer:Timer = new Timer(0, 1);
 		private var _targetFrame:uint;
 		private var _elapsedFrames:uint;
+		private var _frameTextContent:Array; // Each slot contains an object with textfield name and text content
 		// USER VARIABLES
 		// REFERENCES
 		// MARKERS
@@ -62,6 +65,12 @@ package com.pippoflash.movieclips.widgets {
 			_timer.addEventListener(TimerEvent.TIMER, onTimerElapsed);
 		}
 // METHODS //////////////////////////////////////////////////////////////////////////////////////
+		public function setupTextContent(framesTextFields:Array):void { // Sets text content for each frame
+			_frameTextContent = framesTextFields;
+		}
+		public function clearTextContent():void {
+			
+		}
 		public function showOnRoot():void {
 			UGlobal.stage.addChild(_clip);
 			_clip.alpha = 0;
@@ -72,7 +81,7 @@ package com.pippoflash.movieclips.widgets {
 		}
 		public function freeze():void {
 			_active = false;
-			PFMover.stopStaticMotion(_clip);
+			Animator.stopMotion(_clip);
 		}
 		public function hide():void {
 			UDisplay.removeClip(_clip);
@@ -96,21 +105,40 @@ package com.pippoflash.movieclips.widgets {
 			Debug.debug(_debugPrefix, "Clip started rendering first frame with timer.");
 			renderStep(1);
 		}
-
+		public function renderFrame(step:uint, textFieldsContent:Object=null):void {
+			freeze();
+			_clip.gotoAndStop(step);
+			for(var tf:String in textFieldsContent)
+			{
+				var textField:TextField = _clip[tf];
+				if (textField) textField.htmlText = textFieldsContent[tf];
+			}
+			renderStepHard(step);
+		}
 
 // RENDER //////////////////////////////////////////////////////////////////////////////////////////
 		private function renderStep(step:uint):void
 		{
 			Debug.debug(_debugPrefix, "Activating frame " + step);
 			_targetFrame = step;
-			_timer.reset();
-			_timer.delay = _millisecondsToAdvance;
+			resetTimer();
 			if (_clip.alpha > 0) {
 				Animator.fadeOut(_clip, _fadeOutFrames, onFadeOutComplete);
 			} else {
 				onFadeOutComplete();
 			}
 		}
+		private function renderStepHard(step:uint):void { // Renders directly the step without fade out
+			Debug.debug(_debugPrefix, "Activating frame HARD " + step);
+			_targetFrame = step;
+			resetTimer();
+			onFadeOutComplete();
+		}
+		private function resetTimer():void {
+			_timer.reset();
+			_timer.delay = _millisecondsToAdvance;
+		}
+
 // UTY /////////////////////////////////////////////////////////////////////////////////////////
 // LISTENERS //////////////////////////////////////////////////////////////////////////////////////
 		private function onClickStage():void {
@@ -124,7 +152,7 @@ package com.pippoflash.movieclips.widgets {
 			} else {
 				Debug.debug(_debugPrefix, " : " + _activeFrame);
 				_activeFrame = _targetFrame
-				_clip.gotoAndStop(_activeFrame);
+				if (_clip.currentFrame != _activeFrame) _clip.gotoAndStop(_activeFrame);
 				UDisplay.resizeTo(_clip, UGlobal.getStageRect());
 				UDisplay.centerToStage(_clip);
 	 			Animator.fadeIn(_clip, _fadeInFrames, onFadeInComplete);

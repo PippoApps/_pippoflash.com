@@ -45,16 +45,15 @@ package com.pippoflash.framework {
 		//protected var _listeners					:Array; // List of listeners for each instance
 		//protected var _eventListeners				:Object;
 // INIT //////////////////////////////////////////////////////////////////////////////////////////
-		public function _PippoFlashBaseNoDisplay		(id:String, cl:Class=null) {
-			_pfId = _debugPrefix					= id;
-			if (cl)							addClassReference(id, cl);
-			_instances.push						(this);
-			_instancesById[_debugPrefix]			= this;
-			//resetListeners						();
+		public function _PippoFlashBaseNoDisplay(id:String, cl:Class=null) {
+			_pfId = _debugPrefix = id;
+			if (cl) addClassReference(id, cl);
+			_instances.push(this);
+			_instancesById[_debugPrefix] = this;
 		}
 // STATIC METHODS ///////////////////////////////////////////////////////////////////////////////////////
-		public static function callOnAll				(method:String, par:*=null):void {
-			Debug.debug						("_PippoFlashBaseNoDisplay", "Calling on all classes:",method+"()");
+		public static function callOnAll(method:String, par:*=null):void {
+			Debug.debug("_PippoFlashBaseNoDisplay", "Calling on all classes:",method+"()");
 			// This calls on all instances one method with one parameter
 // 			trace("CHIAMO SU TUTTIIIIIIIIIIIIIIIII",method,_instances);
 // 			for each (var instance:_PippoFlashBase in _instances) {

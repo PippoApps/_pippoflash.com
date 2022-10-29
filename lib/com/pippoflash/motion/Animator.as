@@ -9,27 +9,30 @@ package com.pippoflash.motion {
 	
 	public class Animator {
 		// VARIABLES //////////////////////////////////////////////////////////////////////////
-		private static var _endMotionList					:Object = new Object();
-		private static const _showHideMover					:PFMover = new PFMover("PippoFlashAnimator", "Cubic.easeInOut");
-		private static const _debugPrefix					:String = "Animator";
+		private static var _endMotionList:Object = new Object();
+		private static const _showHideMover:PFMover = new PFMover("PippoFlashAnimator", "Cubic.easeInOut");
+		private static const _debugPrefix:String = "Animator";
 // METHODS //////////////////////////////////////////////////////////////////////////////////////
-		public static function fadeTo						(c:DisplayObject, to:Number=1, frames:uint=5, onComplete:Function=null, par:Object=null) {
-			PFMover.fadeTo							(c, to, frames, onComplete, par);
+		public static function fadeTo(c:DisplayObject, to:Number=1, frames:uint=5, onComplete:Function=null, par:Object=null):void {
+			PFMover.fadeTo(c, to, frames, onComplete, par);
 		}
-		public static function fadeIn						(c:DisplayObject, frames:uint=5, onComplete:Function=null, par:Object=null) {
-			PFMover.fadeIn							(c, frames, onComplete, par);
+		public static function fadeIn(c:DisplayObject, frames:uint=5, onComplete:Function=null, par:Object=null):void {
+			PFMover.fadeIn(c, frames, onComplete, par);
 		}
-		public static function fadeInTotal					(c:DisplayObject, frames:uint=3, onComplete:Function=null, par:Object=null) {
-			PFMover.fadeInTotal							(c, frames, onComplete, par);
+		public static function fadeInTotal(c:DisplayObject, frames:uint=3, onComplete:Function=null, par:Object=null):void {
+			PFMover.fadeInTotal(c, frames, onComplete, par);
 		}
-		public static function fadeOut						(c:DisplayObject, frames:uint=3, onComplete:Function=null, par:Object=null) {
-			PFMover.fadeOut							(c, frames, onComplete, par);
+		public static function fadeOut(c:DisplayObject, frames:uint=3, onComplete:Function=null, par:Object=null):void {
+			PFMover.fadeOut(c, frames, onComplete, par);
 		}
-		public static function fadeOutAndKill					(c:DisplayObject=null, frames:uint=5, onComplete:Function=null, par:Object=null) {
-			PFMover.fadeOutAndKill						(c, frames, onComplete, par);
+		public static function fadeOutAndKill(c:DisplayObject=null, frames:uint=5, onComplete:Function=null, par:Object=null):void {
+			PFMover.fadeOutAndKill(c, frames, onComplete, par);
 		}
-		public static function fadeOutAndInvisible				(c:DisplayObject=null, frames:uint=5, onComplete:Function=null, par:Object=null) {
-			PFMover.fadeOutAndInvisible					(c, frames, onComplete, par);
+		public static function fadeOutAndInvisible(c:DisplayObject=null, frames:uint=5, onComplete:Function=null, par:Object=null):void {
+			PFMover.fadeOutAndInvisible(c, frames, onComplete, par);
+		}
+		public static function stopMotion(c:DisplayObject):void {
+			PFMover.stopStaticMotion(c);
 		}
 // EFFECTS ///////////////////////////////////////////////////////////////////////////////////////
 // SHOW and HIDE ///////////////////////////////////////////////////////////////////////////////////////
