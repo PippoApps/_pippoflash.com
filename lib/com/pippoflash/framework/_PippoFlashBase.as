@@ -52,8 +52,8 @@ package com.pippoflash.framework {
 // INIT //////////////////////////////////////////////////////////////////////////////////////////
 		public function _PippoFlashBase(id:String, cl:Class=null) {
 			if (_instancesById[id]) {
-				Debug.error(id, "FRAMEWORK ERROR -------->>>>> This singleton class has been instantiated twice. Aborting instantiation. App will probably fail.");
-				return;
+				Debug.error(id, "FRAMEWORK ERROR -------->>>>> This singleton class has been instantiated twice. App will probably fail.");
+				// return;
 			}
 			/* in final class put something like this to follow OOP */
 			//static public function get instance():_MainAppBase {

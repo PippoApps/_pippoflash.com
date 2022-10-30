@@ -13,6 +13,8 @@ package com.pippoflash.movieclips.loaders {
 	import									com.pippoflash.net.SimpleQueueLoaderObject;
 	import com.pippoflash.motion.Animator;
 	import com.pippoflash.motion.PFMover;
+	import com.pippoflash.utils.UDisplay;
+	import com.pippoflash.utils.UGlobal;
 	
 	
 	public dynamic class _LoaderBase extends _PippoFlashBase {
@@ -25,7 +27,8 @@ package com.pippoflash.movieclips.loaders {
 		// USER VARIABLES
 		// REFERENCES
 		// MARKERS
-		protected var _active						:Boolean = false;
+		protected var _active:Boolean = false;
+		protected var _hasStageShield:Boolean=false;
 		// DATA HOLDERS
 		protected var _percent					:Number;
 		protected var _text						:String;
@@ -96,6 +99,10 @@ package com.pippoflash.movieclips.loaders {
 		public function setText					(t:String):void {
 			_text								= t;
 		}
+		public function setTextInTextField(textFieldName:String, txt:String):void {
+			trace(this[textFieldName], textFieldName)
+			if (this[textFieldName]) this[textFieldName].text = txt;
+		}
 		public function setPercent					(n:Number):void {
 			_percent							= n;
 		}
@@ -107,11 +114,17 @@ package com.pippoflash.movieclips.loaders {
 			loader.connectWithMe(this);
 		}
 		public function setStageShield(shield:Boolean=true):void {
-			if (this["_shield"]) {
+			if (shield && this["_shield"]) {
 				this["_shield"].update();
 				this["_shield"].visible = shield;
 				this["_shield"].alpha = 1;
 			}
+			_hasStageShield = shield;
+		}
+		public function resizeToStage():void { // Makes sure that loader screen fits into stage
+			UDisplay.resizeTo(this, UGlobal.getStageRect());
+			UDisplay.centerToStage(this);
+			setStageShield(_hasStageShield);
 		}
 // LISTENERS //////////////////////////////////////////////////////////////////////////////////////
 		public function onLoadStart					(o:SimpleQueueLoaderObject):void {

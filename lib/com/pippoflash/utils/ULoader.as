@@ -128,6 +128,9 @@ package com.pippoflash.utils {
 		static public function getLoaderInstance():Object { // This can be an instance of anything set by mainapp
 			return _stageLoaderInstance as Object;
 		}
+		static public function getLoaderInstanceAsLoaderBase():com.pippoflash.movieclips.loaders._LoaderBase { // This can be an instance of anything set by mainapp
+			return _stageLoaderInstance;
+		}
 // CLIP LOADER ///////////////////////////////////////////////////////////////////////////////////////
 		public static function setClipLoader(clip:DisplayObjectContainer, v:Boolean, t:String=null, rect:Rectangle=null, shield:Boolean=false, id:String=null):* {
 			id 								= id ? id : _defaultLoaderId;
