@@ -9,7 +9,6 @@ package com.pippoflash.movieclips.widgets {
 	import flash.display.*;
 	import com.pippoflash.utils.UCode;
 	import flash.display.Sprite;
-	import flash.html.__HTMLScriptArray;
 	import com.pippoflash.framework._Application;
 	import com.pippoflash.utils.UGlobal;
 	import starling.core.starling_internal;

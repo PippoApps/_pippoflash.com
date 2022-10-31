@@ -106,10 +106,10 @@ package com.pippoflash.utils {
 			_stageLoaderInstance.connectToLoader(o);
 			return o;
 		}
-		public static function setText(t:String="") {
+		public static function setText(t:String=""):void {
 			_stageLoaderInstance.setText(t);
 		}
-		public static function setProgress(n:Number = 0) {
+		public static function setProgress(n:Number = 0):void {
 			//trace("CAZZO",n);
 			_stageLoaderInstance.setPercent(UCode.setRange(n));
 		}
@@ -166,11 +166,11 @@ package com.pippoflash.utils {
 					delete					_shieldInstances[clipId];
 				}
 				// Loader
-				var c:*						= _loaderInstances[clipId];
-				PFMover.fadeOutAndKill(c, 3, storeMemoryClass, c);
-				delete						_loaderInstances[clipId];
+				var cc:* = _loaderInstances[clipId];
+				PFMover.fadeOutAndKill(cc, 3, storeMemoryClass, cc);
+				delete _loaderInstances[clipId];
 // 				storeMemoryClass				(_c);
-				return						c;
+				return cc;
 			}
 		}
 		public static function removeClipLoader			(clip:DisplayObjectContainer):void { // Removes immediately without fade out
