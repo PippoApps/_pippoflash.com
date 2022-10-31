@@ -12,7 +12,6 @@ import com.pippoflash.framework._Application;
 // CLASS ///////////////////////////////////////////////////////////////////////////////////////
 	public class UAirFake {
 		public static var _debugPrefix				:String = "UAirFake";
-		public static var _w;
 	// INIT ///////////////////////////////////////////////////////////////////////////////////////
 		public static function init					(j:*=null, newSize:Rectangle=null):void {
 			// WARNING

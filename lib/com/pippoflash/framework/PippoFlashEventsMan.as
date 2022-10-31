@@ -279,7 +279,7 @@ package com.pippoflash.framework {
 				else							l[m]();
 			}
 		}
-		public static var callMethod					= callListenerMethodName;
+		public static var callMethod:Function					= callListenerMethodName;
 		public static function callListenerMethodName		(l:Object, e:String, ...rest):Boolean {
 			if (Object(l).hasOwnProperty(e)) {
 				PippoFlashEventsMan["callMethodPar"+rest.length](l[e], rest);

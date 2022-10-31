@@ -408,7 +408,7 @@ package com.pippoflash.framework.air {
 		
 		
 // FILE LISTENERS FOR BROWSING ///////////////////////////////////////////////////////////////////////////////////////
-		public static function onSelectFile				(e:Event) {
+		public static function onSelectFile				(e:Event):void {
 			if (_verbose) 						Debug.debug(_debugPrefix, "File selected:",e);
 			_fileSelected						= true;
 			_onFileSelected						(_file);

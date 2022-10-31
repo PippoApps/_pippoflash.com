@@ -17,6 +17,7 @@ package com.pippoflash.utils {
 	import flash.system.*;
 	import flash.text.*;
 	import flash.utils.*;
+	import com.pippoflash.net.SimpleQueueLoaderObject;
 
 	
 	public class UXml {
@@ -95,7 +96,7 @@ package com.pippoflash.utils {
 			if (hasId(n))					removeReferenceRecursive(n);
 			System.disposeXML				(n);
 		}
-		public static function removeReferenceRecursive(n):void {
+		public static function removeReferenceRecursive(n:XML):void {
 			removeReference					(n);
 			if (hasChildren(n))				for each (_node in n.children()) removeReferenceRecursive(_node);
 		}
@@ -179,14 +180,16 @@ package com.pippoflash.utils {
 		public static function getXML				(s:String):XML {
 			var x								:XML = new XML();
 			x.ignoreWhitespace 					= true;
+			trace(s);
 			x								= XML(s);
 			return							x;
 		}
-		public static function getLoaderXML			(o, noNameSpace:Boolean=false):XML {
+		public static function getLoaderXML			(o:SimpleQueueLoaderObject, noNameSpace:Boolean=false):XML {
 			var s								:String = noNameSpace ? o.getContent().split("xmlns=").join("noNameSpaceXmlns=") : o.getContent();
 			return							getCleanedXML(o.getContent(), noNameSpace);
 		}
 		public static function getCleanedXML			(s:String, noNameSpace:Boolean=false):XML {
+			return getXML(s);
 			return							getXML(noNameSpace ? s.split("xmlns=").join("noNameSpaceXmlns=") : s);
 		}
 	}

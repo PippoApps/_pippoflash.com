@@ -110,10 +110,11 @@ package com.pippoflash.media {
 				var i:uint;
 				if (camIndex is String) {
 					Debug.debug(_debugPrefix, "Selected camera ID is string: " + camIndex);
+					var cam:Camera;
 					if (camIndex == CameraPosition.FRONT || camIndex == CameraPosition.BACK) {
 						Debug.debug(_debugPrefix, "Looking for  camera by POSITION: " + camIndex);
 						for (i = 0; i < Camera.names.length; i++) {
-							var cam:Camera = Camera.getCamera(String(i));
+							cam = Camera.getCamera(String(i));
 							Debug.debug(_debugPrefix, "Checking position for " + Camera.names[i] + " located: " + cam.position);
 							if (cam.position == camIndex) {
 								Debug.debug(_debugPrefix, "Found camera for chosen position.");
@@ -125,7 +126,7 @@ package com.pippoflash.media {
 						Debug.debug(_debugPrefix, "Looking for  camera by NAME: " + camIndex);
 						//var cam:Camera = Camera.getCamera(camIndex);
 						for (i = 0; i < Camera.names.length; i++) {
-							var cam:Camera = Camera.getCamera(String(i));
+							cam = Camera.getCamera(String(i));
 							Debug.debug(_debugPrefix, "Checking camera name " + Camera.names[i]);
 							if (String(Camera.names[i]).toUpperCase().indexOf(String(camIndex).toUpperCase()) != -1) {
 								Debug.debug(_debugPrefix, "Camera found!");

@@ -13,6 +13,7 @@ package com.pippoflash.framework {
 	import com.pippoflash.framework.*; import com.pippoflash.framework.air.*; import com.pippoflash.utils.*; import com.pippoflash.smartfox.SmartFoxMan; import com.pippoflash.net.QuickLoader; // PippoFlash
 	import flash.display.*; import flash.events.*; import flash.media.*; import flash.net.*; import flash.system.*; import flash.text.*; import flash.utils.*; import flash.geom.*; import flash.external.*;// FLash
 	import flash.profiler.*;
+	import com.pippoflash.net.SimpleQueueLoaderObject;
 	//import flash.events.FullScreenEvent;
 // CLASS ///////////////////////////////////////////////////////////////////////////////////////
 	public dynamic class _ApplicationAir extends _Application {
@@ -168,7 +169,7 @@ package com.pippoflash.framework {
 			Debug.debug						(_debugPrefix, "Loading handshake file:", _handshakeUrl);
 			QuickLoader.loadFile					(_handshakeUrl, this, "Handshake");
 		}
-				public function onLoadErrorHandshake(o:Object=null):void {
+				public function onLoadErrorHandshake(o:*=null):void {
 					Debug.error				(_debugPrefix, "Error loading handshake:", Debug.object(o));
 					setMainLoader				(false);
 					updateNoNetworkMessage		();
@@ -178,7 +179,7 @@ package com.pippoflash.framework {
 						setMainLoader			(true);
 						UExec.frame			(5, handshake);
 					}
-				public function onLoadCompleteHandshake(o:Object):void {
+				public function onLoadCompleteHandshake(o:SimpleQueueLoaderObject):void {
 					Debug.debug				(_debugPrefix, "Handshake loaded successfully.");
 					_handshake				= UXml.getLoaderXML(o);
 					onHandshake				();

@@ -171,7 +171,7 @@ package com.pippoflash.utils {
 			return JSON.stringify(o);
 		}
 // CHECKS ///////////////////////////////////////////////////////////////////////////////////////
-		public static function isLocal(c=null):Boolean { // If the file is running on the local file system (localhost is not considered, it returns online)
+		public static function isLocal(c:*=null):Boolean { // If the file is running on the local file system (localhost is not considered, it returns online)
 			return UGlobal.isLocal(); 
 		}
 		public static function isOnline():Boolean {

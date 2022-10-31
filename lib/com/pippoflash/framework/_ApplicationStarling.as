@@ -75,6 +75,7 @@ package com.pippoflash.framework {
 			Debug.debug(_debugPrefix, "Starling initialized: " + event);
 			if (DEPLOY) SHOW_STARLING_STATS = false;
 			_starling.showStats = SHOW_STARLING_STATS;
+			Debug.warning(_debugPrefix, "Starling initialized with profile: " + _starling.profile);
 			//return;
 			_starlingShield = new Canvas();
 			_starlingShield.beginFill(0xff0000);
