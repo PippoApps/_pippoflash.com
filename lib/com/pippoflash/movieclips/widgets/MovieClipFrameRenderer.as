@@ -21,6 +21,7 @@ package com.pippoflash.movieclips.widgets {
 	import flash.text.TextField;	
 	import flash.geom.Rectangle;
 	import com.pippoflash.framework._PippoFlashBaseNoDisplay;
+	import flash.geom.Matrix;
 	public class MovieClipFrameRenderer extends _PippoFlashBaseNoDisplay {
 // VARIABLES //////////////////////////////////////////////////////////////////////////
 		// STATIC
@@ -123,7 +124,10 @@ package com.pippoflash.movieclips.widgets {
         }
         private function positionToViewport(viewport:Rectangle=null):void {
             if (viewport) _targetViewport = viewport;
-			if (_resizeToScreen) UDisplay.resizeTo(_clip, _targetViewport);
+			if (_resizeToScreen) UDisplay.resizeTo(_clip, _targetViewport);			
+			_clip.cacheAsBitmap = false;
+			_clip.cacheAsBitmapMatrix = _clip.transform.matrix.clone();
+			_clip.cacheAsBitmap = true;
         }
         private function reset():void {
             freeze();

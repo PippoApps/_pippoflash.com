@@ -150,12 +150,12 @@ package com.pippoflash.framework.starling
 		
 		
 		// GET IMAGES
-		public function getImage(id:String, resizeRect:Rectangle=null, resizeMode="FILL"):Image {
+		public function getImage(id:String, resizeRect:Rectangle=null, resizeMode:String="FILL"):Image {
 			var img:Image = new Image(mainAssets.getTexture(id));
 			if (resizeRect) uDisplay.resizeTo(img, resizeRect, resizeMode);
 			return img;
 		}
-		public function getImageFromFullPath(id:String, resizeRect:Rectangle=null, resizeMode="FILL"):Image {
+		public function getImageFromFullPath(id:String, resizeRect:Rectangle=null, resizeMode:String="FILL"):Image {
 			return getImage(getAssetTextureNameFromPath(id), resizeRect, resizeMode);
 		}
 		
@@ -248,7 +248,7 @@ package com.pippoflash.framework.starling
 		 * @return
 		 */
 		protected function makeTextField():TextField { 
-			const textOptions = new TextOptions(false, false);
+			const textOptions:TextOptions = new TextOptions(false, false);
 			(textOptions as TextOptions).autoSize = TextFieldAutoSize.BOTH_DIRECTIONS;
 			//const textFormat:TextFormat = new TextFormat("Athelas Regular", 38, 0xffffff); // font name must be font + style
 			const textFormat:TextFormat = new TextFormat("Noto Serif", 36, 0xffffff); // font name must be font + style

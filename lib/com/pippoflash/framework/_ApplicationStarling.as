@@ -76,7 +76,8 @@ package com.pippoflash.framework {
 			if (DEPLOY) SHOW_STARLING_STATS = false;
 			_starling.showStats = SHOW_STARLING_STATS;
 			Debug.warning(_debugPrefix, "Starling initialized with profile: " + _starling.profile);
-			//return;
+			_starling.stage3D.context3D.ignoreResourceLimits = true;
+ 			//return;
 			_starlingShield = new Canvas();
 			_starlingShield.beginFill(0xff0000);
 			_starlingShield.drawRectangle(0, 0, 100, 100);
