@@ -9,6 +9,7 @@ _work/
 
 # Other files and folders
 .settings/
+*.DS_Store
 
 # Executables
 *.swf
