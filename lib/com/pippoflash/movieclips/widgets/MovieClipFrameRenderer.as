@@ -58,8 +58,9 @@ package com.pippoflash.movieclips.widgets {
 		private function get clip():MovieClip {return _clip;}
 		protected function get activeStep():uint {return _activeStep;}
 // INIT //////////////////////////////////////////////////////////////////////////////////////////
-		public function MovieClipFrameRenderer(movieClipId:String, id:String="MovieClipFrameRenderer", resizeToScreen:Boolean=true) {
+		public function MovieClipFrameRenderer(movieClipId:String, id:String="MovieClipFrameRenderer", resizeToScreen:Boolean=true, advanceOnClick:Boolean=true) {
 			super(id, MovieClipFrameRenderer);  
+			_advanceOnClick = advanceOnClick;
 			Debug.debug(_debugPrefix, "Inizialized with id: " + id + " and clip " + movieClipId);
 			_clip = UCode.getInstance(movieClipId);
 			_resizeToScreen = resizeToScreen;
