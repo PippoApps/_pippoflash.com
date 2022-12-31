@@ -6,10 +6,12 @@
 			"src"
 		],
 		"library-path": [
-			"lib/starling 2.5.1.swc",
+			"lib/starling 2.7.swc",
 			"lib/greensock.swc",
 			"lib/flash.swc",
 			"lib/as3corelib.swc",
+			"lib/swc/com.distriqt.Core.swc",
+			"lib/swc/com.distriqt.ExpansionFiles.swc",
 			"D:/AIR_SDK_WINDOWS/AIR_WINDOWS_33.1.1.544/frameworks/libs/air/aircore.swc",
 			"D:/AIR_SDK_WINDOWS/AIR_WINDOWS_33.1.1.544/frameworks/libs/air/airglobal.swc"
 		],
