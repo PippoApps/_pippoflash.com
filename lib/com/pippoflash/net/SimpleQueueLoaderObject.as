@@ -180,7 +180,7 @@ package com.pippoflash.net {
 				onLoadErrorLoader(ee);
 			}
 		}
-		public function getContent					():* {
+		public function getContent():* {
 			if (_loader is Loader)	return _loader.content;
 			else if (_loader is URLLoader) return _loader.data;
 			else if (_loader is URLStream) {
@@ -189,6 +189,9 @@ package com.pippoflash.net {
 				_urlStream.readBytes(fileData, 0, _urlStream.bytesAvailable); 
 				return fileData;
 			}
+		}
+		public function getJsonContent():Object {
+			return JSON.parse(getContent());
 		}
 		public function getInternalClass				(className:String):Class { // This gives the opportunity to get a class that has been exported internally in the application context
 			Debug.debug						(_debugPrefix, "I'm requested class from loaded file: " + className);
@@ -203,7 +206,7 @@ package com.pippoflash.net {
 			}
 			return							null;
 		}
-		public function connectWithMe				(c:DisplayObject) { // This connects an instance of Loader to this loader for automatic counting
+		public function connectWithMe				(c:DisplayObject):void { // This connects an instance of Loader to this loader for automatic counting
 			_loaderListener						 = c;
 		}
 		public function isLoaded					():Boolean {
@@ -322,8 +325,8 @@ package com.pippoflash.net {
 		// STATIC - LOAD OBJECT INITIALIZE
 		private function getLoaderByFileType			(fileType:String):Object {
 			if (_forceURLStream) return _urlStream;
-			if (_dataLoaderNames.toLowerCase().indexOf(fileType) != -1) return _urlLoader;
-			else if (_byteLoaderNames.toLowerCase().indexOf(fileType) != -1) return _contentLoader;
+			if (_dataLoaderNames.toLowerCase().indexOf(fileType.toLowerCase()) != -1) return _urlLoader;
+			else if (_byteLoaderNames.toLowerCase().indexOf(fileType.toLowerCase()) != -1) return _contentLoader;
 			else return _urlStream;
 		}
 		private function getLoaderByFileName(fileName:String):Object {
