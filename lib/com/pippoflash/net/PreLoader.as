@@ -50,6 +50,9 @@ package com.pippoflash.net {
 		public static const EVT_ITEMLOADPROGRESS:String = "onItemLoadProgress";
 		public static const EVT_ITEMLOADERROR:String = "onItemLoadError";
 		public static const EVT_ITEMLOADCOMPLETE:String = "onItemLoadComplete";
+		// Framework
+		public static var _debugPrefix:String = "Gesturizer";
+
 		// REFERENCES
 		private static var _assets:Object;
 		// DATA
@@ -79,7 +82,7 @@ package com.pippoflash.net {
 			_assets = {bmp:{}, txt:{}, swf:{}, gen:{}}; // gen are unrecognized files
 			_total = 0;
 			_queue = new Vector.<Object>();
-			setId("PreLoader");
+			// setId("PreLoader");
 		}
 // METHODS ///////////////////////////////////////////////////////////////////////////////////////
 		// queing
@@ -276,7 +279,7 @@ package com.pippoflash.net {
 // UTY ///////////////////////////////////////////////////////////////////////////////////////
 		private static function addLoadingObject		(t:String, u:String, p:Boolean):void {
 			if (VERBOSE) Debug.debug(_debugPrefix, "Queing " + t +" : " + u);
-			var o								= {
+			var o:Object								= {
 				type:t,
 				uri:u
 			}

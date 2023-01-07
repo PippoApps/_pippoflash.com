@@ -16,7 +16,6 @@
 			"D:/AIR_SDK_WINDOWS/AIR_WINDOWS_33.1.1.544/frameworks/libs/air/airglobal.swc"
 		],
 		"output": "bin/PippoFlash.swf"
-
 	},
 	"mainClass": "PippoFlash",
 	"application": "PippoFlash-app.xml"
