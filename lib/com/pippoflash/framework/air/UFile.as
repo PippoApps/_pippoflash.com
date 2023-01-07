@@ -83,6 +83,8 @@ package com.pippoflash.framework.air {
 				Debug.debug(_debugPrefix, "URLs: \n" + "applicationDirectory " +  _filePaths.application.url + "\nstorage " +  _filePaths.storage.url + "\ndocuments " +  _filePaths.documents.url + "\ncache " +  _filePaths.user.url + "\nuser " +  _filePaths.user.url + "\ndesktop " +  _filePaths.desktop.url + "\n" +  File.desktopDirectory.nativePath);
 				Debug.debug(_debugPrefix, "Root directories:");
 				import flash.filesystem.File;
+				import flash.text.engine.SpaceJustifier;
+				import com.adobe.protocols.dict.Database;
 				//var rootDirs:Array = File.getRootDirectories();
 //
 				//for (var i:uint = 0; i < rootDirs.length; i++) {
@@ -131,7 +133,11 @@ package com.pippoflash.framework.air {
 			if (!_file.exists) Debug.warning(_debugPrefix, "File " + path +  " in " + target + " not found.");
 			return _file;
 		}
-		
+		static public function checkFileExists(path:String, target:String = "storage", verbose:Boolean=true):Boolean {
+			_file = _filePaths[target].resolvePath(path);
+			if (verbose && !_file.exists) Debug.debug(_debugPrefix, "File does not exist: " + path);
+			return _file.exists;
+		}
 		
 		
 		
@@ -369,7 +375,7 @@ package com.pippoflash.framework.air {
 		static public function createDirectory(path:String, target:String="storage"):void {
 			Debug.debug(_debugPrefix, "Creating folder " + path + " in " + target);
 			var f:File = _filePaths[target].resolvePath(path);
-			if (f.exists && f.isDirectory) Debug.debug(_debugPrefix, "Directory already exists.");
+			if (f.exists && f.isDirectory) Debug.debug(_debugPrefix, "Directory already exists:", path, target);
 			else f.createDirectory();
 		}
 		static public function deleteDirectory(path:String, deleteContents:Boolean=true, target:String = "storage"):void {

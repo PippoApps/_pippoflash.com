@@ -49,7 +49,7 @@ package com.pippoflash.net {
 		public static const EVT_COMPLETE:String = "onLoadComplete"; // this
 		private static const DEFAULT_TO_BINARY:Boolean = true; // If a file extension for tring is found uses RLLoader, otherwise default tobinary loader. Set to false for the opposite.
 		// STATIC VARIABLES
-		public static var _verbose:Boolean = true; //  T races events - also progress
+		public static var _verbose:Boolean = false; //  T races events - also progress
 		static public var _traceLoadUrl:Boolean = false; // traces only loaded images
 		public static var _debug:Boolean = false; // Traces loaded object
 		public static var _forceSameApplicationDomain:Boolean = false; // Forces same applicaiton domain in swf loading (set manually if loading too many SWFs)

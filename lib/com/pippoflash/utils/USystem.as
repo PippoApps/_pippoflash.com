@@ -269,6 +269,9 @@ package com.pippoflash.utils {
 			return							udid;
 		}
 	// localization
+		public static function setLanguage(l:String):void { // Force system language
+			_language = l;
+		}
 		public static function getLanguage():String {
 			return _language ? _language : Capabilities["languages"][0].substr(0,2); // This one works on AIR only
 		}

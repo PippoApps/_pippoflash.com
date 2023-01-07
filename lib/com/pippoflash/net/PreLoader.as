@@ -26,7 +26,7 @@ package com.pippoflash.net {
 	public class PreLoader extends _PippoFlashBaseStatic implements IPippoFlashEventDispatcher {
 // VARIABLES ////////////////////////////////////////////////////////////////////////////
 		// CONSTANTS
-		private static const VERBOSE:Boolean = true;
+		public static var VERBOSE:Boolean = false;
 		private static const DELAY_NEXTLOAD_FRAMES:int = 1; // Set this to 0 to just load immediately
 		private static const EXT_TO_TYPE:Object = {
 			jpg:"bmp",
@@ -49,9 +49,9 @@ package com.pippoflash.net {
 		public static const EVT_ITEMLOADSTART:String = "onItemLoadStart";
 		public static const EVT_ITEMLOADPROGRESS:String = "onItemLoadProgress";
 		public static const EVT_ITEMLOADERROR:String = "onItemLoadError";
-		public static const EVT_ITEMLOADCOMPLETE:String = "onItemLoadComplete";
+		public static const EVT_ITEMLOADCOMPLETE:String = "onItemLoadComplete"; // url:String
 		// Framework
-		public static var _debugPrefix:String = "Gesturizer";
+		public static var _debugPrefix:String = "PreLoader";
 
 		// REFERENCES
 		private static var _assets:Object;
@@ -232,7 +232,7 @@ package com.pippoflash.net {
 		private static function loadNextQueueItem():void {
 			_processing = _queue.shift();
 			_loader = QuickLoader.loadFile(_processing.uri, PreLoader, "Item", false, "", null, _forceFileStream);
-			if (VERBOSE) Debug.debug(_debugPrefix, "Loading item " + _loader._url);
+			Debug.debug(_debugPrefix, "Loading item " + _loader._url);
 		}
 		private static function processCompletedLoad():void {
 			var content:* = _loader.getContent();
@@ -242,12 +242,13 @@ package com.pippoflash.net {
 			}
 			//trace("Settu " + _processing.type + ", " +  _processing.uri + ", " + (content as ByteArray).bytesAvailable);
 			_assets[_processing.type][_processing.uri]	= content;
+			_elapsed++;
+			_progress = _elapsed / _total;
+			PippoFlashEventsMan.broadcastStaticEvent(PreLoader, EVT_ITEMLOADCOMPLETE, _loader._url);
+			PippoFlashEventsMan.broadcastStaticEvent(PreLoader, EVT_LOADPROGRESS, _progress);
 			_loader.harakiri();
 			_processing = null;
 			_loader = null;
-			_elapsed++;
-			_progress = _elapsed / _total;
-			PippoFlashEventsMan.broadcastStaticEvent(PreLoader, EVT_LOADPROGRESS, _progress);
 			//trace("PROGRESSSS",_progress);
 			if (_queue.length && isLoading()) {
 				if (DELAY_NEXTLOAD_FRAMES) UExec.frame(DELAY_NEXTLOAD_FRAMES, loadNextQueueItem);

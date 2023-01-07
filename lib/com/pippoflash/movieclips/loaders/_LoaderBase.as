@@ -100,7 +100,7 @@ package com.pippoflash.movieclips.loaders {
 			_text								= t;
 		}
 		public function setTextInTextField(textFieldName:String, txt:String):void {
-			trace(this[textFieldName], textFieldName)
+			// trace(this[textFieldName], textFieldName)
 			if (this[textFieldName]) this[textFieldName].text = txt;
 		}
 		public function setPercent					(n:Number):void {
