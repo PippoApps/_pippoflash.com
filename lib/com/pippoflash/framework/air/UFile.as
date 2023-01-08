@@ -384,7 +384,13 @@ package com.pippoflash.framework.air {
 			if (f.exists && f.isDirectory) f.deleteDirectory(deleteContents);
 			else Debug.debug(_debugPrefix, "Folder does not exist, no need to delete.");
 		}
-		
+		static public function getDirectoryUrl(path:String, target:String="storage"):String { // Returns the URL of a directory
+			createDirectory(path, target);
+			var f:File = _filePaths[target].resolvePath(path);
+			var pathUrl:String = f.url;
+			Debug.debug(_debugPrefix, "Lookig for URL of folder " + path + " in " + target + ": " + pathUrl);
+			return pathUrl;
+		}
 		static public function renameFile(path:String, newPath:String, deleteContents:Boolean=true, target:String = "storage"):void {
 			Debug.debug(_debugPrefix, "Moving folder " + path + " to " + newPath + " in " + target);
 			var f:File = _filePaths[target].resolvePath(path);
