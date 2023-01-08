@@ -387,7 +387,8 @@ package com.pippoflash.framework.air {
 		static public function getDirectoryUrl(path:String, target:String="storage"):String { // Returns the URL of a directory
 			createDirectory(path, target);
 			var f:File = _filePaths[target].resolvePath(path);
-			var pathUrl:String = f.url;
+			f.canonicalize();
+			var pathUrl:String = f.nativePath;
 			Debug.debug(_debugPrefix, "Lookig for URL of folder " + path + " in " + target + ": " + pathUrl);
 			return pathUrl;
 		}
