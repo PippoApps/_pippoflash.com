@@ -16,10 +16,10 @@ package com.pippoflash.framework.air
 	import flash.utils.ByteArray;
 	public final class LocalContentUpdater {
 		// STATIC
-		private static const _debugPrefix = "LocalContentUpdater";
+		private static const _debugPrefix:String = "LocalContentUpdater";
 		private static const CONTENT_FOLDER:String = "_data"; // This folder contains all content
 		private static const ASSETS_SUBFOLDER:String = "assets"; // This folder contains assets
-		private static const TEMP_CONTEN_FOLDER:String = "_data_downloading"; // Here all new content is downloaded
+		private static const TEMP_CONTENT_FOLDER:String = "_data_downloading"; // Here all new content is downloaded
 		private static const STATUSES:Array = ["IDLE", "READY", "LOADING", "RENAMING"];
 		// EVENT NAMES
 		public static const EVT_UPDATE_STARTED:String = "onLocalContentUpdateStarted";
@@ -34,7 +34,6 @@ package com.pippoflash.framework.air
 		// DATA
 		static private var _contentLocation:String; // String to be placed before of folders
 		static private var _urls:Array; // Urls of files to be downloaded. 
-		static private var _urlToFile;
 		static private var _updateId:String;
 		// 
 		
@@ -95,9 +94,9 @@ package com.pippoflash.framework.air
 			_status = 2; _statusDesc = "FILE OPERATIONS";
 			PreLoader.removeListener(LocalContentUpdater);
 			Debug.debug(_debugPrefix, "Finalizing update.");
-			Debug.debug(_debugPrefix, "Creating folder: " + TEMP_CONTEN_FOLDER);
-			UFile.deleteDirectory(TEMP_CONTEN_FOLDER);
-			UFile.createDirectory(TEMP_CONTEN_FOLDER);
+			Debug.debug(_debugPrefix, "Creating folder: " + TEMP_CONTENT_FOLDER);
+			UFile.deleteDirectory(TEMP_CONTENT_FOLDER);
+			UFile.createDirectory(TEMP_CONTENT_FOLDER);
 			// Save all files
 			var stripChars:String = "<>:\"/\\|?*"; // Characters to be removed from url
 			for each (var u:String in _urls) {
@@ -105,14 +104,14 @@ package com.pippoflash.framework.air
 				Debug.debug(_debugPrefix, "Saving ByteArray from url: " + u + " > " + fileName);
 				var file:* = PreLoader.getFile(u, false, false);
 				Debug.debug(_debugPrefix, "Saving ByteArray.");
-				UFile.saveFile(TEMP_CONTEN_FOLDER + "/" + fileName, file);
+				UFile.saveFile(TEMP_CONTENT_FOLDER + "/" + fileName, file);
 			}
 			PreLoader.forceFileStream = false;
 			// Continue after all files have been successfully saved
 			Debug.debug(_debugPrefix, "All files successfully saved.");
 			Debug.debug(_debugPrefix, "Removing existing data folder.");
 			UFile.deleteDirectory(CONTENT_FOLDER);
-			UFile.renameFile(TEMP_CONTEN_FOLDER, CONTENT_FOLDER);
+			UFile.renameFile(TEMP_CONTENT_FOLDER, CONTENT_FOLDER);
 		}
 		
 		

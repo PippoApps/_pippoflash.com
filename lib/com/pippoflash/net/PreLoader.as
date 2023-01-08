@@ -47,7 +47,7 @@ package com.pippoflash.net {
 		public static const EVT_LOADCOMPLETE:String = "onQueueLoadComplete"; // queueID:String
 		public static const EVT_LOADINTERRUPT:String = "onQueueLoadInterrupted"; // queueID:String
 		public static const EVT_ITEMLOADSTART:String = "onItemLoadStart";
-		public static const EVT_ITEMLOADPROGRESS:String = "onItemLoadProgress";
+		public static const EVT_ITEMLOADPROGRESS:String = "onItemLoadProgress"; // percent:uint
 		public static const EVT_ITEMLOADERROR:String = "onItemLoadError";
 		public static const EVT_ITEMLOADCOMPLETE:String = "onItemLoadComplete"; // url:String
 		// Framework
@@ -79,10 +79,15 @@ package com.pippoflash.net {
 				Debug.error(_debugPrefix, "Initialization called twice.");
 				return;
 			}
+			reset();
+		}
+		public static function reset():void {
+			if (_loader) _loader.suicide();
+			_loader = null;
 			_assets = {bmp:{}, txt:{}, swf:{}, gen:{}}; // gen are unrecognized files
 			_total = 0;
+			_status = "IDLE";
 			_queue = new Vector.<Object>();
-			// setId("PreLoader");
 		}
 // METHODS ///////////////////////////////////////////////////////////////////////////////////////
 		// queing
@@ -191,7 +196,6 @@ package com.pippoflash.net {
 		
 		// General
 		public static function startQueue(queueId:String = null):void {
-			init();
 			_queueId = queueId ? queueId : "Queue_" + Math.random();
 			Debug.debug(_debugPrefix, "Starting queue ID " + _queueId);
 			if (isIdle() && _queue.length) initiateQueueLoading();
@@ -220,14 +224,14 @@ package com.pippoflash.net {
 		
 
 // QUEUE & LOADING ///////////////////////////////////////////////////////////////////////////////////////
-		private static function initiateQueueLoading		():void {
-			_errors							= 0;
-			_elapsed							= 0;
-			_loaded							= 0;
-			Debug.debug						(_debugPrefix, "Starting PreLoad of " + _total + " files.");
-			_status							= "LOADING";
-			PippoFlashEventsMan.broadcastStaticEvent	(PreLoader, EVT_LOADSTART, _queueId);
-			loadNextQueueItem					();
+		private static function initiateQueueLoading():void {
+			_errors = 0;
+			_elapsed = 0;
+			_loaded = 0;
+			Debug.debug(_debugPrefix, "Starting PreLoad of " + _total + " files.");
+			_status = "LOADING";
+			PippoFlashEventsMan.broadcastStaticEvent(PreLoader, EVT_LOADSTART, _queueId);
+			loadNextQueueItem();
 		}
 		private static function loadNextQueueItem():void {
 			_processing = _queue.shift();
@@ -257,25 +261,27 @@ package com.pippoflash.net {
 			else processQueueCompleted();
 		}
 		private static function processQueueCompleted():void {
-			
 			Debug.debug(_debugPrefix, "Completed queue. Total files:"+ _total + ". " + (_errors ? ("Loaded:"+_loaded+", Errors:"+_errors) : ("All files loaded successfully.")));
-			_total = 0;
-			_status = "IDLE";
 			PippoFlashEventsMan.broadcastStaticEvent(PreLoader, EVT_LOADCOMPLETE, _queueId);
+			reset();
 		}
 // LOADER LISTENERS ///////////////////////////////////////////////////////////////////////////////////////
 		public static function onLoadStartItem(o:SimpleQueueLoaderObject):void {
 			if (VERBOSE) Debug.debug(_debugPrefix, "Start load: " + o._url);
+			PippoFlashEventsMan.broadcastStaticEvent(PreLoader, EVT_ITEMLOADSTART);
 		}
 		public static function onLoadCompleteItem(o:SimpleQueueLoaderObject):void {
 			_loaded++;
-			processCompletedLoad ();
+			processCompletedLoad();
 		}
-		public static function onLoadErrorItem			(o:SimpleQueueLoaderObject, err:*=null):void {
+		public static function onLoadProgressItem(o:SimpleQueueLoaderObject):void {
+			// trace(o._bytesLoaded, o._bytesTotal, o._percent);
+			PippoFlashEventsMan.broadcastStaticEvent(PreLoader, EVT_ITEMLOADPROGRESS, o._percent);
+		}
+		public static function onLoadErrorItem(o:SimpleQueueLoaderObject, err:*=null):void {
 			Debug.error(_debugPrefix, "File couldn't be loaded: " + _processing.uri);
 			_errors++;
 			PippoFlashEventsMan.broadcastStaticEvent(PreLoader, EVT_LOADERROR, _queueId);
-			processCompletedLoad();
 		}
 // UTY ///////////////////////////////////////////////////////////////////////////////////////
 		private static function addLoadingObject		(t:String, u:String, p:Boolean):void {

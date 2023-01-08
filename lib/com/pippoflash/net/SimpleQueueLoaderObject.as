@@ -89,7 +89,7 @@ package com.pippoflash.net {
 		public var _isLoader						:Boolean;
 		public var _bytesLoaded					:uint;
 		public var _bytesTotal						:uint;
-		public var _percent						:uint;
+		public var _percent:uint;
 		public var _killed							:Boolean; // This prevents further executions after harakiri
 		public var _width						:Number; // Width of loaded LoaderInfo
 		public var _height						:Number; // Height of loaded LoaderInfo
@@ -102,12 +102,12 @@ package com.pippoflash.net {
 		public function SimpleQueueLoaderObject(par:Object=null) {
 			recycle(par);
 		}
-		public function recycle(par:Object=null) {
+		public function recycle(par:Object=null):void {
 			_killed = false;
 			UCode.setParameters(this, par);
 		}
 // METHODS ///////////////////////////////////////////////////////////////////////////////////////////
-		public function startLoad() {
+		public function startLoad():void {
 			// if (_verbose) 
 			if (_traceLoadUrl) Debug.debug(_debugPrefix, "Loading:",_url); // Always say what do you load
 			if (_killed) return;
@@ -115,7 +115,7 @@ package com.pippoflash.net {
 			_loader = UCode.exists(_fileType) ? getLoaderByFileType(_fileType) : getLoaderByFileName(_url);
 			_isLoader = _loader is Loader;
 			_isSwf = _url.lastIndexOf(".swf") == (_url.length - 4); // If url ends with .swf
-			var l = _isLoader ? _loader.contentLoaderInfo : _loader;
+			var l:* = _isLoader ? _loader.contentLoaderInfo : _loader;
 			l.addEventListener(Event.OPEN, onLoadStartLoader);
 			l.addEventListener(Event.INIT, onLoadInitLoader);
 			l.addEventListener(Event.COMPLETE, onLoadCompleteLoader);
@@ -242,10 +242,10 @@ package com.pippoflash.net {
 			_funcPostfix = "";
 			
 		}
-		public function harakiri					() {
+		public function harakiri					():void {
 			cleanup							();
 		}
-		private function killLoading					() {
+		private function killLoading					():void {
 			try {
 				if (_loader == _contentLoader) { // Kill Loader
 					killListeners				(_loader.contentLoaderInfo);
