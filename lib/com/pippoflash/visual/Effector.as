@@ -15,14 +15,14 @@
 				glowAndroid:{f:GlowFilter, par:{blurX:8, blurY:8, quality:1, color:0x000000, strength:1}},
 				glowTalco:{f:GlowFilter, par:{blurX:20, blurY:20, quality:1, color:0xffffff, strength:1}},
 				glowWhite:{f:GlowFilter, par:{color:0xffffff, alpha:1, blurX:20,blurY:20}},
-				glowBlack:{f:GlowFilter, par:{color:0x000000, alpha:1, blurX:10,blurY:10, quality:1, strength:1}},
+				glowBlack:{f:GlowFilter, par:{color:0x000000, alpha:1, blurX:10,blurY:10, quality:1, strength:2}},
 				glowBlackBorder:{f:GlowFilter, par:{color:0x000000, alpha:1, blurX:8,blurY:8, quality:1, strength:3}},
 				removeGlow:{f:GlowFilter, par:{alpha:0, blurX:0,blurY:0, remove:true}},
 				glowInner:{f:GlowFilter, par:{inner:false, color:0xffffff, alpha:1, blurX:12,blurY:12}},
 				glowInviteFriendsClaim:{f:GlowFilter, par:{inner:false, color:0xFFDC00, alpha:1, blurX:12,blurY:12, quality:1, strength:1.6}},
 				glowCasinoLobbyTimedBonus:{f:GlowFilter, par:{inner:false, color:0x009900, alpha:1, blurX:12,blurY:12, quality:1, strength:1.6}},
 				superKnockout:{f:GlowFilter, par:{inner:false, color:0x99ffff, alpha:1, blurX:30,blurY:30, quality:1, strength:3, knockout:true}},
-				cartoonBorder:{f:GlowFilter, par:{inner:false, color:0x000000, alpha:1, blurX:6,blurY:6, quality:1, strength:10, knockout:false}}
+				cartoonBorder:{f:GlowFilter, par:{inner:false, color:0x000000, alpha:1, blurX:12,blurY:12, quality:1, strength:10, knockout:false}}
 			};
 		public static var _default_GLOW						:Object = {blurXS:10,blurXE:30};
 		// SYSTEM
