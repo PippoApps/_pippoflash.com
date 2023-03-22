@@ -86,6 +86,8 @@ package com.pippoflash.framework {
 			es:{title:"<b>CONECTION ASENTE</b>", text:"Para jugar a [pre_GAMENAME] necesitas estar conectado a internet. Activa la conexion antes de volver a intentarlo. Gracias"}
 		};
 		// REFERENCES
+		private var _instance:_Application;
+		private function get instance():_Application {return _instance;}
 		// STAGE INSTANCES
 		// SCREEN SAVER
 		protected var _hasScreensaver:Boolean; // If screensaver is active or not
@@ -105,6 +107,7 @@ package com.pippoflash.framework {
 
 		public function _Application(id:String="_Application", appId:String="PippoFlash Default App ID", appVer:String="0.00"):void {
 			super(id);
+			_instance = this;
 			visible = false;
 			if (FIRST_INIT) {
 				_mainApp = this;

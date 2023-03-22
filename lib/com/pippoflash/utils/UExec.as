@@ -127,17 +127,18 @@ package com.pippoflash.utils {
 				}
 			}
 		}
-		public static function reset				():void { // This removes all taska, and resets everything as new
-			Debug.debug						(_debugPrefix, "Interrupting all motions! (only the ones in frames, with reset())");
+		public static function reset():void { // This removes all taska, and resets everything as new
+			Debug.debug(_debugPrefix, "Interrupting all motions! (only the ones in frames, with reset())");
 			if (_commandsAtFrame.length) {
 				for (var i:uint=0; i<_commandsAtFrame.length; i++) {
-					if (_commandsAtFrame[i])		Debug.debug(_debugPrefix, "Removing " + Debug.object(_commandsAtFrame[i]));
+					if (_commandsAtFrame[i]) Debug.debug(_debugPrefix, "Removing " + Debug.object(_commandsAtFrame[i]));
 				}
 			}
-			_commandsAtFrame					= [];
-			_next							= [];
-			_counter							= 0;
-			checkStop							();
+			_commandsAtFrame = [];
+			_next = [];
+			_counter = 0;
+			resetSequence();
+			checkStop();
 		}
 		public static function addEnterFrameListener(f:Function):void {
 			_myClip.addEventListener(Event.ENTER_FRAME, f, false, 0, true);

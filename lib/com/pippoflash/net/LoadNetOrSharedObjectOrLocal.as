@@ -47,12 +47,14 @@ package com.pippoflash.net
             _qlo = null;
             _loadedAs = 0;
             _status = 0;
+            PippoFlashEventsMan.removeAllListeningToInstance(this);
             super.cleanup();
 		}
 
         // Start and load from network
-        public function start(onComplete:Function):void {
+        public function start(onComplete:Function=null):void {
             _status = _loadedAs = 1;
+            if (onComplete) PippoFlashEventsMan.addInstanceMethodListenerTo(this, EVT_LOAD_COMPLETE, onComplete);
             _qlo = QuickLoader.loadFile(_netUrl, this, "Net", _useAnticache, "txt");
         }
         public function onLoadCompleteNet(o:SimpleQueueLoaderObject):void {
