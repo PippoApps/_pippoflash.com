@@ -16,6 +16,7 @@
 				glowTalco:{f:GlowFilter, par:{blurX:20, blurY:20, quality:1, color:0xffffff, strength:1}},
 				glowWhite:{f:GlowFilter, par:{color:0xffffff, alpha:1, blurX:20,blurY:20}},
 				glowBlack:{f:GlowFilter, par:{color:0x000000, alpha:1, blurX:10,blurY:10, quality:1, strength:1}},
+				glowBlackBorder:{f:GlowFilter, par:{color:0x000000, alpha:1, blurX:8,blurY:8, quality:1, strength:3}},
 				removeGlow:{f:GlowFilter, par:{alpha:0, blurX:0,blurY:0, remove:true}},
 				glowInner:{f:GlowFilter, par:{inner:false, color:0xffffff, alpha:1, blurX:12,blurY:12}},
 				glowInviteFriendsClaim:{f:GlowFilter, par:{inner:false, color:0xFFDC00, alpha:1, blurX:12,blurY:12, quality:1, strength:1.6}},
@@ -58,7 +59,7 @@
 		}
 		public static function getFilter						(effId:String, par:Object=null):BitmapFilter {
 			_o										= _effectsList[effId];
-			var f										:BitmapFilter = new _o.f();
+			var f										:BitmapFilter = new (_o.f as Class)();
 			for (_s in _o.par)							f[_s] = _o.par[_s];
 			if (par)									for (_s in par) f[_s] = par[_s];
 			return									f;

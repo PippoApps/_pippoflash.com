@@ -56,6 +56,14 @@ package com.pippoflash.utils {
 		static public function getRanged01(n:Number):Number {
 			return n < 0 ? 0 : n > 1 ? 1 : n;
 		}
+		/**
+		 * Returns a random number in the middle of delta (i.e.: 100 returns random between -50 and 50)
+		 * @param	delta
+		 * @return
+		 */
+		public static function getRandomDelta(delta:Number):Number {
+			return (Math.random()*delta)-(delta/2);
+		}
 // GEOMETRY ///////////////////////////////////////////////////////////////////////////////////////
 		public static function angleToRadians			(a:Number):Number {
 			return							a * ANGLE_TO_RADIANS;

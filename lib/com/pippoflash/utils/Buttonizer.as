@@ -240,7 +240,7 @@ package com.pippoflash.utils {
 				_lastInteractedItem.onClick(e);
 			}
 		}
-		public static function onPress(e:MouseEvent) {
+		public static function onPress(e:MouseEvent):void {
 			processGeneralEvent();
 			processEvent(e);
 			if (_lastInteractedItem && _lastInteractedItem.active) {

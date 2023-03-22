@@ -176,11 +176,11 @@ package com.pippoflash.framework.air {
 					return;
 				}
 				if (a) {
-					resetFrameRateCheck			();
-					UExec.addEnterFrameListener	(onEnterFrame);
+					resetFrameRateCheck();
+					UExec.addEnterFrameListener(onEnterFrame);
 				}
 				else {
-					UExec.removeEnterFrameListener	(onEnterFrame);
+					UExec.removeEnterFrameListener(onEnterFrame);
 				}
 				if (traceFramerateSeconds) traceAverageFramerate(traceFramerateSeconds);
 			}
@@ -189,6 +189,7 @@ package com.pippoflash.framework.air {
 			}
 			private static function onEnterFrame		(e:Event):void {
 				_framesCounter					++;
+				// trace(1);
 				if (_framesCounter == CHECK_FRAMERATE_FRAMES) {
 					var time					:uint = getTimer() - _lastCheckTimer;
 					_averageFramerate			= (_framesCounter*1000) / ((getTimer() - _lastCheckTimer));
