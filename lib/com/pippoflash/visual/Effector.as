@@ -17,6 +17,7 @@
 				glowWhite:{f:GlowFilter, par:{color:0xffffff, alpha:1, blurX:20,blurY:20}},
 				glowSabicTitle:{f:GlowFilter, par:{color:0xc77aff, alpha:1, blurX:70,blurY:70, strength:1.5}},
 				glowBlack:{f:GlowFilter, par:{color:0x000000, alpha:1, blurX:10,blurY:10, quality:1, strength:2}},
+				glowBlackWide:{f:GlowFilter, par:{color:0x000000, alpha:1, blurX:20,blurY:20, quality:1, strength:2}},
 				glowBlackBorder:{f:GlowFilter, par:{color:0x000000, alpha:1, blurX:8,blurY:8, quality:1, strength:3}},
 				removeGlow:{f:GlowFilter, par:{alpha:0, blurX:0,blurY:0, remove:true}},
 				glowInner:{f:GlowFilter, par:{inner:false, color:0xffffff, alpha:1, blurX:12,blurY:12}},

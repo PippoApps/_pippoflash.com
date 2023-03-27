@@ -37,7 +37,7 @@ package com.pippoflash.framework.prompt {
 		public static var _fadeSpeed:uint = 3;
 		public static var _resetCenter:Boolean = true; // If true, everytime a prompt appears, it is set again to the center of the screen. Otherwise, it will be positioned where last prompt was
 		public static var _draggerToolTip:String; // If this is defined, dragger has a tooltip
-		public static var _shieldAlpha:Number = 0;
+		// public static var _shieldAlpha:Number = 0;
 		public static var _addToRoot:Boolean = false; // If this is true, prompts will be added to root, else, they are added to stage (and scaled according to root scaling if any)
 		static public var _scaleToStageScaling:Boolean = true; // Scales up or down prompts in relation to ratio between original rect and stage rect
 		static public var _setInstantIfDevice:Boolean = true; // If I am running on a device, all prompts do not fade but appear instantly
@@ -117,6 +117,15 @@ package com.pippoflash.framework.prompt {
 			// Called by _Application on initialization
 			UDisplay.removeClips(_prompts);
 		}
+		public static function setPromptDefaultPar(promptId:String, parName:String, value:*):void {
+			Debug.warning("_Prompt", "Setting default par",parName,"of prompt",promptId,"to",value);
+			const p:_Prompt = _promptsById[promptId];
+			if (!p) Debug.error("_Prompt", "Error, prompt not found: " + promptId);
+			else p.setDefaultPar(parName, value);
+		}
+		public function setDefaultPar(parName:String, value:*):void {
+			_defaultPar[parName] = value;
+		}
 // INIT ////////////////////////////////////////////////////////////////////////////////////
 		public function _Prompt(id:String="_Prompt", group:String="default") {
 			super(id);
@@ -142,7 +151,7 @@ package com.pippoflash.framework.prompt {
 				// Proceed with resizing, positioning, boundaries setup
 // 				onResize								();
 				// Shielding
-				if (this["_shield"]) this["_shield"].alpha = _shieldAlpha;
+				// if (this["_shield"]) this["_shield"].alpha = _shieldAlpha;
 			}
 					private function setupChildren():void {
 						_butts = [];
@@ -451,19 +460,21 @@ package com.pippoflash.framework.prompt {
 		public function resetTexts							(p:Object=null):void {
 			// First make everything invisible
 			if (_hideInactiveItems) {
-				for each (_c in _txts)						_c.visible = false;
-				for each (_c in _butts)					_c.visible = false;
+				for each (_c in _txts) _c.visible = false;
+				for each (_c in _butts) _c.visible = false;
 			}
 			// Look for possible button namesin PAR
 			if (!p)									p = _par;
 			var textProp								:String = _useHtml ? "htmlText" : "text";
 			var txtMethod								:Function = _useHtml ? UText.setHtmlTextDynamicSize : UText.setTextDynamicSize;
-			//trace(Debug.object(p));
+			trace(Debug.object(p));
 			for (_s in p) {
 				// Extension classes must be set as dynamic or will trigger an error here
-				//trace(_s);
+				trace("ECCO: " + _s);
 				if (this[_s]) { // If there is an instance of something with the same name of parameter
+				trace(_s)
 					if (_s.indexOf("_butt") == 0 && p[_s]) {
+						trace("Cerco i bottoni " + _s, this[_s], p[_s])
 						Buttonizer.setButtonText			(this[_s], p[_s], _buttHtml);
 						this[_s].visible					= true;
 					}
