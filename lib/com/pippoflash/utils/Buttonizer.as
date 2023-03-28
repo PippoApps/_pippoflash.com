@@ -236,7 +236,7 @@ package com.pippoflash.utils {
 		public static function onClick(e:MouseEvent):void {
 			processGeneralEvent();
 			processEvent(e);
-			if (_lastInteractedItem.active) {
+			if (_lastInteractedItem && _lastInteractedItem.active) {
 				_lastInteractedItem.onClick(e);
 			}
 		}

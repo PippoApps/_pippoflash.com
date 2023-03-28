@@ -296,8 +296,9 @@ package com.pippoflash.utils {
 		public static function removeClip(c:DisplayObject):void {
 			if (c && c.parent) c.parent.removeChild(c);
 		}
-		public static function removeClips				(a:Array):void {
-			for each (_c in a)					removeClip(_c);
+		public static function removeClips(...rest):void {
+			const a:Array = rest[0] is Array ? rest[0] : rest; 
+			for each (_c in a) removeClip(_c);
 		}
 		public static function resetClip				(container:DisplayObjectContainer, c:MovieClip, par:Object=null):DisplayObject {
 			// This function removes the MovieClip and replace it with a new one (returning it)
