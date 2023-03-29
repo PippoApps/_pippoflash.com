@@ -8,6 +8,7 @@ Any of the following special properties can optionally be passed in through the 
 	onUpdateParams 	: Array An Array of parameters to pass the onUpdate function
 	onComplete 		: Function A function that should be called when the tween has finished
 	onCompleteParams 	: Array An Array of parameters to pass the onComplete function.
+	scaleAll			: Converts into scaleX and scaleY
 	immediateRender 	: Boolean Normally when you create a from() tween, it renders the starting state immediately even if you define a delay which in typical "animate in" scenarios is very desirable, but if you prefer to override this behavior and have the from() tween render only after any delay has elapsed, set immediateRender to false.
 	overwrite 			: Boolean Controls how other tweens of the same object are handled when this tween is created. Here are the options:
 				false (NONE): No tweens are overwritten. This is the fastest mode, but you need to be careful not to create any tweens with overlapping properties of the same object that run at the same time, otherwise they'll conflict with each other. 
@@ -213,6 +214,9 @@ package com.pippoflash.motion {
 				// Setup motions param
 				var motionParams:Object = {};
 				var vars:Object = UCode.duplicateObject(userVars);
+				if (vars.scaleAll != undefined) {
+					vars.scaleX = vars.scaleY = vars.scaleAll;
+				}
 				// Setup ease function
 				vars.ease	= EaseLookup.find(ease ? ease : _defaultEase);
 				// Setup stuff for onComplete

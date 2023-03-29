@@ -42,6 +42,9 @@ REVISIONS
 */
 package com.pippoflash.utils {
 	
+	import com.adobe.protocols.dict.Database;
+	import flash.text.engine.DigitWidth;
+
 	import 									flash.events.MouseEvent;
 	import									flash.display.*;
 	import									flash.display.InteractiveObject;
@@ -59,6 +62,9 @@ package com.pippoflash.utils {
 		public static var _verbose:Boolean = true; // If buttonizer has to trace all events
 		public static var _debugPrefix:String = "Buttonizer";
 		private static var _initialized:Boolean; // If buttonizer has been initialized
+		private static var _allButtonsBlocked:Boolean;
+		public static function get allButtonsBlocked():Boolean {if (_allButtonsBlocked) Debug.warning(_debugPrefix, "All buttons are blocked."); return _allButtonsBlocked;}
+		// If true, all active buttons are blocked at the general level. 
 		// SYSTEM
 		private static var _buttonsItem:Dictionary = new Dictionary(true); // Stores instances of ButtonizerItem associated to button
 		// MARKERS
@@ -85,7 +91,12 @@ package com.pippoflash.utils {
 			_isTouchDevice = USystem.isDevice() || FORCE_TOUCH_DEVICE;
 		}
 // METHODS ////////////////////////////////////////////////////////////////////////////////////////////////////
-		
+	// GENERAL METHODS
+		public static function setAllButtonsBlocked(blocked:Boolean):void {
+			_allButtonsBlocked = blocked;
+			if (_allButtonsBlocked) Debug.warning(_debugPrefix, "All active buttons are now blocked.");
+			else Debug.debug(_debugPrefix, "Buttons are now active again (individually blocked buttons are still blocked).");
+		}
 	// CREATE BUTTONS
 		public static function setupButton(c:InteractiveObject, listener:*, post:String="", actions:String="onClick", useFinger:Boolean=true):void {
 			// check if button is already set and clear it
@@ -451,6 +462,7 @@ package com.pippoflash.utils {
 			return							Boolean(_toolTipOn);
 		}
 		public function callMethod					(m:String, e:MouseEvent=null):void {
+			if (Buttonizer.allButtonsBlocked) return;
 			// First I check if I am in tunneling mode
 			// If I want to FIRE events also, not just tunnel them, I need to move the event call ON TOP OF THIS BLOCK
 			// Otherwise, it needs to be in an else statement. Activating tunneled clicks, destroys the Buttonizer last interacted item flow, therefore it can't be called afterwards.
@@ -498,6 +510,7 @@ package com.pippoflash.utils {
 		}
 	// EVENTS
 		public function onRollOver					(e:MouseEvent):void {
+			if (Buttonizer.allButtonsBlocked) return;
 			callMethod							(ON_ROLLOVER, e);
 			if (hasTooltip()) {
 				if (_selected) { // Show correct tooltip for switch if selected, or doesn't show tip for list if selected
@@ -511,10 +524,12 @@ package com.pippoflash.utils {
 			}
 		}
 		public function onRollOut					(e:MouseEvent):void {
+			if (Buttonizer.allButtonsBlocked) return;
 			callMethod							(ON_ROLLOUT, e);
 			if (hasTooltip())						UGlobal.setToolTip(false);
 		}
 		public function onPress					(e:MouseEvent):void {
+			if (Buttonizer.allButtonsBlocked) return;
 			if (hasTooltip())						UGlobal.setToolTip(false);
 			if (_switch) { // Behaviour for switch
 				toggleSwitchSelected				();
@@ -525,13 +540,15 @@ package com.pippoflash.utils {
 			callMethod							(ON_PRESS, e);
 		}
 		public function onRelease					(e:MouseEvent):void {
+			if (Buttonizer.allButtonsBlocked) return;
 			callMethod							(ON_RELEASE, e);
 		}
 		public function onReleaseOutside				(e:MouseEvent):void {
+			if (Buttonizer.allButtonsBlocked) return;
 			callMethod							(ON_RELEASE_OUTSIDE, e);
 		}
 		public function onClick					(e:MouseEvent):void {
-			
+			if (Buttonizer.allButtonsBlocked) return;
 			callMethod							(ON_CLICK, e);
 		}
 	// UTY

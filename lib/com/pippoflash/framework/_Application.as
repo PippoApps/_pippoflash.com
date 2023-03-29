@@ -127,8 +127,23 @@ package com.pippoflash.framework {
 			if (MANAGE_UNCAUGHT_ERRORS) handleUncaughtErrors();
 			// Add stage event listener
 			addEventListener(Event.ADDED_TO_STAGE, initOnStage); // Initialize ONLY when stage is available
-			// Setup debug version
+			// Setup error handler
+			this.loaderInfo.uncaughtErrorEvents.addEventListener(UncaughtErrorEvent.UNCAUGHT_ERROR, onUncaughtError);
 		}
+
+
+
+		private function onUncaughtError(e : UncaughtErrorEvent) : void
+		{
+			trace("UNCAUGHT ERROR------------------------------------------------------------------------------");
+			trace(e.toString());
+			trace(e.error.toString());
+		}
+
+
+
+
+
 		protected function handleUncaughtErrors():void {
 			loaderInfo.uncaughtErrorEvents.addEventListener(UncaughtErrorEvent.UNCAUGHT_ERROR, uncaughtErrorHandler);
 		}

@@ -470,13 +470,17 @@ package com.pippoflash.framework.prompt {
 			trace(Debug.object(p));
 			for (_s in p) {
 				// Extension classes must be set as dynamic or will trigger an error here
-				trace("ECCO: " + _s);
+				// trace("ECCO: " + _s);
 				if (this[_s]) { // If there is an instance of something with the same name of parameter
-				trace(_s)
+				// trace(_s)
 					if (_s.indexOf("_butt") == 0 && p[_s]) {
 						trace("Cerco i bottoni " + _s, this[_s], p[_s])
-						Buttonizer.setButtonText			(this[_s], p[_s], _buttHtml);
-						this[_s].visible					= true;
+						const b:InteractiveObject = this[_s];
+						if (b is PippoFlashButton) (b as PippoFlashButton).setText(p[_s]);
+						else {
+							Buttonizer.setButtonText			(this[_s], p[_s], _buttHtml);
+							this[_s].visible					= true;
+						}
 					}
 					else if (_s.indexOf("_txt") == 0 && p[_s]) {
 						// Use UText framework to enter text

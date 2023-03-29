@@ -134,6 +134,12 @@ package com.pippoflash.utils {
 					if (_commandsAtFrame[i]) Debug.debug(_debugPrefix, "Removing " + Debug.object(_commandsAtFrame[i]));
 				}
 			}
+			// Removing timed executions
+			for each(var o:Object in _timedExecutions) {
+				cleanupObject(o);
+			}
+			_timedExecutions = new Dictionary();
+			_timedExecutionsByMethods = new Dictionary();
 			_commandsAtFrame = [];
 			_next = [];
 			_counter = 0;
