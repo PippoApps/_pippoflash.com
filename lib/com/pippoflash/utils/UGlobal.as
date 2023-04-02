@@ -23,7 +23,6 @@ package com.pippoflash.utils {
 	public dynamic class UGlobal {
 		// CONSTANTS
 		// RENDER QUALITY CAN BE SET NUMERICALLY - 															0	1					2				3		4				5					6				7	
-		private static const RENDER_QUALITIES		:Vector.<String> = new <String>["low",	"medium",	"high",	"best",	"8x8",	"8x8linear",	"16x16",	"16x16linear"]; 
 		
 // 		    BEST : String = "best"
 // [static] Specifies very high rendering quality. 
@@ -686,8 +685,9 @@ package com.pippoflash.utils {
 			_colorShield.width = _shield.width = _sw; _colorShield.height = _shield.height = _sh;
 		}
 // QUALITY ///////////////////////////////////////////////////////////////////////////////////////
+		private static const RENDER_QUALITIES		:Vector.<String> = new <String>[StageQuality.HIGH_16X16_LINEAR,	StageQuality.HIGH_16X16,	StageQuality.HIGH_8X8_LINEAR,	StageQuality.HIGH_8X8,	StageQuality.BEST,	StageQuality.HIGH,	StageQuality.MEDIUM,	StageQuality.LOW]; 
 		public static function setRenderQuality		(q:int):void {
-			// 0 = best, 3 = minimum.
+			// 0 = best, 7 = minimum.
 			if (q < 0) {
 				Debug.debug					(_debugPrefix, "Render quality has not been set, using default one: " + _stage.quality);
 				return;
@@ -702,6 +702,7 @@ package com.pippoflash.utils {
 		public static function getRenderQuality():String {
 			return RENDER_QUALITIES[_renderQuality];
 		}
+
 // MOUSE EVENTS //////////////////////////////////////////////////////////////////////////////////////
 		public static function addStageOnMouseUp		(f:Function) {
 			if (_stage)						_stage.addEventListener(MouseEvent.MOUSE_UP, f);

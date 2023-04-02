@@ -98,8 +98,20 @@ package com.pippoflash.utils {
 // 			c.y								= UGlobal.getCenterPoint().y;
 // 		}
 	// CENTERING ///////////////////////////////////////////////////////////////////////////////////////
+		public static function centerToSelf(c:DisplayObject):void {
+			c.x = -(c.width/2);
+			c.y = -(c.height/2);
+		}
 		public static function centerToArea			(c:DisplayObject, w:Number, h:Number):void {
 			centerV(c, h); centerH(c, w);
+		}
+		public static function centerTextVertTo(c:TextField, o:Object):void {
+			c.y = (o.height - c.textHeight)/2;
+			// trace(c);
+			// trace(o)
+			// trace(o.width)
+			// trace(c.textWidth)
+			// c.x = (o.width - c.textWidth)/2;
 		}
 		public static function centerV				(c:*, h:Number):void {
 			c.y								= c is TextField ? centerAmount(UCode.getHeight(c), h) : centerAmount(UCode.getHeight(c), h);

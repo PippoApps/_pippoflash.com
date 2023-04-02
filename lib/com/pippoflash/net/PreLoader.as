@@ -55,6 +55,7 @@ package com.pippoflash.net {
 
 		// REFERENCES
 		private static var _assets:Object;
+		private static var _allAssets:Object;
 		// DATA
 		private static var _queue:Vector.<Object>; // Stores a QUEUE of loading OBJECTS
 		private static var _processing:Object; // The Object actually processing
@@ -85,6 +86,7 @@ package com.pippoflash.net {
 			if (_loader) _loader.suicide();
 			_loader = null;
 			_assets = {bmp:{}, txt:{}, swf:{}, gen:{}}; // gen are unrecognized files
+			_allAssets = {};
 			_total = 0;
 			_status = "IDLE";
 			_queue = new Vector.<Object>();
@@ -111,7 +113,7 @@ package com.pippoflash.net {
 		public static function queue					(uri:String, prioritize:Boolean=false):void {
 			addLoadingObject					("gen", uri, prioritize);
 		}
-		// Getting
+		// Getting   
 		/**
 		 * Returns a file of any kind related to the url it was loaded from.
 		 * @param	uri Url of loaded file
@@ -138,6 +140,7 @@ package com.pippoflash.net {
 		 * @return Any Object
 		 */
 		public static function getBitmap(id:String, nullify:Boolean=true, duplicate:Boolean=false, hasSmoothing:Boolean=true):Bitmap {
+			// trace("returning bmp", Debug.object(_assets));
 			var b:Bitmap = _assets.bmp[id] as Bitmap;
 			if (!b) {
 				Debug.error(_debugPrefix, "Bitmap not found: " + id + ". Returning an empty bitmap.");
@@ -168,7 +171,28 @@ package com.pippoflash.net {
 			if (nullify)							delete _assets.gen[id];
 			return							t;
 		}
-		
+		public static function getAllFilesByUrl(andReset:Boolean=true, stripAllExtrasAndLeaveOnlyFileNameWithNoExtension:Boolean=true):Object { // Returns an object where {url:file}
+			var o:Object = {};
+			if (!stripAllExtrasAndLeaveOnlyFileNameWithNoExtension) o = UCode.duplicateObject(_allAssets);
+			else {
+				var newKey:String;
+				for(var key:String in _allAssets)
+				{
+					newKey = key.split("/").pop().split(".")[0];
+					o[newKey] = _allAssets[key];
+				}
+			}
+			Debug.traceObject(o);
+			if (andReset) reset();
+			return o;
+		}
+		public static function getAllBitmapsByUrl(andReset:Boolean=true, stripAllExtrasAndLeaveOnlyFileNameWithNoExtension:Boolean=true, smoothing:Boolean=true):Object { // Returns an object where {url:file}
+			var o:Object = getAllFilesByUrl(andReset, stripAllExtrasAndLeaveOnlyFileNameWithNoExtension);
+			for each(var b:Bitmap in o) {
+				b.smoothing = smoothing;
+			}
+			return o;
+		}
 		
 		
 		// List queing
@@ -246,6 +270,7 @@ package com.pippoflash.net {
 			}
 			//trace("Settu " + _processing.type + ", " +  _processing.uri + ", " + (content as ByteArray).bytesAvailable);
 			_assets[_processing.type][_processing.uri]	= content;
+			_allAssets[_processing.uri] = content;
 			_elapsed++;
 			_progress = _elapsed / _total;
 			PippoFlashEventsMan.broadcastStaticEvent(PreLoader, EVT_ITEMLOADCOMPLETE, _loader._url);
@@ -263,6 +288,7 @@ package com.pippoflash.net {
 		private static function processQueueCompleted():void {
 			Debug.debug(_debugPrefix, "Completed queue. Total files:"+ _total + ". " + (_errors ? ("Loaded:"+_loaded+", Errors:"+_errors) : ("All files loaded successfully.")));
 			PippoFlashEventsMan.broadcastStaticEvent(PreLoader, EVT_LOADCOMPLETE, _queueId);
+			getAllFilesByUrl(false);
 			reset();
 		}
 // LOADER LISTENERS ///////////////////////////////////////////////////////////////////////////////////////

@@ -44,6 +44,10 @@ package com.pippoflash.utils {
 	
 	import com.adobe.protocols.dict.Database;
 	import flash.text.engine.DigitWidth;
+	import flash.utils.Timer;
+	import flash.events.TimerEvent;
+	import com.greensock.TimelineMax;
+	import com.pippoflash.framework.PippoFlashEventsMan;
 
 	import 									flash.events.MouseEvent;
 	import									flash.display.*;
@@ -58,21 +62,27 @@ package com.pippoflash.utils {
 		public static const EVENT_PRIORITY:uint = 10; // Priority of events in the events chain - ContentBoxTouch is 20; Highest the number, higher the priority.
 		public static const EVENT_WEAK_REFERENCE:Boolean = true; // Use weak references
 		public static const FORCE_TOUCH_DEVICE:Boolean = true;
+		private static var INACTIVITY_TIMER_INTERVAL_SECONDS:Number = 10; // Seconds to detect inactivity timer
+		public static const EVT_INACTIVITY_INTERVAL:String = "onButtonizerInactivityInterval"; // seconds:uint - 10, 20, 30, etc.
 	// VARIABLES ///////////////////////////////////////////////////////////////////////////////////////
 		public static var _verbose:Boolean = true; // If buttonizer has to trace all events
 		public static var _debugPrefix:String = "Buttonizer";
 		private static var _initialized:Boolean; // If buttonizer has been initialized
 		private static var _allButtonsBlocked:Boolean;
 		public static function get allButtonsBlocked():Boolean {if (_allButtonsBlocked) Debug.warning(_debugPrefix, "All buttons are blocked."); return _allButtonsBlocked;}
-		// If true, all active buttons are blocked at the general level. 
 		// SYSTEM
 		private static var _buttonsItem:Dictionary = new Dictionary(true); // Stores instances of ButtonizerItem associated to button
 		// MARKERS
 		private static var _lastInteractedItem:ButtonizerItem; // Stored the last item who's interaction was received
 		private static var _lastPressedItemWaitingRelease:ButtonizerItem; // When an item is waiting for onRelease, it is stored here
 		private static var _lastEvent:MouseEvent; // Stores the last received mouse event, to retrieve values such as ctrlKey, etc.
-		// MARKERS
+		// CHECKS
 		private static var _isTouchDevice:Boolean; // This marks if we are working on a touch device. Is so, clicks are handled differently
+		// INACTIVITY TIMER
+		private static var _inactivityTimerActive:Boolean;
+		private static var _inactivityTimeElapsed:Number;
+		private static var _inactivityTimer:Timer; // Regular timer for inactivity, needs to be activated
+		private static var _inactivityTimerVerbose:Boolean = false;
 		// STATIC LISTENERS
 		static private var _onClickGeneralMethod:Function; // Broadcasted on each click, no matter where
 		// STATIC UTY
@@ -97,6 +107,40 @@ package com.pippoflash.utils {
 			if (_allButtonsBlocked) Debug.warning(_debugPrefix, "All active buttons are now blocked.");
 			else Debug.debug(_debugPrefix, "Buttons are now active again (individually blocked buttons are still blocked).");
 		}
+		public static function setInactivityAlert(active:Boolean, intervalSeconds:Number=3, verbose:Boolean=true):void {
+			// Counts inactivity every N seconds and broadcasts how long it has been inactive
+			_inactivityTimerVerbose = verbose;
+			_inactivityTimerActive = active;
+			INACTIVITY_TIMER_INTERVAL_SECONDS = intervalSeconds;
+			Debug.debug(_debugPrefix, active ? "Inacitivity timer is on every " + intervalSeconds + " seconds." : "Switching off inactivity timer.");
+			if (!active && _inactivityTimer) {
+				_inactivityTimer.removeEventListener(TimerEvent.TIMER_COMPLETE, onInactivityTimerElapsed);
+				_inactivityTimer.reset();
+				_inactivityTimer = null;
+			}
+			if (_inactivityTimerActive) {
+				if (!_inactivityTimer) {
+					_inactivityTimer = new Timer(INACTIVITY_TIMER_INTERVAL_SECONDS*1000, 0);
+					_inactivityTimer.addEventListener(TimerEvent.TIMER, onInactivityTimerElapsed, false, 0, true);
+				}
+				resetInactivityTimer();
+			}
+		}
+					private static function onInactivityTimerElapsed(e:TimerEvent):void {
+						_inactivityTimeElapsed += INACTIVITY_TIMER_INTERVAL_SECONDS;
+						if (_inactivityTimerVerbose) Debug.debug(_debugPrefix, "Inactivity timer elapsed: " + _inactivityTimeElapsed);
+						PippoFlashEventsMan.broadcastStaticEvent(Buttonizer, EVT_INACTIVITY_INTERVAL, _inactivityTimeElapsed);
+						// resetInactivityTimer();
+					}
+					private static function resetInactivityTimer():void {
+						if (_inactivityTimerVerbose) Debug.debug(_debugPrefix, "Reset inactivity timer.");
+						if (_inactivityTimerActive) {
+							_inactivityTimeElapsed = 0;
+							// _inactivityTimer.stop();
+							_inactivityTimer.reset();
+							_inactivityTimer.start();
+						}
+					}
 	// CREATE BUTTONS
 		public static function setupButton(c:InteractiveObject, listener:*, post:String="", actions:String="onClick", useFinger:Boolean=true):void {
 			// check if button is already set and clear it
@@ -262,6 +306,7 @@ package com.pippoflash.utils {
 		}
 			// General event
 		private static function processGeneralEvent():void { // Only on press or click, processes a general event that happens at every click
+			resetInactivityTimer();
 			if (_onClickGeneralMethod) {
 				var m:Function = _onClickGeneralMethod; // This has to be nullified before calling it, or if I set it again it might be nullified
 				_onClickGeneralMethod = null;
