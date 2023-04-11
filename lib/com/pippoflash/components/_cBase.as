@@ -22,16 +22,16 @@ package com.pippoflash.components {
 	public class _cBase extends MovieClip implements IPippoFlashEventDispatcher {
 // USER VARIABLES ////////////////////////////////////////////////////////////////////////////////
 		[Inspectable (name="_cBase - ID for Group Commands", type=String, defaultValue="")]
-		public function set _cBase_set_classGroup		(s:String) {
-			if (s)								addInstanceToGroup(s);
+		public function set _cBase_set_classGroup(s:String):void {
+			if (s) addInstanceToGroup(s);
 		}
 		[Inspectable (name="_cBase - Automatic Listener", type=String, defaultValue="NONE", enumeration="NONE,stage,root,parent")]
-		public function set _cBase_set_autoListener		(s:String) {
-			if (s != "NONE")						addListener(this[s]);
+		public function set _cBase_set_autoListener(s:String):void {
+			if (s != "NONE") addListener(this[s]);
 		}
 		[Inspectable (name="_cBase - Events postfix", type=String, defaultValue="")]
-		public function set _cBase_set_eventPostfix		(s:String) {
-			_cBase_eventPostfix 					= s;
+		public function set _cBase_set_eventPostfix(s:String):void {
+			_cBase_eventPostfix = s;
 		}
 		[Inspectable 							(name="_cBase - _parameter1", type=String)]
 		public var _parameter1						:String;
@@ -213,14 +213,14 @@ package com.pippoflash.components {
 			_cStatus = 0;
 		}
 // LISTENERS MANAGEMENT /////////////////////////////////////////////////////////////////////////
-		public function addListener(listener:Object) {
+		public function addListener(listener:Object):void {
 			// Adds a listener to the listener's chain
 			for (var i:Number=0; i<_cBase_listenersList.length; i++) {
 				if (_cBase_listenersList[i] == listener) return;
 			}
 			_cBase_listenersList.push(listener);
 		}
-		public function removeListener(listener:Object) {
+		public function removeListener(listener:Object):void {
 			// Remove a listener from the listener's chain
 			for (var i:Number=0; i<_cBase_listenersList.length; i++) {
 				if (_cBase_listenersList[i] == listener) {
@@ -229,10 +229,10 @@ package com.pippoflash.components {
 				};
 			}
 		}
-		public function removeAllListeners() {
+		public function removeAllListeners():void {
 			_cBase_listenersList = new Array();
 		}
-		public function broadcastEvent(event:String, ... par) {
+		public function broadcastEvent(event:String, ... par):void {
 			if (!_cBase_listenersList.length) return; // No listeners
 			event += _cBase_eventPostfix;
 			for (var i:Number=0; i<_cBase_listenersList.length; i++) {
@@ -289,7 +289,7 @@ package com.pippoflash.components {
 			if (name.indexOf(id) == 0) _cBase_eventPostfix = name.substr(id.length);
 		}
 // GROUPS MANAGEMENT //////////////////////////////////////////////////////////////////////////
-		public function addInstanceToGroup(g:String) {
+		public function addInstanceToGroup(g:String):void {
 			if (_cBase_classGroupsList[g] == undefined) _cBase_classGroupsList[g] = new Array();
 			_cBase_classGroupsList[g].push(this);
 			_cBase_groupId = g;

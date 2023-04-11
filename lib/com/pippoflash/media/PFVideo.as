@@ -167,15 +167,31 @@ package com.pippoflash.media {
 			_ns.play(_url);
 		}
 		public function pause():void {
+			if (!_ns) {
+				Debug.warning(_debugPrefix, "pause() error: NetStream not defined.");
+				return;
+			}
 			_ns.pause();
 		}
 		public function resume():void {
+			if (!_ns) {
+				Debug.warning(_debugPrefix, "resume() error: NetStream not defined.");
+				return;
+			}
 			_ns.resume();
 		}
 		public function seek(n:Number):void {
+			if (!_ns) {
+				Debug.warning(_debugPrefix, "seek() error: NetStream not defined.");
+				return;
+			}
 			_ns.seek(n);
 		}
 		public function seekPercent(n:Number):void {
+			if (!_ns) {
+				Debug.warning(_debugPrefix, "seekPercent() error: NetStream not defined.");
+				return;
+			}
 			_ns.seek(UNumber.getPercent(getDuration(), n));
 		}
 		public function stop(andDispose:Boolean=false):void {
