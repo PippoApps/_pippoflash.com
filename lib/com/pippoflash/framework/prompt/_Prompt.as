@@ -70,7 +70,7 @@ package com.pippoflash.framework.prompt {
 			_enlargeOnBoundaries:false, // If true, popup is not just reduced in order to have all boundaries visible, but also enlarged if boundaries are smaller than one stage size
 			_promptUnderOthers:false, // If true, this prompt will be added BELOW all others
 			_doNotQueue:false, // Queue makes so that if another prompt is called when this is opened, will be queued and launched when this is closed. Set this to true to just discard any other occurrance when prompt is active.
-			_blockStage:true // If stage below this prompt should be blocked
+			_blockStage:false // If stage below this prompt should be blocked
 		};
 		protected static var _prompts:Array = []; // Stores all prompts. The singleton instance of each.
 		protected static var _promptsById:Object = {}; // Store prompts by ID only

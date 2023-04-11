@@ -177,11 +177,11 @@ package com.pippoflash.utils {
 			}
 		}
 	// CONTROL SOUNDS
-		public static function playSound				(id:String, loops:uint=1, listener:*=null, vol:Number=1):void { // This accepts the class id, or a custom ID used for sound lists
-			if (_soundListsIdToAttachId[id])			id = _soundListsIdToAttachId[id]; // If it was a list sound with custom ID, I set the ID as for the real attach id
+		public static function playSound(id:String, loops:uint=1, listener:*=null, vol:Number=1):void { // This accepts the class id, or a custom ID used for sound lists
+			if (_soundListsIdToAttachId[id]) id = _soundListsIdToAttachId[id]; // If it was a list sound with custom ID, I set the ID as for the real attach id
 			Debug.debug(_debugPrefix, "Play:",id,"loops",loops,"listener",listener);
-			initializeSound						(id, listener);
-			startPlaying						(id, 0, loops, listener);
+			initializeSound(id, listener);
+			startPlaying(id, 0, loops, listener, vol);
 		}
 		public static function stopSound				(id:String):void {
 			if (_soundListsIdToAttachId[id])			id = _soundListsIdToAttachId[id]; // If it was a list sound with custom ID, I set the ID as for the real attach id

@@ -3,6 +3,8 @@
 
 package com.pippoflash.components {
 	
+	import com.pippoflash.motion.PFMover;
+
 	import 											com.pippoflash.components._cBase;
 	import											com.pippoflash.utils.*;
 	import											com.pippoflash.motion.Animator;
@@ -62,13 +64,14 @@ package com.pippoflash.components {
 		[Inspectable 									(name="Double Click prevent millisecs", type=Number, defaultValue=500)]
 		public var _doubleClickPreventOffset					:Number = 500; // How long it will wait before triggering a new click action
 		// VARIABLES //////////////////////////////////////////////////////////////////////////
-		private static const VERBOSE						:Boolean = false;
+		private static const VERBOSE:Boolean = false;
 // 		private static const NORMAL_BUTTON_BUTTONIZER_EVENTS	:String = "onPress,onRollOver,onRollOut,onRelease";
 // 		private static const TOUCH_BUTTON_BUTTONIZER_EVENTS	:String = "onPress,onRelease";
-		public static var SMOOTH_APPEAR_FRAMES				:int = 8;
-		public static var _radioButtonGroups					:Array = new Array();
-		public static var _radioGroupsList						:Object = new Object();
-		public const _instanceList							:Array = ["_up","_over","_down","_sleep"];
+		public static var SMOOTH_APPEAR_FRAMES:int = 8;
+		public static var _radioButtonGroups:Array = new Array();
+		public static var _radioGroupsList:Object = new Object();
+		public const _instanceList:Array = ["_up","_over","_down","_sleep"];
+		private static const _mover:PFMover =  new PFMover("PippoFlashButton");
 		// STATIC UTY ////////////////////////////////////////////////////////////////////////- These are to be reused instead of creating new temp vars
 		public static var _horizAlign							:String;
 		public static var _vertAlign							:String;
@@ -81,7 +84,12 @@ package com.pippoflash.components {
 		private var _appearFunction						:Function;
 		private var _clickTimerOffset						:uint = 0; // Marks last click timer so that I can calculate if double click prevention worked. Set to 0, first click is always good.
  		// REFERENCES ////////////////////////////////////////////////////////////////////////
-		protected var _button								:*;
+		private var _button:*;
+
+		public function get buttonizedButton():InteractiveObject
+		{
+			return _button;
+		}
 		protected var _txt									:TextField;
 		private var _icon									:MovieClip; // Stores the attached icon instance
 		// MARKERS ////////////////////////////////////////////////////////////////////////
@@ -378,8 +386,10 @@ package com.pippoflash.components {
 		}
 		private function appearSmooth						(c:DisplayObject, a:Boolean) {
 			if (a) {
+				// _mover.fade(c, 0.2, 1);
 				Animator.fadeInTotal						(c, SMOOTH_APPEAR_FRAMES);
 			}
+			// else _mover.fade(c, 0.2, 0);	 	 								Animator.fadeOut(c, SMOOTH_APPEAR_FRAMES);
 			else	 									Animator.fadeOut(c, SMOOTH_APPEAR_FRAMES);
 		}
 		private function appearInstant						(c:DisplayObject, a:Boolean) {
@@ -429,7 +439,7 @@ package com.pippoflash.components {
 				return;
 			}
 			// Otherwise continue normally
-			_appearFunction							(_button["_down"], false);
+			_appearFunction(_button["_down"], false);
 			broadcastEvent							("onRelease", this);
 			UGlobal.setToolTip							(false);
 		}

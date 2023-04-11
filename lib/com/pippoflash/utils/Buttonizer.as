@@ -224,8 +224,13 @@ package com.pippoflash.utils {
 				getItem(c).setTooltip					(null, null);
 			}
 		}
-		private static function getItem				(c:InteractiveObject):ButtonizerItem {
-			return							_buttonsItem[c];
+		private static function getItem(c:InteractiveObject):ButtonizerItem {
+			return _buttonsItem[c is PippoFlashButton ? (c as PippoFlashButton).buttonizedButton : c];
+		}
+	// SOUNDS
+		public static function setButtonSound(c:InteractiveObject, soundId:String, evt:String="onClick", volume:Number=1):void {
+			if (getItem(c)) getItem(c).setSound(evt, soundId, volume);
+			else Debug.error(_debugPrefix, "setButtonSound() Cannot find button to set sound: "+ c);
 		}
 	// GENERAL METHOD
 		static public function setGeneralOnClick(clickMethod:Function=null):void { // Sets or remove a general click method that happens at each click
@@ -421,6 +426,8 @@ package com.pippoflash.utils {
 
 // HELPER CLASSES ///////////////////////////////////////////////////////////////////////////////////////	 
 	import									flash.events.*;
+import flash.desktop.DockIcon;
+
 	import									flash.display.*;
 	import									flash.geom.*;
 	import									com.pippoflash.utils.*;
@@ -435,7 +442,7 @@ package com.pippoflash.utils {
 		public static const ON_RELEASE_OUTSIDE		:String = "onReleaseOutside";
 		public static const ON_SELECT_LIST			:String = "onSelectList";
 		public static const ON_TUNNEL				:String = "tunnel"; // Just add this to the initializer events of Buttonizer, and I will tunnel events to underneath children
-		// STATIC
+		// ISTANCE
 		private static var _lists						:Object = {}; // Stores the arrays of buttons associated with list
 		private var _button						:InteractiveObject;
 		private var _listener						:*; // This can be anything, an object, a class, a Sprite...
@@ -451,8 +458,11 @@ package com.pippoflash.utils {
 		private var _listIndex						:uint = 0; // The index positioned in the list array
 		private var _isTunnel						:Boolean; // This container has been instructed to tunnel events
 		//private var _stopPropagation:Boolean; // New system would stop propagation ONLY if specified
+		// SOUND
+		private var _sounds:Object;
+		private var _soundsVolume:Object;
 	// FRAMEWORK ///////////////////////////////////////////////////////////////////////////////////////
-		public function harakiri					():void { // Destroyes class and frees memory
+		public function harakiri():void { // Destroyes class and frees memory
 			// If button is part of a list, remove the button from list, or if is the last button, kill the list
 			if (_list) {
 				if (_lists[_listId]) {
@@ -464,9 +474,11 @@ package com.pippoflash.utils {
 			}
 			_active = _onRelease = _switch = _selected = _list = _isTunnel = null as Boolean; // Nullify booleans
 			_post = _toolTipOn = _toolTipOff = _listId	= null; // nullify strings
-			_listIndex							= 0;
-			_button							= null;
-			_listener							= null;
+			_listIndex = 0;
+			_button = null;
+			_listener = null;
+			_sounds = null;
+			_soundsVolume = null;
 		}
 	// GETTERS ///////////////////////////////////////////////////////////////////////////////////////
 		public function get active					():Boolean {
@@ -506,8 +518,22 @@ package com.pippoflash.utils {
 		public function hasTooltip					():Boolean { // Tooltip is considered active only if tooltipon is defined
 			return							Boolean(_toolTipOn);
 		}
+		public function setSound(evt:String, soundId:String, volume:Number=1):void {
+			// trace("Setto sound      " + evt, soundId)
+			if (!_sounds) {
+				_sounds = {};
+				_soundsVolume = {};
+			}
+			_sounds[evt] = soundId;
+			_soundsVolume[evt] = volume;
+		}
+		public function playSound(evt:String):void {
+			if (_sounds && _sounds[evt]) USound.playSound(_sounds[evt], 1, null, _soundsVolume[evt]);
+		}
 		public function callMethod					(m:String, e:MouseEvent=null):void {
 			if (Buttonizer.allButtonsBlocked) return;
+			playSound(m);
+			// Debug.warning("BUTTON", "SOUND",m, Debug.object(_sounds) ); 
 			// First I check if I am in tunneling mode
 			// If I want to FIRE events also, not just tunnel them, I need to move the event call ON TOP OF THIS BLOCK
 			// Otherwise, it needs to be in an else statement. Activating tunneled clicks, destroys the Buttonizer last interacted item flow, therefore it can't be called afterwards.
@@ -547,7 +573,7 @@ package com.pippoflash.utils {
 				*/
 			}
 			else {
-				UCode.callMethod					(_listener, m+_post, _button);
+				UCode.callMethod(_listener, m+_post, _button);
 			}
 		}
 		public function setActive					(a:Boolean):void {
@@ -592,9 +618,9 @@ package com.pippoflash.utils {
 			if (Buttonizer.allButtonsBlocked) return;
 			callMethod							(ON_RELEASE_OUTSIDE, e);
 		}
-		public function onClick					(e:MouseEvent):void {
+		public function onClick(e:MouseEvent):void {
 			if (Buttonizer.allButtonsBlocked) return;
-			callMethod							(ON_CLICK, e);
+			callMethod(ON_CLICK, e);
 		}
 	// UTY
 		private function toggleSwitchSelected			():void {

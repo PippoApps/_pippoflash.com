@@ -33,12 +33,23 @@ package com.pippoflash.utils {
 		public static function getRandom				(n:uint, plus:uint=0):Number { // Returns a random number from 0 to n-1 (ideal for arrays)
 			return							Math.floor(Math.random()*n) + plus;
 		}
+		public static function getRandomFloat				(n:Number, plus:Number=0):Number { // Returns a random number from 0 to n-1 (ideal for arrays)
+			return							(Math.random()*n) + plus;
+		}
 		public static function getRandomSlot			(o:Object):Object { // Returns a random slot from an array, a vector, or any element with a length property
 			if (o is XML)						return o.children()[getRandom(o.children().length())];
 			if (o is XMLList)						return o[getRandom(o.length())];
 			else if (o.length != undefined && o.length != null) return o[getRandom(o.length)];
 			//Debug.error						(_debugPrefix, "Cannot getRandomSlot() from " + o);
 			return							null;
+		}
+		/**
+		 * Returns a random number in the middle of delta (i.e.: 100 returns random between -50 and 50)
+		 * @param	delta
+		 * @return
+		 */
+		public static function getRandomDeltaFloat(delta:Number, plus:Number=0):Number {
+			return ((Math.random()*delta)-(delta/2))+plus;
 		}
 // LOOPS AND RANGES ///////////////////////////////////////////////////////////////////////////////////////
 		public static function loop					(n:int, end:int, start:int=0):int { // Loops a number. If it is >= then end becomes start. If it is < than start it becomes end-1.
@@ -55,14 +66,6 @@ package com.pippoflash.utils {
 		 */
 		static public function getRanged01(n:Number):Number {
 			return n < 0 ? 0 : n > 1 ? 1 : n;
-		}
-		/**
-		 * Returns a random number in the middle of delta (i.e.: 100 returns random between -50 and 50)
-		 * @param	delta
-		 * @return
-		 */
-		public static function getRandomDelta(delta:Number):Number {
-			return (Math.random()*delta)-(delta/2);
 		}
 // GEOMETRY ///////////////////////////////////////////////////////////////////////////////////////
 		public static function angleToRadians			(a:Number):Number {

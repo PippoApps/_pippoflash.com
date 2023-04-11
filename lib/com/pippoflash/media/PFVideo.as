@@ -18,6 +18,7 @@ package com.pippoflash.media {
 // VARIABLES ///////////////////////////////////////////////////////////////////////////////////////
 		public static const EV_SV_AVAIL				:String = "onStageVideoAvailability"; // (available:Boolean) Broadcasted when after PFVideo.init(), it is known if stagevideo is available or not. Do stuff AFTER this event.
 		public static const PLAY_START_EVENT		:String = "onPFVideoPlayStart";
+		public static const EVT_PLAY_REACHED_END:String = "EVT_PLAY_REACHED_END"; // Not sure why play complete does    not work locally on  windows
 		public static const PLAY_COMPLETE_EVENT		:String = "onPFVideoPlayComplete";
 		public static const LOOP_COMPLETE_EVENT		:String = "onPFVideoLoopComplete";
 		public static const PLAY_DELAY_ELAPSED_EVENT	:String = "onPFVideoPlayDelayElapsed";
@@ -28,7 +29,7 @@ package com.pippoflash.media {
 		private static var _debugPrefix				:String = "PFVideo";
 		private static var _stageVideosUsed			:uint = 0; // This lets us know if
 		private static var _pfVideos					:Array = [];
-		private static var _verbose					:Boolean = false;
+		private static var _verbose					:Boolean = true;
 		private var _svNum						:uint; // Which number in stagevideos array I am using
 		// REFERENCE TO VIDEO OBJECT
 		private var _sv							:StageVideo;
@@ -265,13 +266,16 @@ package com.pippoflash.media {
 		}
 		private function processNetStatusEventObject	(o:Object):void {
 			if (o.code == "NetStream.Play.Start")		onPlayStarted();
+			else if (o.code  == "NetStream.Buffer.Flush") {
+				onPlayReachedEnd();
+			}
 			else if (o.code == "NetStream.Play.Complete") {
-				_loopsPlayed					++;
-				if (_loopsPlayed >= _playLoops)		onPlayComplete();
-				else							onLoopComplete();
+				_loopsPlayed ++;
+				if (_loopsPlayed >= _playLoops) onPlayComplete();
+				else onLoopComplete();
 			}
 			else if (o.code == "NetStream.Play.StreamNotFound") {
-				onStreamNotFound				();
+				onStreamNotFound();
 			}
 		}
 		private function onPlayStarted				():void {
@@ -287,6 +291,9 @@ package com.pippoflash.media {
 		private function onPlayDelayElapsed			(e:*=null):void {
 			setVideoVisible						(true);
 			broadcastEvent						(PLAY_DELAY_ELAPSED_EVENT+_eventPostfix);
+		}
+		private function onPlayReachedEnd():void {
+			broadcastEvent						(EVT_PLAY_REACHED_END+_eventPostfix);
 		}
 		private function onLoopComplete				():void {
 			broadcastEvent						(LOOP_COMPLETE_EVENT+_eventPostfix, _loopsPlayed);
@@ -339,6 +346,8 @@ package com.pippoflash.media {
 			_ns.client = this;
 // 			_ns.client							= {onMetaData:function(){trace("ONMETADATA"}, onXmpData:function(){trace("ONXMPDATA"}};
 			_ns.addEventListener(NetStatusEvent.NET_STATUS, onNetStreamStatus);
+			
+			// _ns.addEventListener(NetStream., onNetStreamStatus);
 			attachStream(_ns); // By default it attaches the internal netstream
 		}
 		private function disposeNetStream():void {

@@ -48,7 +48,7 @@
 		public var _scrollH								:MovieClip; // Reference to a PippoFlashScrollBar
 		private var _scrollVfunc							:Function; // Accordin to the type of scroll, links to the correct function
 		private var _scrollHfunc							:Function; // Accordin to the type of scroll, links to the correct function
-		private var _bgClip								:MovieClip; // If activated, this will cover the BG (to block click thru, and listen mousewheel)
+		private var _bgClip								:DisplayObject; // If activated, this will cover the BG (to block click thru, and listen mousewheel)
 		private var _textField								:TextField; // The textfield used for setText();
  		// MARKERS
 		private var _boundaries							:Rectangle = new Rectangle();
@@ -73,16 +73,16 @@
 			if (_useMouseWheel)							addEventListener(MouseEvent.MOUSE_WHEEL, onMouseWheel);
 			if (_coverBg)								renderBgCover();
 		}
-			private function renderBgCover						() {
-				_bgClip									= UDisplay.addChild(this, UDisplay.getSquareClip({width:_w, height:_h, alpha:0}));
+			private function renderBgCover():void {
+				_bgClip = addChild(UDisplay.getSquareSprite(_w, _h, 0));
 			}
-			private function setupScrollBarLink					(link:String, funcPost:String):MovieClip {
-				return								setupScrollBar(UCode.getPathFromString(this.parent, link), funcPost);
+			private function setupScrollBarLink(link:String, funcPost:String):MovieClip {
+				return setupScrollBar(UCode.getPathFromString(this.parent, link), funcPost);
 			}
-				private function setupScrollBar				(sb:MovieClip, funcPost:String):MovieClip {
-					sb._cBase_eventPostfix					= funcPost;
-					sb.addListener						(this);
-					return							sb;
+				private function setupScrollBar(sb:MovieClip, funcPost:String):MovieClip {
+					sb._cBase_eventPostfix = funcPost;
+					sb.addListener(this);
+					return sb;
 				}
 // METHODS //////////////////////////////////////////////////////////////////////////////////////
 		public override function update						(par:Object):void {
