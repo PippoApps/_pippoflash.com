@@ -132,7 +132,7 @@ package com.pippoflash.utils {
 						PippoFlashEventsMan.broadcastStaticEvent(Buttonizer, EVT_INACTIVITY_INTERVAL, _inactivityTimeElapsed);
 						// resetInactivityTimer();
 					}
-					private static function resetInactivityTimer():void {
+					public static function resetInactivityTimer():void {
 						if (_inactivityTimerVerbose) Debug.debug(_debugPrefix, "Reset inactivity timer.");
 						if (_inactivityTimerActive) {
 							_inactivityTimeElapsed = 0;

@@ -7,6 +7,7 @@ Manages alignment and resizing of clips
 
 package com.pippoflash.utils {
 
+
 	import									com.pippoflash.utils.Debug;
 	import									com.pippoflash.utils.UGlobal;
 	import									flash.system.*;
@@ -300,10 +301,13 @@ package com.pippoflash.utils {
 		public static function wrapInNewSprite			(c:DisplayObject):Sprite {
 			var s:Sprite = new Sprite(); s.addChild(c); return s;
 		}
-		public static function addChild				(container:DisplayObjectContainer, child:DisplayObject, par:Object=null):DisplayObject {
-			container.addChild					(child);
-			if (par)							UCode.setParametersForced(child, par);
-			return							child;
+		public static function addChild(container:DisplayObjectContainer, child:DisplayObject, par:Object=null):DisplayObject {
+			container.addChild(child);
+			if (par) UCode.setParametersForced(child, par);
+			return child;
+		}
+		public static function addChilds(container:DisplayObjectContainer, ...childs):void {
+			for each(var child:DisplayObject in childs) container.addChild(child)
 		}
 		public static function removeClip(c:DisplayObject):void {
 			if (c && c.parent) c.parent.removeChild(c);

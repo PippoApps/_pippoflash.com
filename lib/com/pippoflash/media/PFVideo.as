@@ -6,6 +6,10 @@ Uses ByteArray class SimpleStageVideo.
 
 package com.pippoflash.media {
 
+	import com.adobe.protocols.dict.Database;
+	import flash.utils.Timer;
+	import com.pippoflash.framework.PippoFlashEventsMan;
+
 	import									com.pippoflash.utils.*;
 	import									com.pippoflash.framework._PippoFlashBaseNoDisplayUMemDispatcher;
 	import									flash.media.*;
@@ -18,7 +22,9 @@ package com.pippoflash.media {
 // VARIABLES ///////////////////////////////////////////////////////////////////////////////////////
 		public static const EV_SV_AVAIL				:String = "onStageVideoAvailability"; // (available:Boolean) Broadcasted when after PFVideo.init(), it is known if stagevideo is available or not. Do stuff AFTER this event.
 		public static const PLAY_START_EVENT		:String = "onPFVideoPlayStart";
-		public static const EVT_PLAY_REACHED_END:String = "EVT_PLAY_REACHED_END"; // Not sure why play complete does    not work locally on  windows
+		// public static const EVT_PLAY_REACHED_END:String = "EVT_PLAY_REACHED_END"; // Not sure why play complete does    not work locally on  windows
+		public static const EVT_PLAY_STOP:String = "EVT_PLAY_STOP"; // Not sure why play complete does    not work locally on  windows
+		public static const EVT_PLAYING:String = "EVT_PLAYING"; // this - Regularly sends data on playhead position
 		public static const PLAY_COMPLETE_EVENT		:String = "onPFVideoPlayComplete";
 		public static const LOOP_COMPLETE_EVENT		:String = "onPFVideoLoopComplete";
 		public static const PLAY_DELAY_ELAPSED_EVENT	:String = "onPFVideoPlayDelayElapsed";
@@ -30,6 +36,20 @@ package com.pippoflash.media {
 		private static var _stageVideosUsed			:uint = 0; // This lets us know if
 		private static var _pfVideos					:Array = [];
 		private static var _verbose					:Boolean = true;
+
+		private var _triggerEventsWithBytes:Boolean;
+
+		public function get triggerEventsWithBytes():Boolean
+		{
+			return _triggerEventsWithBytes;
+		}
+
+		public function set triggerEventsWithBytes(value:Boolean):void
+		{
+			_triggerEventsWithBytes = value;
+		}
+
+
 		private var _svNum						:uint; // Which number in stagevideos array I am using
 		// REFERENCE TO VIDEO OBJECT
 		private var _sv							:StageVideo;
@@ -45,6 +65,9 @@ package com.pippoflash.media {
 		private var _showOnlyWhenPlaying			:Boolean; // If this is on, video will be visible ONLY when is playing
 		private var _delayOneFrameOnPlay			:Boolean; // If this is on, shows the video 1 frame after it is playing, to prevent the bug on Android that shows a frame of the previous video
 		private var _eventPostfix					:String;
+		private var _playEventTimer:Timer = new Timer(500, 0);
+		private var _playEventTimerLastTime:Number; // Stores last time and broadcasts only if different
+		// private var _metaData:Object;
 		// LOOPING
 		private var _playLoops						:uint; // Stors howmany loops we have to play
 		private var _loopsPlayed					:uint; // Stores howmany loops we played already
@@ -70,6 +93,7 @@ package com.pippoflash.media {
 			_nc.addEventListener					(NetStatusEvent.NET_STATUS, onNetConnectionStatus);
 			initVideo							(forceSoftware);
 			Debug.debug						(_debugPrefix, "Initializing " + (_isStageVideo ? "StageVideo instance." : "Regular Video (StageVideo not available)."));
+			_playEventTimer.addEventListener(TimerEvent.TIMER, onPlayEventTimer);
 			if (videoUrl)						play(videoUrl);
 		}
 // STATIC ///////////////////////////////////////////////////////////////////////////////////////
@@ -164,6 +188,7 @@ package com.pippoflash.media {
 			}
 			if (_showOnlyWhenPlaying) setVideoVisible(false); // If visible only when playing, video gets visible only on play started
 			_metaData = null;
+			_playEventTimerLastTime = -1;
 			_ns.play(_url);
 		}
 		public function pause():void {
@@ -180,11 +205,20 @@ package com.pippoflash.media {
 			}
 			_ns.resume();
 		}
+		public function seekToEnd():void {
+			Debug.debug(_debugPrefix, "Seeking to END: " + getDuration());
+			if (!_ns) {
+				Debug.warning(_debugPrefix, "seekToEnd() error: NetStream not defined.");
+				return;
+			}
+			_ns.seek(getDuration());
+		}
 		public function seek(n:Number):void {
 			if (!_ns) {
 				Debug.warning(_debugPrefix, "seek() error: NetStream not defined.");
 				return;
 			}
+			Debug.debug(_debugPrefix, "sSeeking playhead to: " + n);
 			_ns.seek(n);
 		}
 		public function seekPercent(n:Number):void {
@@ -272,6 +306,21 @@ package com.pippoflash.media {
 		public function getElapsedString			():String {
 			return							_metaData ? UText.checkOneZero(Math.floor(Math.round(getElapsed())/60)) + ":" + UText.checkOneZero(Math.round(getElapsed())%60) : "00:00";
 		}
+// PLAY EVENT TIMER ////////////////////////////////////////////////////////////////////////////////////
+		public function activatePlayEventTimer():void {
+			_playEventTimer.reset();
+			_playEventTimer.start();
+		}
+		public function deActivatePlayEventTimer():void {
+			_playEventTimer.stop();
+		}
+		public function onPlayEventTimer(e:TimerEvent):void {
+			trace("timer " + (_ns ? _ns.time : 0));
+			if (_playEventTimerLastTime != _ns.time) {
+				_playEventTimerLastTime = _ns.time;
+				PippoFlashEventsMan.broadcastInstanceEvent(this, EVT_PLAYING);
+			} 
+		}
 // NET LISTENERS ///////////////////////////////////////////////////////////////////////////////////////
 		public function onNetStreamStatus			(e:NetStatusEvent):void {
 			if (_verbose)						Debug.debug(_id, "onNetStreamStatus",e,Debug.object(e.info));
@@ -281,9 +330,12 @@ package com.pippoflash.media {
 			if (_verbose)						Debug.debug(_id, "onNetConnectionStatus",e,Debug.object(e.info));
 		}
 		private function processNetStatusEventObject	(o:Object):void {
-			if (o.code == "NetStream.Play.Start")		onPlayStarted();
-			else if (o.code  == "NetStream.Buffer.Flush") {
-				onPlayReachedEnd();
+			if (_verbose) Debug.debug(_debugPrefix, "Processing: " + o.code);
+			if (o.code == "NetStream.Play.Start") onPlayStarted();
+			else if (o.code == "NetStream.Play.Stop") onPlayStop();
+			else if (o.code == "NetStream.Pause.Notify") {
+				deActivatePlayEventTimer();
+				Debug.warning(_debugPrefix, "REMEMBER TO INTERCEPT UNPAUSE AND REACTVATE TIMEER EvENT");
 			}
 			else if (o.code == "NetStream.Play.Complete") {
 				_loopsPlayed ++;
@@ -295,6 +347,7 @@ package com.pippoflash.media {
 			}
 		}
 		private function onPlayStarted				():void {
+			if (_verbose) Debug.debug(_debugPrefix, "onPlayStarted()");
 			if (_showOnlyWhenPlaying) {
 				if (_delayOneFrameOnPlay && _loopsPlayed == 0) { // Only does this on first play, if it is looping, no need to hide the video
 					setVideoVisible				(false);
@@ -303,22 +356,32 @@ package com.pippoflash.media {
 				else							_myVideo.visible = true;
 			}
 			broadcastEvent						(PLAY_START_EVENT+_eventPostfix);
+			activatePlayEventTimer();
 		}
 		private function onPlayDelayElapsed			(e:*=null):void {
 			setVideoVisible						(true);
 			broadcastEvent						(PLAY_DELAY_ELAPSED_EVENT+_eventPostfix);
 		}
-		private function onPlayReachedEnd():void {
-			broadcastEvent						(EVT_PLAY_REACHED_END+_eventPostfix);
+		// private function onPlayReachedEnd():void {
+		// 	broadcastEvent						(EVT_PLAY_REACHED_END+_eventPostfix);
+		// }
+		private function onLoopComplete():void {
+			Debug.debug(_debugPrefix, "Loop Complete.");
+			broadcastEvent(LOOP_COMPLETE_EVENT+_eventPostfix, _loopsPlayed);
+			_ns.seek(0);
 		}
-		private function onLoopComplete				():void {
-			broadcastEvent						(LOOP_COMPLETE_EVENT+_eventPostfix, _loopsPlayed);
-			_ns.seek							(0);
+		private function onPlayStop(e:*=null):void {
+			if (_verbose) Debug.debug(_debugPrefix, "onPlayStop()");
+			// _ns.seek(_ns.info.);
+			// _ns.pause();
+			broadcastEvent(EVT_PLAY_STOP+_eventPostfix);
+			deActivatePlayEventTimer();
 		}
-		private function onPlayComplete				():void {
-			if (_showOnlyWhenPlaying)				_myVideo.visible = false;
-			broadcastEvent						(PLAY_COMPLETE_EVENT+_eventPostfix);
-			if (_repeat)						_ns.seek(0);
+		private function onPlayComplete():void {
+			Debug.debug(_debugPrefix, "onPlayComplete()");
+			// if (_showOnlyWhenPlaying) _myVideo.visible = false;
+			broadcastEvent(PLAY_COMPLETE_EVENT+_eventPostfix);
+			// if (_repeat) _ns.seek(0);
 		}
 		private function onStreamNotFound			():void {
 			Debug.debug						(_debugPrefix, "Stream not found: " + _url + ". Broadcasting " + STREAM_NOT_FOUND_EVENT+_eventPostfix+"()");
@@ -326,29 +389,30 @@ package com.pippoflash.media {
 		}
 		// For full description please look: http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/net/NetStream.html#client
 		public function onCuePoint				(o:Object):void {
-			if (_verbose)						Debug.debug						(_id, "onCuePoint",Debug.object(o));
+			if (_verbose)						Debug.debug						(_id, "onCuePoint\n",Debug.object(o));
 		}
 		public function onXMPData				(o:Object):void {
-			if (_verbose)						Debug.debug						(_id, "onXMPData",Debug.object(o));
+			if (_verbose)						Debug.debug						(_id, "onXMPData\n",Debug.object(o));
 		}
 		public function onMetaData				(o:Object):void {
-			if (_verbose)						Debug.debug(_id, "onMetaData",Debug.object(o));
+			if (_verbose)						Debug.debug(_id, "onMetaData\n",Debug.object(o));
+			// trace("o.duration",o.duration);
 			_metaData						= o;
 			broadcastEvent						(ON_METADATA, o);
 		}
 		public function onPlayStatus				(o:Object):void {
-			if (_verbose) 						Debug.debug(_id, "onPlayStatus",Debug.object(o));
+			if (_verbose) 						Debug.debug(_id, "onPlayStatus\n",Debug.object(o));
 			processNetStatusEventObject			(o);
 			// onPlayStatus {level:status, code:NetStream.Play.Complete}
 		}
 		public function onSeekPoint				(o:Object):void {
-			if (_verbose)						Debug.debug						(_id, "onSeekPoint",Debug.object(o));
+			if (_verbose)						Debug.debug						(_id, "onSeekPoint\n",Debug.object(o));
 		}
 		public function onTextData				(o:Object):void {
-			if (_verbose)						Debug.debug						(_id, "onTextData",Debug.object(o));
+			if (_verbose)						Debug.debug						(_id, "onTextData\n",Debug.object(o));
 		}
 		public function onImageData				(o:Object):void {
-			if (_verbose)						Debug.debug						(_id, "onImageData",Debug.object(o));
+			if (_verbose)						Debug.debug						(_id, "onImageData\n",Debug.object(o));
 		}
 		public function stopTransmit				(o:Object=null):void {
 			if (_verbose)						Debug.debug						(_debugPrefix, "received stopTransmit " + Debug.object(o));
@@ -360,15 +424,14 @@ package com.pippoflash.media {
 		private function createNetStream():void {
 			_ns = new NetStream(_nc);
 			_ns.client = this;
-// 			_ns.client							= {onMetaData:function(){trace("ONMETADATA"}, onXmpData:function(){trace("ONXMPDATA"}};
+			_ns.inBufferSeek = true;
 			_ns.addEventListener(NetStatusEvent.NET_STATUS, onNetStreamStatus);
-			
-			// _ns.addEventListener(NetStream., onNetStreamStatus);
 			attachStream(_ns); // By default it attaches the internal netstream
 		}
 		private function disposeNetStream():void {
 			if (_ns) {
 				_ns.removeEventListener(NetStatusEvent.NET_STATUS, onNetStreamStatus);
+				_ns.client = {};
 			}
 			_myVideo.attachNetStream(null); // this is the same for Video and StageVideo
 			_ns = null;
@@ -423,6 +486,7 @@ package com.pippoflash.media {
 			_v								= new Video(_rect.width, _rect.height);
 			_v.x								= _rect.x;
 			_v.y								= _rect.y;
+			_v.smoothing = true;
 			_myVideo							= _v;
 			Debug.debug						(_debugPrefix, "Initialized Software Video: " + _v);
 		}
