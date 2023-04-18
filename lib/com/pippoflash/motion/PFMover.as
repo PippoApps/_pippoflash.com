@@ -70,6 +70,7 @@ package com.pippoflash.motion {
 		private static const VERBOSE:Boolean = false;
 		private static const DEFAULT_EASE:String = "Quart.easeOut";
 		private static const DEFAULT_SLIDE_STEPS:uint = 6;
+		private static const OBJECT_INITIAL_PROPERTIES:Vector.<String> = new <String>["x", "y", "alpha", "scaleX", "scaleY"];
 	// STATIC VARS
 		private static var _internalMover:PFMover;	
 		private static var _allMotions:Dictionary = new Dictionary(); // Motions are stored centrally. An object motion is ALWAYS overwritten
@@ -83,6 +84,7 @@ package com.pippoflash.motion {
 		private var _blitMasks:Dictionary = new Dictionary(true);
 		private var _defaultEase:String;
 		private var _allTweenNano:Vector.<TweenNano> = new Vector.<TweenNano>();
+		private const _displayObjectInitialProperties:Dictionary = new Dictionary(true); // Stores the initial properties of an object (position and scale);
 		// UTY
 		private var _tw:TweenNano; // Acts as a temporary reference
 // STATIC METHODS ///////////////////////////////////////////////////////////////////////////////////////
@@ -141,6 +143,90 @@ package com.pippoflash.motion {
 			_verbose = VERBOSE;
 		}
 // METHODS ///////////////////////////////////////////////////////////////////////////////////////
+	// OBJECTS SETUP AND AUTOMATED PROPERTIES - Methods with auto are related to the stored initial properties
+		public function storeObjectInitialProperties(c:*, remove:Boolean=false, transparent:Boolean=false):void {
+			var props:Object = {};
+			for each(var p:String in OBJECT_INITIAL_PROPERTIES){
+				props[p] = c[p];
+				_displayObjectInitialProperties[c] = props;
+			}
+			if (_verbose) Debug.debug(_debugPrefix, "Storing initial props for " + c + Debug.object(props));
+			if (transparent) c.alpha = 0;
+			if (remove) UDisplay.removeClip(c);
+		}
+		public function restoreInitialProperties(c:*):void {
+			var props:Object = _displayObjectInitialProperties[c];
+			if (_verbose) Debug.debug(_debugPrefix, "Restoring instantly initial props for " + c + Debug.object(props));
+			for(var p:String in OBJECT_INITIAL_PROPERTIES){
+				c[p] = props[p];
+			}
+		}
+		public function getInitialProperty(c:*, prop:String):Number {
+			return _displayObjectInitialProperties[c][prop];
+		}
+		public function autoEnterFromZoomZero(c:*, time:Number, directionFrom:String="bottom", setOffStageBeforeEnter:Boolean=false, onComplete:Function=null, onCompleteParams:*= null, emd:String=null, resetBefore:Boolean=false, ease:String="Strong.easeOut"):TweenNano {
+			c.scaleX = c.scaleY = 0;
+			return doMove(c, time, {scaleX:getInitialProperty(c, "scaleX"), scaleY:getInitialProperty(c, "scaleY"), onComplete:onComplete, onCompleteParams:onCompleteParams}, ease, emd, "to");
+		}
+		public function autoEnterFromOffScreen(c:*, time:Number, directionFrom:String="bottom", setOffStageBeforeEnter:Boolean=false, onComplete:Function=null, onCompleteParams:*= null, emd:String=null, resetBefore:Boolean=false, ease:String="Strong.easeOut"):void {
+			const p:String = directionFrom.charAt(0).toLowerCase();
+			if (setOffStageBeforeEnter) autoSetOffScreen(c, p, resetBefore);
+			const prop:String = (p == "b" || p == "t") ? "y" : "x";
+			autoRestoreProp(c, time, prop, onComplete, onCompleteParams, emd, resetBefore, ease);
+		}
+		public function autoExitOffScreen(c:*, time:Number, directionTo:String="bottom", onComplete:Function=null, onCompleteParams:*= null, emd:String=null, resetBefore:Boolean=false, ease:String="Strong.easeOut"):void {
+			const p:String = directionTo.charAt(0).toLowerCase();
+			const prop:String = autoGetOffScreenPropName(p);
+			autoMoveProp(c, time, autoGetOffScreenPropValue(c, p), autoGetOffScreenPropName(p), onComplete, onCompleteParams, emd, resetBefore, ease);
+		}
+		public function autoRestoreProp(c:*, time:Number, prop:String, onComplete:Function=null, onCompleteParams:*= null, emd:String=null, resetBefore:Boolean=false, ease:String="Strong.easeOut"):void { // Moves object in relation to initial properties
+			autoMoveProp(c, time, getInitialProperty(c, prop), prop, onComplete, onCompleteParams, emd, resetBefore, ease);
+		}
+		public function autoSetOffScreen(c:*, direction:String="bottom", resetBefore:Boolean=false):void { // bottom, top, left, right or b, t, l, r
+			const p:String = direction.charAt(0).toLowerCase();
+			if (_verbose) Debug.debug(_debugPrefix, "Setting off screen " + c + " direction " + direction, autoGetOffScreenPropName(p), autoGetOffScreenPropValue(c, p));
+			// this one needs to be redone using rectangles and bounds to optimize offscreen positions
+			if (resetBefore) restoreInitialProperties(c);
+			c[autoGetOffScreenPropName(p)] = autoGetOffScreenPropValue(c, p);
+		}
+		public function autoSetY(c:*, delta:Number, resetBefore:Boolean=false):void { // Sets object in relation to initial properties
+			autoSetProp(c, delta, "y", resetBefore);
+		}
+		public function autoSetProp(c:*, delta:Number, prop:String, resetBefore:Boolean=false):void {
+			if (resetBefore) restoreInitialProperties(c);
+			c[prop] = getInitialProperty(c, prop) + delta;
+		}
+		public function autoMoveY(c:*, time:Number, delta:Number, onComplete:Function=null, onCompleteParams:*= null, emd:String=null, resetBefore:Boolean=false, ease:String="Strong.easeOut"):void { // Moves object in relation to initial properties
+			autoMoveAddProp(c, time, delta, "y", onComplete, onCompleteParams, emd, resetBefore);
+		}
+		public function autoMoveX(c:*, time:Number, delta:Number, onComplete:Function=null, onCompleteParams:*= null, emd:String=null, resetBefore:Boolean=false, ease:String="Strong.easeOut"):void { // Moves object in relation to initial properties
+			autoMoveAddProp(c, time, delta, "x", onComplete, onCompleteParams, emd, resetBefore);
+		}
+		public function autoMoveAddProp(c:*, time:Number, delta:Number, prop:String, onComplete:Function=null, onCompleteParams:*= null, emd:String=null, resetBefore:Boolean=false, ease:String="Strong.easeOut"):void {
+			autoMoveProp(c, time, _displayObjectInitialProperties[c][prop] + delta, prop, onComplete, onCompleteParams, emd, resetBefore, ease);
+		}
+		// INTERNAL UTY
+		private function autoGetOffScreenPropValue(c:*, p:String="b"):Number { // Gets value from t, b, l, r
+			if (p == "b") return UGlobal.stageRect.height + c.height;
+			else if (p == "t") return 0 - c.height;
+			else if (p == "l") return 0 - c.width;
+			else if (p == "r") return UGlobal.stageRect.width + c.width;
+			Debug.error(_debugPrefix, "autoGetOffScreenProp() error, direction not understood: " + p);
+			return 0;
+		}
+		private function autoGetOffScreenPropName(p:String):String { // Gives x or y from t, b, l, r
+			return p == "b" || p == "t" ? "y" : "x";
+		}
+		private function autoMoveProp(c:*, time:Number, targetPos:Number, prop:String, onComplete:Function=null, onCompleteParams:*= null,  emd:String=null, resetBefore:Boolean=false, ease:String="Strong.easeOut"):void {
+			if (resetBefore) restoreInitialProperties(c);
+			const props:Object = {};
+			props[prop] = targetPos;
+			if (onComplete) {
+				props.onComplete = onComplete;
+				if (onCompleteParams) props.onCompleteParams = onCompleteParams;
+			}
+			move(c, time, props, ease, emd);
+		}
 	// SIMPLIFIED MOVERS
 		public function fadeScale(c:*, time:Number, alpha:Number = 1, scale:Number=1, onComplete:Function = null, onCompleteParams:*= null):TweenNano { // Fades to 1, and scales to 1
 			return									doMove(c, time, {alpha:alpha, scaleX:scale, scaleY:scale, onComplete:onComplete, onCompleteParams:onCompleteParams}, "Linear.easeOut", null, "to");
@@ -149,10 +235,14 @@ package com.pippoflash.motion {
 			return									doMove(c, time, {alpha:1, scaleX:1, scaleY:1, onComplete:onComplete, onCompleteParams:onCompleteParams}, "Linear.easeOut", null, "to");
 		}
 		public function fade(c:*, time:Number, alpha:Number, onComplete:Function=null, onCompleteParams:*=null, emd:String=null):TweenNano {
-			return									doMove(c, time, {alpha:alpha, onComplete:onComplete, onCompleteParams:onCompleteParams}, "Linear.easeIn", emd, "to");
+			return doMove(c, time, {alpha:alpha, onComplete:onComplete, onCompleteParams:onCompleteParams}, "Linear.easeIn", emd, "to");
 		}
-		public function scale(c:*, time:Number, scale:Number, onComplete:Function=null, onCompleteParams:*=null, emd:String=null):TweenNano {
-			return									doMove(c, time, {scaleX:scale, scaleY:scale, onComplete:onComplete, onCompleteParams:onCompleteParams}, "Strong.easeOut", emd, "to");
+		public function fadeInFrom0(c:*, time:Number, onComplete:Function=null, onCompleteParams:*=null, emd:String=null):TweenNano {
+			c.alpha = 0;
+			return doMove(c, time, {alpha:1, onComplete:onComplete, onCompleteParams:onCompleteParams}, "Linear.easeIn", emd, "to");
+		}
+		public function scale(c:*, time:Number, scale:Number, onComplete:Function=null, onCompleteParams:*=null, emd:String=null, ease:String="Strong.easeOut"):TweenNano {
+			return doMove(c, time, {scaleX:scale, scaleY:scale, onComplete:onComplete, onCompleteParams:onCompleteParams}, ease, emd, "to");
 		}
 		public function rotate(c:*, time:Number, rot:Number, onComplete:Function=null, onCompleteParams:*=null, emd:String=null):TweenNano {
 			return doMove(c, time, {rotation:rot, onComplete:onComplete, onCompleteParams:onCompleteParams}, "Strong.easeOut", emd, "to");
@@ -230,7 +320,7 @@ package com.pippoflash.motion {
 				// Always set an onComplete function
 				vars.onComplete = onPFMoverComplete;
 				// Debug trace
-				if (_verbose) Debug.debug(_debugPrefix, "Start motion", ease, c, c.name);
+				if (_verbose) Debug.debug(_debugPrefix, "Start motion", ease, c, c.name, Debug.object(vars));
 				// Setup stuff for motion
 // 				var t									:TweenNano = _allMotions[c] ? _allMotions[c] : TweenNano[dir](c, steps, vars); 
 				var t:TweenNano = TweenNano[dir](c, steps, vars);

@@ -423,13 +423,13 @@ package com.pippoflash.framework {
 			_noNetworkMessage					= _config ? _config.substitutePreKeywords(_noNetworkLocale[lan].text) : _noNetworkLocale[lan].text;
 		}
 // PROMPTS MANAGEMENT ///////////////////////////////////////////////////////////////////////////////////////
-		public function prompt					(id:String, par:Object=null):_Prompt {
+		public function prompt(id:String, par:Object=null):_Prompt {
 			if (getInstance(id)) {
-				getInstance(id).prompt			(par);
-				return						getInstance(id) as _Prompt;
+				getInstance(id).prompt(par);
+				return getInstance(id) as _Prompt;
 			}
-			else								Debug.debug(_debugPrefix, "Prompt",id,"requested but doesnt exist");
-			return							null;
+			else Debug.error(_debugPrefix, "Prompt",id,"requested but doesnt exist");
+			return null;
 		}
 		public function promptOk(msg:String, tit:String=null, func:Function=null, buttOk:String="OK", promptId:String="Ok"):_Prompt {
 			Debug.debug(_debugPrefix, "Prompting:",msg);
@@ -444,16 +444,16 @@ package com.pippoflash.framework {
 		}
 		public function promptConfirm(msg:String, tit:String=null, funcOk:Function=null, funcCancel:Function=null, buttOk:String=null, buttCancel:String=null):_Prompt {
 			// This prompts for a confirm, setting text, and eventually title, ok function, cancel function, and the text for the 2 buttons
-			_o								= {_txt:msg};
-			if (tit)							_o._txtTitle = tit;
-			if (Boolean(funcOk))					_o._funcOk = funcOk;
-			if (Boolean(funcCancel))				_o._funcCancel = funcCancel;
-			if (buttOk)							_o._buttOk = buttOk;
-			if (buttCancel)						_o._buttCancel = buttCancel;
-			return							prompt("Confirm", _o);
+			const o:Object = {_txt:msg};
+			if (tit) o._txtTitle = tit;
+			if (Boolean(funcOk)) o._funcOk = funcOk;
+			if (Boolean(funcCancel)) o._funcCancel = funcCancel;
+			if (buttOk) o._buttOk = buttOk;
+			if (buttCancel) o._buttCancel = buttCancel;
+			return prompt("Confirm", o);
 		}
-		public function clearAllPrompts				(group:String=null):void {
-			_Prompt.clearAllPrompts				(group);
+		public function clearAllPrompts(group:String=null):void {
+			_Prompt.clearAllPrompts(group);
 		};
 		// Process config xml prompt
 		public function processConfigPrompt(id:String, params:Object=null, substituteAttributes:Object=null, textKeywords:Object=null):_Prompt {

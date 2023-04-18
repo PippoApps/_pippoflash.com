@@ -12,6 +12,7 @@
 	public class Effector {
 		// VARIABLES //////////////////////////////////////////////////////////////////////////
 		public static const _effectsList							:Object = {
+				glowSabicMiddle:{f:GlowFilter, par:{color:0xc77aff, alpha:1, blurX:25,blurY:25, strength:1.5}},
 				glowSabicTitle:{f:GlowFilter, par:{color:0xc77aff, alpha:1, blurX:70,blurY:70, strength:1.5}},
 				glowAndroid:{f:GlowFilter, par:{blurX:8, blurY:8, quality:1, color:0x000000, strength:1}},
 				glowTalco:{f:GlowFilter, par:{blurX:20, blurY:20, quality:1, color:0xffffff, strength:1}},
@@ -114,9 +115,10 @@
 		public static function setGlowColor						(c:Number):void {
 			_glowColor									= c;
 		}
-		public static function startGlow(c:DisplayObject, time:Number=0.5, glowFilter:*=null):void {
+		public static function startGlow(c:DisplayObject, time:Number=0.5, glowFilter:*=null, killPreviousGlow:Boolean=false):void {
 			if (glowFilter == null) glowFilter = {color:_glowColor, alpha:1, blurX:12,blurY:12,inner:false};
 			else if (glowFilter is String) glowFilter = _effectsList[glowFilter].par;
+			if (killPreviousGlow) stopGlow(c, 0.01);
 			TweenMax.to(c, time, {yoyo:true, repeat:-1, glowFilter:glowFilter});
 		}
 		public static function startGlowColor					(c:DisplayObject, col:uint=0xffffff, time:Number=0.5):void {
@@ -126,7 +128,8 @@
 			_glowColor									= prevColor;
 		}
 		public static function stopGlow(c:DisplayObject, time:Number=0.5):void {
-			setGlow(c, time, "removeGlow");
+			if (time > 0) setGlow(c, time, "removeGlow");
+			else TweenMax.killTweensOf(c);
 // 			TweenMax.to(c, 0, {glowFilter  :{remove:true}});
 		}
 		public static function startBounce(c:DisplayObject, time:Number = 0.3, scale:Number=1.08):void {
@@ -138,6 +141,7 @@
 		public static function setGlow(c, time:Number=0.5, filter:String="glowWhite"):void {
 			var t:TweenMax = TweenMax.to(c, time, {glowFilter:_effectsList[filter].par});
 			if (time == 0) t.progress(1);
+			// var c:DisplayObject;
 		}
 // UTY /////////////////////////////////////////////////////////////////////////////////////////
 		public function activateEffect						() {

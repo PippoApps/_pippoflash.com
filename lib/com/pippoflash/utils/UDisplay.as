@@ -316,11 +316,17 @@ package com.pippoflash.utils {
 			const a:Array = rest[0] is Array ? rest[0] : rest; 
 			for each (_c in a) removeClip(_c);
 		}
-		public static function resetClip				(container:DisplayObjectContainer, c:MovieClip, par:Object=null):DisplayObject {
-			// This function removes the MovieClip and replace it with a new one (returning it)
-			// If the movieclip doesnt exist, it creates a new one and adds it to container (thats why I need container)
-			removeClip						(c);
-			return							addNewClip(container, par);
+		// public static function resetClip				(container:DisplayObjectContainer, c:MovieClip, par:Object=null):DisplayObject {
+		// 	// This function removes the MovieClip and replace it with a new one (returning it)
+		// 	// If the movieclip doesnt exist, it creates a new one and adds it to container (thats why I need container)
+		// 	removeClip						(c);
+		// 	return							addNewClip(container, par);
+		// }
+		public static function resetDisplayObjectProperties(c:DisplayObject):void {
+			c.x = c.y = 0;
+			c.rotation = 0;
+			c.scaleX = c.scaleY = 0;
+			c.rotationX = c.rotationY = c.rotationZ = 0;
 		}
 		public static function clipIsRemovable(c:DisplayObject):Boolean {
 			return c != null && c.hasOwnProperty("parent");
@@ -328,9 +334,9 @@ package com.pippoflash.utils {
 		public static function moveToTop(c:DisplayObject):void { // Moves selected sprite to higher depth
 			if (clipIsRemovable(c)) c.parent.addChild(c);
 		}
-		public static function moveToBottom(c:DisplayObject):void { // Moves selected sprite to lowest depth
+		// public static function moveToBottom(c:DisplayObject):void { // Moves selected sprite to lowest depth
 			
-		}
+		// }
 		public static function getChildren(c:DisplayObjectContainer):Array { // Gets an array with all children
 			var a:Array = [];
 			for (_i=0; _i<c.numChildren; _i++) a[_i] = c.getChildAt(_i);

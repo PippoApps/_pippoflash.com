@@ -220,13 +220,24 @@ package com.pippoflash.framework {
 			if (_eventListeners[evt].indexOf(listener) == -1) _eventListeners[evt].push(listener);
 		}
 		
-		static public function get mover():PFMover 
-		{
-			return _mover;
-		}
 		
 		public function removeListenerTo(evt:String, listener:*):void {
 			if (_eventListeners[evt]) UCode.removeArrayItem(_eventListeners[evt], listener);
 		}
+
+// GENERAL MOVER ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		static public function get mover():PFMover 
+		{
+			return _mover;
+		}
+
+
+// ANIMATE TIMELINE ITEMS UTILITIES /////////////////////////////////////////////////////////////////////////////////////////////
+		protected function getTimelineObject(instanceName:String):* {
+			const c:DisplayObject = this[instanceName];
+			if (!c) Debug.error(_debugPrefix, "Cannot find instance in Animate timeline: " + instanceName);
+			return c; 
+		}
+
 	}
 }
