@@ -155,11 +155,11 @@ package com.pippoflash.utils {
 	// UTY ///////////////////////////////////////////////////////////////////////////////////////
 			private static function makeCommandObject(f:Function=null, par:Array=null):Object {
 				if (Boolean(f)) {
-					return					{f:f, p:par};
+					return {f:f, p:par};
 				}
 				else {
-					Debug.error				(_debugPrefix, "UExec.makeCommandObject() received an empty function! I am setting dummyfunction, params are",par);
-					return					{f:UCode.dummyFunction, par:null};
+					Debug.error(_debugPrefix, "UExec.makeCommandObject() received a null function, params are",par);
+					return {f:UCode.dummyFunction, par:null};
 				}
 			}
 			private static function startListener():void { // Starts listening waiting for right frame
