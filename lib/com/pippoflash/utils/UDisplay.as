@@ -206,49 +206,50 @@ package com.pippoflash.utils {
 			else								c.scaleX = c.scaleY;
 		}
 	// ALIGNMENT ///////////////////////////////////////////////////////////////////////////////////////
-		public static var alignTo					:Function = alignSpriteTo;
-		public static function alignSpriteTo			(c:*, rect:*, horiz:String="CENTER", vert:String="MIDDLE", useBounds:Boolean=false, useRect:Boolean=false):void {
-			alignSpriteHorizTo					(c, rect, horiz, useBounds, useRect);
-			alignSpriteVertTo						(c, rect, vert, useBounds, useRect);
+		public static var alignTo:Function = alignSpriteTo;
+		public static function alignSpriteTo(c:*, rect:*, horiz:String="CENTER", vert:String="MIDDLE", useBounds:Boolean=false, useRect:Boolean=false, useTextBounds:Boolean=false):void {
+			alignSpriteHorizTo(c, rect, horiz, useBounds, useRect, useTextBounds);
+			alignSpriteVertTo(c, rect, vert, useBounds, useRect, useTextBounds);
 		}
-		public static function alignSpriteHorizTo			(c:*, rect:*, m:String="CENTER", useBounds:Boolean=false, useRect:Boolean=false):void {
+		public static function alignSpriteHorizTo(c:*, rect:*, m:String="CENTER", useBounds:Boolean=false, useRect:Boolean=false, useTextBounds:Boolean=false):void {
 			if (useBounds) {
 				// Element bounds can be measure ONLY if element is positioned at 0.
 				c.x = 0;
-				const bounds					:Rectangle = useRect ? c.getRect(c.parent) : c.getBounds(c.parent);
-				const diff						:Number = (rect.width - bounds.width) / 2;
-				c.x							= rect.x + diff;
-				c.x							-= bounds.x;
+				const bounds:Rectangle = useRect ? c.getRect(c.parent) : c.getBounds(c.parent);
+				const diff:Number = (rect.width - bounds.width) / 2;
+				c.x = rect.x + diff;
+				c.x -= bounds.x;
 			}
 			else {
-				const ww						:Number = c.hasOwnProperty("_w") ? c["_w"] : c.width;
-				m 							= m.toUpperCase();
-// 				trace("ALLINEO ORIZZONTALE ", m);
-
-				//trace("Cazzo sprite � largo: ",c.width);
-				if (m == "CENTER")				c.x = rect.x + ((rect.width-ww)/2);
-				else if (m == "RIGHT")			c.x = rect.x + (rect.width-ww);
-				else if (m == "LEFT")				c.x = rect.x;
+				const ww:Number = c.hasOwnProperty("_w") ? c["_w"] : c.width;
+				m = m.toUpperCase();
+				if (m == "CENTER") c.x = rect.x + ((rect.width-ww)/2);
+				else if (m == "RIGHT") c.x = rect.x + (rect.width-ww);
+				else if (m == "LEFT") c.x = rect.x;
 			}
 		}
-		public static function alignSpriteVertTo			(c:*, rect:*, m:String="MIDDLE", useBounds:Boolean=false, useRect:Boolean=false):void {
+		public static function alignSpriteVertTo(c:*, rect:*, m:String="MIDDLE", useBounds:Boolean=false, useRect:Boolean=false, useTextBounds:Boolean=false):void {
 			if (useBounds) {
-				c.y 							= 0;
-				const bounds					:Rectangle = useRect ? c.getRect(c.parent) : c.getBounds(c.parent);
-				const diff						:Number = (rect.height - bounds.height) / 2;
-				c.y							= rect.y + diff;
-				c.y							-= bounds.y;
+				c.y = 0;
+				const bounds:Rectangle = useRect ? c.getRect(c.parent) : c.getBounds(c.parent);
+				const diff:Number = (rect.height - bounds.height) / 2;
+				c.y = rect.y + diff;
+				c.y -= bounds.y;
+			} else if (useTextBounds && c is TextField) {
+				// Here I am using text boundaries, therefore it is a bit more complex
+				const ty:Number = (c as TextField).getCharBoundaries(0).y;
+				const th:Number = (c as TextField).textHeight;
+				m = m.toUpperCase();
+				if (m == "MIDDLE" || m == "CENTER")c.y = rect.y + ((rect.height-th)/2);
+				else if (m == "BOTTOM") c.y = rect.y + (rect.height-th);
+				else if (m == "TOP") c.y = rect.y;
+				c.y -= ty; // Remove offset from text positioning
 			} else {
-				const hh						:Number = c.hasOwnProperty("_h") ? c["_h"] : c.height;
-				m							= m.toUpperCase();
-// 				trace("ALLINEO VERTICALE ", m);
+				const hh:Number = c.hasOwnProperty("_h") ? c["_h"] : c.height;
+				m = m.toUpperCase();
 				if (m == "MIDDLE" || m == "CENTER")c.y = rect.y + ((rect.height-hh)/2);
-				else if (m == "BOTTOM")			c.y = rect.y + (rect.height-hh);
-				else if (m == "TOP")				c.y = rect.y;
-// 				if (m == "TOP") {
-// 					trace("Cazzo questa � TOOOOOOOOOOOOOOOOOOOPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP");
-// 					c.y += 1000;
-// 				}
+				else if (m == "BOTTOM") c.y = rect.y + (rect.height-hh);
+				else if (m == "TOP") c.y = rect.y;
 			}
 		}
 // COORDINATES /////////////////////////////////////////////////////////////////////////////////
@@ -310,7 +311,15 @@ package com.pippoflash.utils {
 			for each(var child:DisplayObject in childs) container.addChild(child)
 		}
 		public static function removeClip(c:DisplayObject):void {
-			if (c && c.parent) c.parent.removeChild(c);
+			// Added check for DisplayObjectContainer because Loader results as a parent
+			// trace(c);
+			// trace(c.parent);
+			// trace(c.parent is DisplayObjectContainer)
+			if (c && c.parent && c.parent) try {
+				c.parent.removeChild(c);
+			} catch (e:Error) {
+				Debug.error(_debugPrefix, "Cannot remove clip from parent:",c,c.parent);
+			}
 		}
 		public static function removeClips(...rest):void {
 			const a:Array = rest[0] is Array ? rest[0] : rest; 
@@ -327,6 +336,7 @@ package com.pippoflash.utils {
 			c.rotation = 0;
 			c.scaleX = c.scaleY = 0;
 			c.rotationX = c.rotationY = c.rotationZ = 0;
+			c.alpha = 1;
 		}
 		public static function clipIsRemovable(c:DisplayObject):Boolean {
 			return c != null && c.hasOwnProperty("parent");

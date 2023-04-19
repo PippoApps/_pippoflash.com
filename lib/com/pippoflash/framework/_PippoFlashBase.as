@@ -12,6 +12,7 @@ package com.pippoflash.framework {
 	import com.pippoflash.utils.UDisplay;
 	import com.pippoflash.motion.PFMover;
 	import com.pippoflash.framework.interfaces.IPippoFlashBase;
+	import com.pippoflash.utils.UExec;
 // CLASS ///////////////////////////////////////////////////////////////////////////////////////
 	public dynamic class _PippoFlashBase extends MovieClip implements IPippoFlashBase {
 		// STATIC USER DEFINABLE //////////////////////////////////////////////////////
@@ -238,6 +239,20 @@ package com.pippoflash.framework {
 			if (!c) Debug.error(_debugPrefix, "Cannot find instance in Animate timeline: " + instanceName);
 			return c; 
 		}
-
+// TIMED COMMANDS UTILITIES /////////////////////////////////////////////////////////////////////////////////////////////////
+		protected function addTimedCommand(time:Number, f:Function, ...rest):void {
+			// Uses class ID as a unique identifier for timed events, and can reset them automatically
+			if (rest.length == 0) UExec.timeWithID(_pfId, time, f);
+			else if (rest.length == 1) UExec.timeWithID(_pfId, time, f, rest[0]);
+			else if (rest.length == 2) UExec.timeWithID(_pfId, time, f, rest[0], rest[1]);
+			else if (rest.length == 3) UExec.timeWithID(_pfId, time, f, rest[0], rest[1], rest[2]);
+			else if (rest.length == 4) UExec.timeWithID(_pfId, time, f, rest[0], rest[1], rest[2], rest[3]);
+			else if (rest.length == 5) UExec.timeWithID(_pfId, time, f, rest[0], rest[1], rest[2], rest[3], rest[4]);
+			else Debug.error(_debugPrefix, "Too many parameters for addTimedCommand()");
+		}
+		protected function resetTimedCommands():void {
+			Debug.debug(_debugPrefix, "Resetting all timed commands for ID: " + _pfId);
+			UExec.removeTimedMethodsWithID(_pfId);
+		}
 	}
 }

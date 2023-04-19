@@ -171,6 +171,17 @@ package com.pippoflash.net {
 			if (nullify)							delete _assets.gen[id];
 			return							t;
 		}
+		public static function getAllBitmapsVector(andReset:Boolean=true, smoothing:Boolean=true):Vector.<Bitmap> { 
+			const v:Vector.<Bitmap> = new Vector.<Bitmap>();
+			var b:Bitmap;
+			for(var key:String in _allAssets) {
+				b = _allAssets[key];
+				b.smoothing = smoothing;
+				v.push(b);
+			}
+			if (andReset) reset();
+			return v;
+		}
 		public static function getAllFilesByUrl(andReset:Boolean=true, stripAllExtrasAndLeaveOnlyFileNameWithNoExtension:Boolean=true):Object { // Returns an object where {url:file}
 			var o:Object = {};
 			if (!stripAllExtrasAndLeaveOnlyFileNameWithNoExtension) o = UCode.duplicateObject(_allAssets);
@@ -182,7 +193,7 @@ package com.pippoflash.net {
 					o[newKey] = _allAssets[key];
 				}
 			}
-			Debug.traceObject(o);
+			// Debug.traceObject(o);
 			if (andReset) reset();
 			return o;
 		}

@@ -29,6 +29,8 @@ package com.pippoflash.utils {
 		// TIMED EXECUTION
 		private static var _timedExecutions:Dictionary = new Dictionary(); // Stored by TIMER instance
 		static private var _timedExecutionsByMethods:Dictionary = new Dictionary();
+		// COMMANDS BY ID
+		private static var _allCommandsListsById:Object = {};
 		
 		
 		// Sequenced execution
@@ -77,17 +79,36 @@ package com.pippoflash.utils {
 		}
 		public static function time(realSeconds:Number, f:Function, ...rest):void {
 			var o:Object = makeCommandObject(f, rest);
-			if (realSeconds <= 0) {
-				execObject(o);
-				return;
-			}
-			var t:Timer = new Timer(realSeconds*1000, 1);
-			o.timer = t;
-			_timedExecutions[t] = o;
-			_timedExecutionsByMethods[f] = o;
-			t.addEventListener(TimerEvent.TIMER_COMPLETE, onTimerComplete, false, 0, true);
-			t.start();
+			activateTimerForObject(o, realSeconds);
+			// if (realSeconds <= 0) {
+			// 	execObject(o);
+			// 	return;
+			// }
+			// var t:Timer = new Timer(realSeconds*1000, 1);
+			// o.timer = t;
+			// _timedExecutions[t] = o;
+			// _timedExecutionsByMethods[f] = o;
+			// t.addEventListener(TimerEvent.TIMER_COMPLETE, onTimerComplete, false, 0, true);
+			// t.start();
 		}
+		public static function timeWithID(id:String, realSeconds:Number, f:Function, ...rest):void {
+			var o:Object = makeCommandObjectWithID(id, f, rest);
+			if (!_allCommandsListsById[id]) _allCommandsListsById[id] = []; // Create the array if is not already there
+			_allCommandsListsById[id].push(o);
+			activateTimerForObject(o, realSeconds);
+		}
+				private static function activateTimerForObject(o:Object, realSeconds:Number):void {
+					if (realSeconds <= 0) {
+						execObject(o);
+						return;
+					}
+					const t:Timer = new Timer(realSeconds*1000, 1);
+					o.timer = t;
+					_timedExecutions[t] = o;
+					_timedExecutionsByMethods[o.f] = o;
+					t.addEventListener(TimerEvent.TIMER_COMPLETE, onTimerComplete, false, 0, true);
+					t.start();
+				}
 				private static function onTimerComplete(e:Event):void {
 					delete _timedExecutions[e.target].timer;
 					execObject(_timedExecutions[e.target]);
@@ -106,7 +127,7 @@ package com.pippoflash.utils {
 				}
 			}
 		}
-		public static function removeMethod(f:Function, info:String=""):void { // Removes all commands with method - ONLY FRAME EVENTS
+		public static function removeMethod(f:Function, info:String=""):void { // Removes all commands with method
 			Debug.debug(_debugPrefix, "Trying to remove a single method " + info);
 			// Look for timed executions
 			var o:Object = _timedExecutionsByMethods[f];
@@ -127,6 +148,22 @@ package com.pippoflash.utils {
 				}
 			}
 		}
+		public static function removeTimedMethodsWithID(id:String):void { // ID only works with timed methods
+			Debug.debug(_debugPrefix, "Removing all timed commands with ID: " + id);
+			if (_allCommandsListsById[id]) {
+				const cmds:Array = _allCommandsListsById[id];
+				_allCommandsListsById[id] = null;
+				delete _allCommandsListsById[id];
+				Debug.debug(_debugPrefix, "Found " + cmds.length + "commands.");
+				while (cmds.length) {
+					var o:Object = cmds.pop();
+					Debug.debug(_debugPrefix, "Deleting " + Debug.object(o));
+					cleanupObject(o);
+				}
+			}
+		}
+
+
 		public static function reset():void { // This removes all taska, and resets everything as new
 			Debug.debug(_debugPrefix, "Interrupting all motions! (only the ones in frames, with reset())");
 			if (_commandsAtFrame.length) {
@@ -140,6 +177,7 @@ package com.pippoflash.utils {
 			}
 			_timedExecutions = new Dictionary();
 			_timedExecutionsByMethods = new Dictionary();
+			_allCommandsListsById = {};
 			_commandsAtFrame = [];
 			_next = [];
 			_counter = 0;
@@ -161,6 +199,11 @@ package com.pippoflash.utils {
 					Debug.error(_debugPrefix, "UExec.makeCommandObject() received a null function, params are",par);
 					return {f:UCode.dummyFunction, par:null};
 				}
+			}
+			private static function makeCommandObjectWithID(id:String, f:Function=null, par:Array=null):Object {
+				const o:Object = makeCommandObject(f, par);
+				o.id = id;
+				return o;
 			}
 			private static function startListener():void { // Starts listening waiting for right frame
 				_myClip.addEventListener(Event.ENTER_FRAME, onEnterFrame);
@@ -191,12 +234,23 @@ package com.pippoflash.utils {
 				if (t) {
 					t.stop();
 					t.removeEventListener(TimerEvent.TIMER_COMPLETE, onTimerComplete, false);
+					delete _timedExecutions[t];
 					delete _timedExecutionsByMethods[o.f];
 					delete o.timer;
 				}
+				if (o.id && _allCommandsListsById[o.id]) { // Its a method with id, and there are still methods in the list (not already removed)
+					if (_allCommandsListsById[o.id].length > 1) { // There are other methods, just remove this one
+						UCode.removeArrayItem(_allCommandsListsById[o.id], o);
+					} else { // There is only this method. Just kill the array
+						_allCommandsListsById[o.id].pop();
+						_allCommandsListsById[o.id] = null;
+						delete _allCommandsListsById[o.id];
+					}
+				}
 				delete o.f;
 				delete o.p;
-				
+				delete o.id;
+				o = null;
 			}
 			private static function checkStop		():void {
 				if (!_next.length && !_commandsAtFrame.length) _myClip.removeEventListener(Event.ENTER_FRAME, onEnterFrame);

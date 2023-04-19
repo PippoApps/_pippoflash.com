@@ -134,9 +134,9 @@ package com.pippoflash.components {
 		public function setToHtml							(v:Boolean):void { // Sets button to use html or not
 			_isHtml									= v;
 		}
-		public function setText							(s:String, params:Object=null) {
-			_text										= params ? UText.insertParams(s, params) : s;
-			setTextInRectangle							();
+		public function setText(s:String, params:Object=null) {
+			_text = params ? UText.insertParams(s, params) : s;
+			setTextInRectangle();
 		}
 		public function setHtmlText						(s:String, params:Object=null) {
 			_text										= params ? UText.insertParams(s, params) : s;
@@ -304,58 +304,59 @@ package com.pippoflash.components {
 			_icon.y									+= _yIOff;
 		}
 // UTY /////////////////////////////////////////////////////////////////////////////////////////
-		private function setTextInRectangle					() {
+		private function setTextInRectangle() {
 			// Apply rectangle dimensions and overwrite rectangle positioning
-			resetToRectangle								();
-			// Proceed with dynamic size textfield
-			setTextDynamicSize							();
+			resetToRectangle();
+			// Proceed with dynamic size 
+			setTextDynamicSize();
 			// Update text color
-			updateTextColor								();
+			updateTextColor();
 		}
-				private function setTextDynamicSize			():void {
-					if (VERBOSE)						Debug.debug(_debugPrefix, "Text goes out of button boundaries. Resizing and re-centering.");
+				private function setTextDynamicSize():void {
+					if (VERBOSE) Debug.debug(_debugPrefix, "Text goes out of button boundaries. Resizing and re-centering.");
 					// Sets text with dynamically sized textfield that expands and then is centered
-					if (!_txt)							return;
+					if (!_txt) return;
 					// Reset from UText in order to restore size and else
-					UText.resetTextFieldToOriginal			(_txt); // Reset textfield original properties in order oto reset it's size to original
+					UText.resetTextFieldToOriginal(_txt); // Reset textfield original properties in order oto reset it's size to original
 					// Apply correct settings
-					_txt.autoSize						= TextFieldAutoSize.CENTER;
-					_txt.width							= _rect.width;
+					_txt.autoSize = TextFieldAutoSize.CENTER;
+					_txt.width = _rect.width;
 					// Proceed with alignment
-					UText.setTextFormat					(_txt, {align:_textAlign.toLowerCase()});
+					UText.setTextFormat(_txt, {align:_textAlign.toLowerCase()});
 					// Set properties
-					_txt.embedFonts 					= _embed ? _embed : false;
+					_txt.embedFonts = _embed ? _embed : false;
 					// Insert text
-					if (_isHtml)						_txt.htmlText = _text;
-					else								_txt.text = _text;
+					if (_isHtml) _txt.htmlText = _text;
+					else _txt.text = _text;
 					// If text expands outside button proceed with second sizing using dynamic settings
 					if (_txt.width > _rect.width || _txt.height > _rect.height) {
-						setTextResizeToFit				();
+						setTextResizeToFit();
 					}
 					// Text doesn't expand, just align textfield to rectangle
 					else {
-						UDisplay.alignSpriteTo			(_txt, _rect);
+						UDisplay.alignSpriteTo(_txt, _rect, "CENTER", "MIDDLE", false, false, false);
+						// UDisplay.alignSpriteTo(_txt, _rect, "CENTER", "MIDDLE", false, false, true);
 					}
 					// Set offset in any case
-					_txt.x							+= _xOff;
-					_txt.y							+= _yOff;
+					_txt.x += _xOff;
+					_txt.y += _yOff;
 				}
-				private function setTextResizeToFit			():void {
-					if (VERBOSE)						Debug.debug(_debugPrefix, "Text goes out of button boundaries. Resizing and re-centering.");
+				private function setTextResizeToFit():void {
+					if (VERBOSE) Debug.debug(_debugPrefix, "Text goes out of button boundaries. Resizing and re-centering.");
 					// Remove autosize and reset textfield to it's original dimensions
-					_txt.autoSize						= TextFieldAutoSize.NONE;
+					_txt.autoSize = TextFieldAutoSize.NONE;
 					UText.resetTextFieldToOriginal			(_txt); // Reset textfield original properties in order oto reset it's size to original
-					if (_isHtml)						UText.setHtmlTextDynamicSize(_txt, _text);
-					else								UText.setTextDynamicSize(_txt, _text);
+					if (_isHtml) UText.setHtmlTextDynamicSize(_txt, _text);
+					else UText.setTextDynamicSize(_txt, _text);
 					// Restore AutoSize so that TF can be centered
-					_txt.autoSize						= TextFieldAutoSize.CENTER;
-					UText.centerTextInOriginalRectangle		(_txt, false);
+					_txt.autoSize = TextFieldAutoSize.CENTER;
+					UText.centerTextInOriginalRectangle(_txt, false);
 				}
-		private function setupButton						() {
+		private function setupButton():void {
 			// Setup _txt variable as first thing
 			if (_button.hasOwnProperty("_txt")) {
 				_txt = _button["_txt"];
-				if (_textSize)							UText.setTextFormat(_txt, {size:_textSize});
+				if (_textSize) UText.setTextFormat(_txt, {size:_textSize});
 			}
 			// Proceed with rectangle according to margins
 // 			_rect										= new Rectangle(_textMargin,_textMargin,_w-(_doubleMargin),_h-(_doubleMargin));

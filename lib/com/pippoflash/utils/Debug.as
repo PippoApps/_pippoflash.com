@@ -6,22 +6,13 @@
 package com.pippoflash.utils {
 
 	import com.pippoflash.framework.PippoFlashEventsMan;
-	import									flash.geom.*;
-	import									flash.display.*;
-	import									flash.text.*;
-	import									flash.net.*;
-	import									flash.events.*;
-	import 									flash.utils.*;
-	import									flash.external.*;
-	import									flash.system.*;
-	import 									fl.motion.Color; 
-	import									com.pippoflash.utils.*;
+	import flash.geom.*;
+	import flash.display.*;
+	import flash.utils.*;
+	import flash.external.*;
+	import com.pippoflash.utils.*;
 	import flash.desktop.Clipboard;
 	import flash.desktop.ClipboardFormats;
-// 	import									flash.profiler.Telemetry;
-// 	import									PippoFlashAS3.Buttonizer;
-	// IMPORT 3RD PARTY //////////////////////////////////////////////////////
-// 	import									com.demonsters.debugger.MonsterDebugger;
 
 	
 	public class Debug {
@@ -134,7 +125,7 @@ package com.pippoflash.utils {
 			//_traceOut = !switchOffInternalTrace;
 			//debug(_debugPrefix, "Output to browser console status: " + object(EXPORT_TO_CONSOLE));
 		//}
-		public static function setupConsole(t:*) { // TextField or Console Component. As long as it has TextField methods.
+		public static function setupConsole(t:*):void { // TextField or Console Component. As long as it has TextField methods.
 			// This sets up a textfield to use as debug
 			traceDebug("Debug console initialized on "+t+".");
 			_debugConsole = t;
@@ -193,7 +184,7 @@ package com.pippoflash.utils {
 			Debug.warning(_debugPrefix, "Clipboard filled with debug data.");
 		}
 		public static var debug:Function = doDebug;
-		public static function doDebug(id:String, ...rest) {
+		public static function doDebug(id:String, ...rest):void {
 			windowDebug(id, rest.join(" "));
 		}
 		// ERROR
@@ -211,7 +202,7 @@ package com.pippoflash.utils {
 			windowDebug("DEBUG|" + id, rest.join(" "));
 		}
 		// SCREAM
-		public static function scream(id:String, ...rest) { // this traces 2 highlighters so that I cna see immediately the highlight!!!
+		public static function scream(id:String, ...rest):void { // this traces 2 highlighters so that I cna see immediately the highlight!!!
 			var initIndex:uint;
 			if (_debugConsole) initIndex = _debugConsole.length;
 			forceDebug(id, ">>>>>>---------------------------------------->>>>>>>>\n" + rest.join(" "));
@@ -247,7 +238,7 @@ package com.pippoflash.utils {
 			return UText.insertParams(LINE_SOURCE, {ID:id});
 		}
 	// UTY
-		public static function resetConsole() {
+		public static function resetConsole():void {
 			// Resets all arrays and consoles to free memory
 			PippoFlashEventsMan.broadcastStaticEvent(Debug, EVT_ABOUT_TO_RESET);
 			
@@ -270,18 +261,18 @@ package com.pippoflash.utils {
 			trace(o is Array ? getArrayString(o, recursive, uniteProps) : getObjectString(o, recursive, uniteProps));
 		}
 	// Error objects - get an Error instance ad argument
-		public static function debugError				(id:String, e:Error, comment:String):void {
-			error								(id, comment + "\n" + comment + "\n" + e.getStackTrace());
+		public static function debugError(id:String, e:Error, comment:String):void {
+			error(id, comment + "\n" + comment + "\n" + e.getStackTrace());
 		}
 	// Forces output to browser console
-		public static function debugToJSConsole		(id:String, t:String):void { // This forces output to console, and also adds to debug chain 
-			debug							(id, t);
+		public static function debugToJSConsole(id:String, t:String):void { // This forces output to console, and also adds to debug chain 
+			debug(id, t);
 			// If EXPORT_TO_CONSOLE.ALL == true, debug already outputs all to console no need to do it twice
 			if (!EXPORT_TO_CONSOLE.ALL && ExternalInterface.available) {
-				outputToConsole					(_allEntries[_allEntries.length-1]);
+				outputToConsole(_allEntries[_allEntries.length-1]);
 			}
 			else if (!ExternalInterface.available) {
-				Debug.debug					(_debugPrefix, "Cannot output last event to browser console since ExternalInterface is not available.");
+				Debug.debug(_debugPrefix, "Cannot output last event to browser console since ExternalInterface is not available.");
 			}
 		}
 // METHODS FOR SPECIAL EXTERNAL FUNCTIONS ///////////////////////////////////////////////////////////////////////////////////////
@@ -317,15 +308,8 @@ package com.pippoflash.utils {
 			_partialEntries = new Vector.<String>();
 			_partialEntriesCharLength = 0;
 		}
-		static public function addToPartialEntries(_s):void {
-			_partialEntriesCharLength += _s.length + 2;
-			//if (_partialEntriesCharLength >= PARTIAL_ENTRY_MAX_CHAR_SIZE) {
-				//PippoFlashEventsMan.broadcastStaticEvent(Debug, EVT_PARTIAL_ENTRY_SIZE_REACHED);
-				//if (_partialEntriesCharLength) {
-					//resetPartialEntries();
-					//addToPartialEntries(_s);
-				//}
-			//} else 
+		static public function addToPartialEntries(s:String):void {
+			_partialEntriesCharLength += s.length + 2;
 			_partialEntries.push(_s);
 		}
 		
@@ -346,33 +330,33 @@ package com.pippoflash.utils {
 			else for (prop in o) a.push(prop+":"+o[prop]+OBJECT_STRING_EOF);
 			return "{"+a.join(uniteProps)+"}";
 		}
-		private static function getArrayString			(arr:Array, recursive:Boolean=true, uniteProps:String=", "):String {
-			var i								:*;
-			var a								:Array = [];
-			if (recursive)						for (i in arr) a.push(i+":"+(arr[i] && arr[i] is Array ? array(arr[i], true) : arr[i] && arr[i].toString() == "[object Object]" ? getObjectString(arr[i], true) : arr[i]));
-			else								for (i in arr) a.push(i+":"+arr[i]);
-			return							"["+a.join(uniteProps)+"]";
+		private static function getArrayString(arr:Array, recursive:Boolean=true, uniteProps:String=", "):String {
+			var i:*;
+			var a:Array = [];
+			if (recursive) for (i in arr) a.push(i+":"+(arr[i] && arr[i] is Array ? array(arr[i], true) : arr[i] && arr[i].toString() == "[object Object]" ? getObjectString(arr[i], true) : arr[i]));
+			else for (i in arr) a.push(i+":"+arr[i]);
+			return "["+a.join(uniteProps)+"]";
 		}
-		private static function getItemString			(o:*, recursive:Boolean=true, uniteProps:String=", "):String {
-			if (o is Array)						return "\n" + getArrayString(o, recursive, uniteProps);
-			else if (o is String)					return o;
-			else								return "\n" + getObjectString(o, recursive, uniteProps);
+		private static function getItemString(o:*, recursive:Boolean=true, uniteProps:String=", "):String {
+			if (o is Array) return "\n" + getArrayString(o, recursive, uniteProps);
+			else if (o is String) return o;
+			else return "\n" + getObjectString(o, recursive, uniteProps);
 		}
 // LISTING OBJECTS /////////////////////////////////////////////////////////////////////////////////
-		public static function listObject				(o:Object, s:String="LIST") {
-			for (var i in o) 						debug(s, i,  " : " + o[i]);
+		public static function listObject(o:Object, s:String="LIST"):void {
+			for (var i:* in o) debug(s, i,  " : " + o[i]);
 		}
-		public static function listObjectRecursive		(o:Object, s:String="ListREC>") {
-			for (var i in o) {
-				debug						(s, i + " : "+ o[i]);
+		public static function listObjectRecursive(o:Object, s:String="ListREC>"):void {
+			for (var i:* in o) {
+				debug(s, i + " : "+ o[i]);
 				if (o[i] is Object || o[i] is Array) {
-					listObjectRecursive			(o[i], s+"     ");
+					listObjectRecursive(o[i], s+"     ");
 				}
 			}				
 		}
 // LISTENERS ///////////////////////////////////////////////////////////////////////////////////////
-		public static function setListenerFor			(debugPrefix:String, f:Function):void {
-			_prefixListeners[debugPrefix]			= f;
+		public static function setListenerFor(debugPrefix:String, f:Function):void {
+			_prefixListeners[debugPrefix] = f;
 		}
 // UTY INTERNALS///////////////////////////////////////////////////////////////////////////////////////
 		private static function outputToConsole(t:String):void {
@@ -381,7 +365,7 @@ package com.pippoflash.utils {
 				else ExternalInterface.call("console.log", t);
 			}
 		}
-		private static function checkConsoleSize() {
+		private static function checkConsoleSize():void {
 			// Checks if console length is more than, just reset everything to save ram
 			if (_counter > MAXLINES) resetConsole();
 		}
@@ -395,7 +379,7 @@ package com.pippoflash.utils {
 			if (_prefixListeners[id]) _prefixListeners[id](t);
 			traceWarning(_s, id);
 		}
-		private static function windowDebug(id:String = "Debug", t:String = "") {
+		private static function windowDebug(id:String = "Debug", t:String = ""):void {
 			var debugLog:String;
 			if (_addTimer) debugLog	= UText.getFormattedTime() + " [" +id + "]\t\t" + t;
 			else debugLog = _counter + " [" +id + "]\t\t" + t;
@@ -408,7 +392,7 @@ package com.pippoflash.utils {
 		// TRACE MANAGEMENT ACCORDING TO SETTINGS
 		private static var traceDebug:Function = traceNormal;
 		static private var traceWarning:Function = traceNormal;
-		private static function traceNormal(t:String, id:String="") { // Only traces to debug windows
+		private static function traceNormal(t:String, id:String=""):void { // Only traces to debug windows
 			if (_traceOut) trace(_mainPrefix + t);
 			if (_debugConsole) {
 				_debugConsole.appendText("\n"+t);
@@ -431,9 +415,9 @@ package com.pippoflash.utils {
 			//if (_filterIn.indexOf(id) != -1) {
 			//}
 		}
-		private static function postTrace				():void {
-			_counter							++;
-			checkConsoleSize						();
+		private static function postTrace():void {
+			_counter ++;
+			checkConsoleSize();
 		}
 		// TRACE ACTIVATION
 		private static function setFiltersActive(a:Boolean):void {
@@ -446,7 +430,7 @@ package com.pippoflash.utils {
 			forceDebug(id, ERROR_DISPLAY_PREFIX + _s + ERROR_DISPLAY_POSTFIX);
 			
 			if (_debugConsole && _textFormats) {
-				var initIndex						:uint = _debugConsole.length;
+				var initIndex:uint = _debugConsole.length;
 				try { // This sometimes triggers an out of index error
 					_debugConsole.setTextFormat(_textFormats.ERROR, initIndex, _debugConsole.length);
 				}
@@ -469,13 +453,13 @@ package com.pippoflash.utils {
 			//} catch (e:Error) {};
 		}
 	// ADD ELEMENTS TO LISTS
-		private static function addFilter				(id:String, t:String):void {
-			if (_filterObject[id] == null)			_filterObject[id] = new <String>[];
-			_filterObject[id].push					(t);
+		private static function addFilter(id:String, t:String):void {
+			if (_filterObject[id] == null) _filterObject[id] = new <String>[];
+			_filterObject[id].push(t);
 		}
-		private static function addError				(id:String, t:String):void {
-			if (_errors[id] == null)				_errors[id] = new <String>[];
-			_errors[id].push						(t);
+		private static function addError(id:String, t:String):void {
+			if (_errors[id] == null) _errors[id] = new <String>[];
+			_errors[id].push(t);
 		}
 	}
 }
