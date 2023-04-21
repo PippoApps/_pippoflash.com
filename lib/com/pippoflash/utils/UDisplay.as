@@ -322,8 +322,8 @@ package com.pippoflash.utils {
 			}
 		}
 		public static function removeClips(...rest):void {
-			const a:Array = rest[0] is Array ? rest[0] : rest; 
-			for each (_c in a) removeClip(_c);
+			const a:* = rest[0] is Array || rest[0] is Vector.<*> ? rest[0] : rest; 
+			for each (var c:DisplayObject in a) removeClip(c);
 		}
 		// public static function resetClip				(container:DisplayObjectContainer, c:MovieClip, par:Object=null):DisplayObject {
 		// 	// This function removes the MovieClip and replace it with a new one (returning it)

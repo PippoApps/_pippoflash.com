@@ -164,7 +164,7 @@ package com.pippoflash.motion {
 		public function getInitialProperty(c:*, prop:String):Number {
 			return _displayObjectInitialProperties[c][prop];
 		}
-		public function autoEnterFromZoomZero(c:*, time:Number, directionFrom:String="bottom", setOffStageBeforeEnter:Boolean=false, onComplete:Function=null, onCompleteParams:*= null, emd:String=null, resetBefore:Boolean=false, ease:String="Strong.easeOut"):TweenNano {
+		public function autoEnterFromZoomZero(c:*, time:Number, onComplete:Function=null, onCompleteParams:*= null, emd:String=null, resetBefore:Boolean=false, ease:String="Strong.easeOut"):TweenNano {
 			c.scaleX = c.scaleY = 0;
 			return doMove(c, time, {scaleX:getInitialProperty(c, "scaleX"), scaleY:getInitialProperty(c, "scaleY"), onComplete:onComplete, onCompleteParams:onCompleteParams}, ease, emd, "to");
 		}

@@ -13,6 +13,7 @@ package com.pippoflash.framework {
 	import com.pippoflash.motion.PFMover;
 	import com.pippoflash.framework.interfaces.IPippoFlashBase;
 	import com.pippoflash.utils.UExec;
+	import com.greensock.plugins.TransformMatrixPlugin;
 // CLASS ///////////////////////////////////////////////////////////////////////////////////////
 	public dynamic class _PippoFlashBase extends MovieClip implements IPippoFlashBase {
 		// STATIC USER DEFINABLE //////////////////////////////////////////////////////
@@ -23,7 +24,7 @@ package com.pippoflash.framework {
 		public static var _mainApp:MovieClip; // Reference to _mainApp - this should be _Application, but it would not work when this is used as a standalone plugin
 		public static var _ref:*; // Reference to the relevant Ref object () - defaults to Ref(), can be expanded
 		public static var _config:*; // Stores a reference to a ConfigProj instance
-		static private var _mover:PFMover = new PFMover("MainMover");
+		private var _singletonMover:PFMover; // Automatic mover created at instantiation
 		// Protected
 // 		protected static var _instances				:Array = []; // Stores all instances inherited from this class as a simple list
 		protected static var _instances:Array = []; // Stores all instances inherited from this class as a simple list
@@ -63,6 +64,7 @@ package com.pippoflash.framework {
 			//_instance = this;
 			_pfId = _debugPrefix = id;
 			registerInstance(this, id, cl);
+			_singletonMover = new PFMover(_pfId);
 			resetListeners();
 			if (_mainApp && _mainApp.isInitialized()) { // This means class is instantiated AFTER mainapp is initialized. Therefore there is NO onConfig etc...
 				onInstantiation();
@@ -195,7 +197,37 @@ package com.pippoflash.framework {
 			for each (_j in _listeners) UCode.broadcastEvent(_j, evt, rest);
 			for each (_j in _eventListeners[evt]) UCode.broadcastEvent(_j, evt, rest);
 		}
+// ANIMATE TIMELINE ITEMS UTILITIES /////////////////////////////////////////////////////////////////////////////////////////////
 // DisplayObject SETUP ///////////////////////////////////////////////////////////////////////////////////////
+		protected function setupTimelineObjectsList(idsList:Array, andStorePosInMover:Boolean=false, moverRemove:Boolean=false, moverTransparent:Boolean=false):void {
+			// BEWARE - Variables must be public (not private or protected or it will fail)!
+			// Gets a list of strings, searches for "_clipString", and sets a local variable "_spriteString"
+			// I.e.: "LogoLeft", sets var _spriteLogoLeft with this["_clipLogoLeft"]
+			// remove and transparent only work storing original position in mover
+			Debug.debug(_debugPrefix, "Setting timeline sprites for ");
+			var clip:DisplayObject;
+			var clipName:String;
+			for each(var id:String in idsList) {
+				clipName = "_clip"+id;
+				Debug.debug(_debugPrefix, "Retrieving timeline object: " + clipName);
+				clip = this[clipName] as DisplayObject;
+				if (!clip) {
+					Debug.error(_debugPrefix, "Cannot find clip: " + clipName + " in " + this);
+				} else {
+					this["_sprite"+id] = clip;
+					if (andStorePosInMover) mover.storeObjectInitialProperties(clip, moverRemove, moverTransparent);
+				}
+			}
+		}
+		// Gets a full name of timeline object and returns it
+		protected function getTimelineObject(instanceName:String, andStorePosInMover:Boolean=false, moverRemove:Boolean=false, moverTransparent:Boolean=false):* {
+			const c:DisplayObject = this[instanceName];
+			if (!c) Debug.error(_debugPrefix, "Cannot find instance in Animate timeline: " + instanceName);
+			else {
+				mover.storeObjectInitialProperties(c, moverRemove, moverTransparent);
+			}
+			return c; 
+		}
 		/**
 		 * Sets up display object direct variable reference from Objects placed directly on stage. It does "_varName:ClassName = this["_varNameClip"]" for each object in list. WARNING: class with variables must be dynamic or this will throw an error.
 		 * @param	displayObjectNames The list of variables names. Display object name must be like variable name + postfix.
@@ -227,18 +259,11 @@ package com.pippoflash.framework {
 		}
 
 // GENERAL MOVER ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		static public function get mover():PFMover 
-		{
-			return _mover;
+		public function get mover():PFMover {
+			return _singletonMover;
 		}
 
 
-// ANIMATE TIMELINE ITEMS UTILITIES /////////////////////////////////////////////////////////////////////////////////////////////
-		protected function getTimelineObject(instanceName:String):* {
-			const c:DisplayObject = this[instanceName];
-			if (!c) Debug.error(_debugPrefix, "Cannot find instance in Animate timeline: " + instanceName);
-			return c; 
-		}
 // TIMED COMMANDS UTILITIES /////////////////////////////////////////////////////////////////////////////////////////////////
 		protected function addTimedCommand(time:Number, f:Function, ...rest):void {
 			// Uses class ID as a unique identifier for timed events, and can reset them automatically
