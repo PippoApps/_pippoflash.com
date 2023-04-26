@@ -468,25 +468,26 @@ package com.pippoflash.framework.prompt {
 			var textProp								:String = _useHtml ? "htmlText" : "text";
 			var txtMethod								:Function = _useHtml ? UText.setHtmlTextDynamicSize : UText.setTextDynamicSize;
 			trace(Debug.object(p));
-			for (_s in p) {
+			var s:String;
+			for (s in p) {
 				// Extension classes must be set as dynamic or will trigger an error here
 				// trace("ECCO: " + _s);
-				if (this[_s]) { // If there is an instance of something with the same name of parameter
+				if (this[s]) { // If there is an instance of something with the same name of parameter
 				// trace(_s)
-					if (_s.indexOf("_butt") == 0 && p[_s]) {
-						trace("Cerco i bottoni " + _s, this[_s], p[_s])
-						const b:InteractiveObject = this[_s];
-						if (b is PippoFlashButton) (b as PippoFlashButton).setText(p[_s]);
+					if (s.indexOf("_butt") == 0 && p[s]) {
+						trace("Cerco i bottoni " + s, this[s], p[s])
+						const b:InteractiveObject = this[s];
+						if (b is PippoFlashButton) (b as PippoFlashButton).setText(p[s]);
 						else {
-							Buttonizer.setButtonText			(this[_s], p[_s], _buttHtml);
-							this[_s].visible					= true;
+							Buttonizer.setButtonText			(this[s], p[s], _buttHtml);
+							this[s].visible					= true;
 						}
 					}
-					else if (_s.indexOf("_txt") == 0 && p[_s]) {
+					else if (s.indexOf("_txt") == 0 && p[s]) {
 						// Use UText framework to enter text
-						txtMethod						(this[_s], p[_s]);
+						txtMethod						(this[s], p[s]);
 						// this[_s][textProp] 				= p[_s];
-						this[_s].visible					= true;
+						this[s].visible					= true;
 					}
 				}
 			}

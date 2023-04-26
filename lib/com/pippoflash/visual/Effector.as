@@ -1,4 +1,7 @@
 ﻿package com.pippoflash.visual {
+	import com.pippoflash.framework.starling.gui.parts.Line;
+	import com.greensock.data.TweenMaxVars;
+
 	import											com.pippoflash.utils.*;
 	import											flash.display.*;
 	import											flash.text.*;
@@ -27,22 +30,20 @@
 				superKnockout:{f:GlowFilter, par:{inner:false, color:0x99ffff, alpha:1, blurX:30,blurY:30, quality:1, strength:3, knockout:true}},
 				cartoonBorder:{f:GlowFilter, par:{inner:false, color:0x000000, alpha:1, blurX:12,blurY:12, quality:1, strength:10, knockout:false}}
 			};
-		public static var _default_GLOW						:Object = {blurXS:10,blurXE:30};
+		public static var _default_GLOW:Object = {blurXS:10,blurXE:30};
 		// SYSTEM
-		public var _id									:String;
-		public var _effId									:String;
-		public var _filter;
+		public var _id:String;
+		public var _effId:String;
+		public var _filter:*;
 // 		public var _filterArrayNum							:uint;
-		public var _par									:Object = new Object();
+		public var _par:Object = new Object();
 // 		public var _par									:Object;
 		// USER VARIABLES
-		public static var _glowColor							:Number = 0xffffff;
+		public static var _glowColor:Number = 0xffffff;
 		// REFERENCES
-		public var _target								:DisplayObject;
-		// MARKERS
-		// STATIC UTY
-		public static var _o								:Object;
-		public static var _s								:String;
+		public var _target:DisplayObject;
+		// GLOBAL MOTIONS CONTAINER
+		private static var _motionObjectsByClip:Dictionary = new Dictionary(false);
 // INIT /////////////////////////////////////////////////////////////////////////////////////////
 		public function Effector(c:DisplayObject, eff:String="GLOW", anim:Boolean=true, id:String=null, par:Object=null) {
 			_id = id ? id : UText.getRandomString();
@@ -54,22 +55,23 @@
 			activateEffect();
 		}
 // STATIC METHODS ///////////////////////////////////////////////////////////////////////////////////////
-		public static function addEffect						(id:String, effect:Object):void { // Adds an effet to the _effectsList to be used as a default effect
-			_effectsList[id]								= effect;
+		public static function addEffect(id:String, effect:Object):void { // Adds an effet to the _effectsList to be used as a default effect
+			_effectsList[id] = effect;
 		}
-		public static function setEffect						(c:DisplayObject, effId:String, par:Object=null):void {
-			c.filters									= [getFilter(effId, par)];
+		public static function setEffect(c:DisplayObject, effId:String, par:Object=null):void {
+			c.filters = [getFilter(effId, par)];
 		}
-		public static function getFilter						(effId:String, par:Object=null):BitmapFilter {
-			_o										= _effectsList[effId];
-			var f										:BitmapFilter = new (_o.f as Class)();
-			for (_s in _o.par)							f[_s] = _o.par[_s];
-			if (par)									for (_s in par) f[_s] = par[_s];
-			return									f;
+		public static function getFilter(effId:String, par:Object=null):BitmapFilter {
+			var o:Object;
+			var s:String;
+			o = _effectsList[effId];
+			var f:BitmapFilter = new (o.f as Class)();
+			for (s in o.par) f[s] = o.par[s];
+			if (par) for (s in par) f[s] = par[s];
+			return f;
 		}
-		
 		// convert passed clip to greyscale
-		public static function desaturate(obj:DisplayObject)
+		public static function desaturate(obj:DisplayObject):void
 		{
 			var r:Number=0.212671;
 			var g:Number=0.715160;
@@ -91,31 +93,32 @@
 
 		}
 // METHODS //////////////////////////////////////////////////////////////////////////////////////
-		public static function setColor						(clip:DisplayObject, col:uint) {
-			var c										:Color = new Color();
-			c.setTint									(col, 1);
-			clip.transform.colorTransform						= c;
+		public static function setColor(clip:DisplayObject, col:uint):void {
+			var c:Color = new Color();
+			c.setTint(col, 1);
+			clip.transform.colorTransform = c;
 		}
-		public function setVisible							(v:Boolean) {
-			if (v)										activateEffect();
-			else										_target.filters = null;
+		public function setVisible(v:Boolean):void {
+			if (v) activateEffect();
+			else _target.filters = null;
 		}
-		public static function blurIn							(c:DisplayObject, time:Number=1, func=null):void {
-			TweenMax.to								(c, time, {alpha:1, blurFilter :{blurX:0,blurY:0,color:_glowColor}, startAt:{alpha:0, blurFilter :{blurX:50,blurY:10,color:_glowColor}, onCompleteListener:func ? func : UCode.dummyFunction}});
+		public static function blurIn(c:DisplayObject, time:Number=1, func:Function=null):void {
+			TweenMax.to(c, time, {alpha:1, blurFilter :{blurX:0,blurY:0,color:_glowColor}, startAt:{alpha:0, blurFilter :{blurX:50,blurY:10,color:_glowColor}, onCompleteListener:func ? func : UCode.dummyFunction}});
 		}
-		public static function blurOut						(c:DisplayObject, time:Number=1, func=null):void {
+		public static function blurOut(c:DisplayObject, time:Number=1, func:Function=null):void {
 			
 		}
-		public static function fadeIn							(c:DisplayObject, time:Number=1):void {
-			TweenMax.to								(c, time, {autoAlpha:1});
+		public static function fadeIn(c:DisplayObject, time:Number=1):void {
+			TweenMax.to(c, time, {autoAlpha:1});
 		}
-		public static function fadeOut						(c:DisplayObject, time:Number=1):void {
-			TweenMax.to								(c, time, {autoAlpha:0});
+		public static function fadeOut(c:DisplayObject, time:Number=1):void {
+			TweenMax.to(c, time, {autoAlpha:0});
 		}
-		public static function setGlowColor						(c:Number):void {
-			_glowColor									= c;
+		public static function setGlowColor(c:Number):void {
+			_glowColor = c;
 		}
 		public static function startGlow(c:DisplayObject, time:Number=0.5, glowFilter:*=null, killPreviousGlow:Boolean=false):void {
+			// killClipEffect(c);
 			if (glowFilter == null) glowFilter = {color:_glowColor, alpha:1, blurX:12,blurY:12,inner:false};
 			else if (glowFilter is String) glowFilter = _effectsList[glowFilter].par;
 			if (killPreviousGlow) stopGlow(c, 0.01);
@@ -133,34 +136,69 @@
 // 			TweenMax.to(c, 0, {glowFilter  :{remove:true}});
 		}
 		public static function startBounce(c:DisplayObject, time:Number = 0.3, scale:Number=1.08):void {
+			killPreviousMotionIfAny(c);
 			TweenMax.to(c, time, {yoyo:true, repeat:-1, scaleX:scale, scaleY:scale});
 		}
 		public static function stopBounce(c:DisplayObject, time:Number=0.5, scale:Number=1):void {
 			TweenMax.to(c, time, {scaleX:scale, scaleY:scale});
 		}
-		public static function setGlow(c, time:Number=0.5, filter:String="glowWhite"):void {
+		public static function startFloat(c:DisplayObject, time:Number = 0.3, scale:Number=1.08):void {
+			killPreviousMotionIfAny(c);
+			const vars:TweenMaxVars = new TweenMaxVars();
+			vars.yoyo(true);
+			vars.scaleX(scale);
+			vars.scaleY(scale);
+			vars.repeat(-1);
+			vars.ease(Power2.easeInOut);
+			activateMotion(c, time, vars);
+			// TweenMax.to(c, time, vars);
+		}
+		public static function setGlow(c:DisplayObject, time:Number=0.5, filter:String="glowWhite"):void {
 			var t:TweenMax = TweenMax.to(c, time, {glowFilter:_effectsList[filter].par});
 			if (time == 0) t.progress(1);
 			// var c:DisplayObject;
 		}
-// UTY /////////////////////////////////////////////////////////////////////////////////////////
-		public function activateEffect						() {
-			this["activateEffect_"+_effId]					();
+// STATIC MOTIONS MANAGEMENT ////////////////////////////////////////////////////////////////////
+
+		public static function killClipEffect(c:DisplayObject):void {
+			killPreviousMotionIfAny(c);
 		}
-		private function activateEffect_GLOW					() {
-			_filter									= new GlowFilter();
-// 			_target.filters[_filterArrayNum]					= _filter;
-// 			if (_target.filters.length > 0)						_target.filters.push(_filter);
-			_target.filters 								= [_filter];
-			_filter.color									= 0x000000;
-			_filter.alpha								= 0.3;
-			_filter.quality								= 3;
-			_filter.blurX = _filter.blurY						= 2;
-			_target.filters 								= [_filter];
+		private static function activateMotion(c:DisplayObject, time:Number, vars:TweenMaxVars):void {
+			killClipEffect(c);
+			_motionObjectsByClip[c] = TweenMax.to(c, time, vars);
+		}
+		private static function replacePreviousMotion(m:TweenMax):void {
+			// m.target - from GreenSock documentation
+			// [READ-ONLY] Target object (or array of objects) whose properties the tween affects.
+			killPreviousMotionIfAny(m.target as DisplayObject);
+		}
+		private static function killPreviousMotionIfAny(c:DisplayObject):void {
+			const m:TweenMax = _motionObjectsByClip[c];
+			if (m) {
+				m.kill();
+				_motionObjectsByClip[c];
+				delete _motionObjectsByClip[c];
+			}
+		}
+		private static function getMotionObjectFromClip(c:DisplayObject):TweenMax {
+			return _motionObjectsByClip[c];
+		}
+// UTY /////////////////////////////////////////////////////////////////////////////////////////
+		public function activateEffect():void {
+			this["activateEffect_"+_effId]();
+		}
+		private function activateEffect_GLOW():void {
+			const filter:GlowFilter = new GlowFilter();
+			_target.filters = [filter];
+			filter.color = 0x000000;
+			filter.alpha = 0.3;
+			filter.quality = 3;
+			filter.blurX = filter.blurY = 2;
+			_target.filters = [filter];
 			
 		}
-		public function removeEffects						() {
-			_target.filters 								= [];
+		public function removeEffects():void {
+			_target.filters = [];
 		}
 // END MOTION ACTIONS ////////////////////////////////////////////////////////////////////////////
 // LISTENERS //////////////////////////////////////////////////////////////////////////////////////

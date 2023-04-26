@@ -99,20 +99,20 @@ package com.pippoflash.components {
 		// DATA ///////////////////////////////////////////////////////////////////////////////////////
 		private var _toolTipText								:String;
 // INIT ///////////////////////////////////////////////////////////////////////////////////////
-		public function PippoFlashButton					(par:Object=null) {
-			super									("PippoFlashButton", par);
+		public function PippoFlashButton(par:Object=null):void {
+			super("PippoFlashButton", par);
 		}
-		protected override function initialize					():void {
-			_appearFunction								= USystem.isDevice() ? appearInstant : _appearStyle == "SMOOTH" ? appearSmooth : appearInstant;
-			_doubleMargin								= _textMargin*2;
-			attachButtonGraphics							();
-			setupButtonMode							();
-			setText									(_text);
-			super.initialize								();
+		protected override function initialize():void {
+			_appearFunction = USystem.isDevice() ? appearInstant : _appearStyle == "SMOOTH" ? appearSmooth : appearInstant;
+			_doubleMargin = _textMargin*2;
+			attachButtonGraphics();
+			setupButtonMode();
+			setText(_text);
+			super.initialize();
 		}
-		private function attachButtonGraphics					() {
-			UMem.addClassString							(_buttonLinkage);
-			addAndSetupButton							(UMem.getInstanceId(_buttonLinkage));
+		private function attachButtonGraphics():void {
+			UMem.addClassString(_buttonLinkage);
+			addAndSetupButton(UMem.getInstanceId(_buttonLinkage));
 		}
 		private function setupButtonMode						():void {
 			if (_radioGroup) {
@@ -125,31 +125,31 @@ package com.pippoflash.components {
 			if (!UCode.exists(_cBase_eventPostfix)) setAutoPost("_butt");
 		}
 // METHODS //////////////////////////////////////////////////////////////////////////////////////
-		public function addAndSetupButton					(c:*) {
-			_button									= c;
-			_button.name								= "PippoFlashButtonContent_" + UText.getRandomString(16);
-			addChild									(c);
-			setupButton								();
+		public function addAndSetupButton(c:*):void {
+			_button = c;
+			_button.name = "PippoFlashButtonContent_" + UText.getRandomString(16);
+			addChild(c);
+			setupButton();
 		}
-		public function setToHtml							(v:Boolean):void { // Sets button to use html or not
-			_isHtml									= v;
+		public function setToHtml(v:Boolean):void { // Sets button to use html or not
+			_isHtml = v;
 		}
-		public function setText(s:String, params:Object=null) {
+		public function setText(s:String, params:Object=null):void {
 			_text = params ? UText.insertParams(s, params) : s;
 			setTextInRectangle();
 		}
-		public function setHtmlText						(s:String, params:Object=null) {
-			_text										= params ? UText.insertParams(s, params) : s;
-			_isHtml									= true;
-			setTextInRectangle							();
+		public function setHtmlText(s:String, params:Object=null):void {
+			_text = params ? UText.insertParams(s, params) : s;
+			_isHtml = true;
+			setTextInRectangle();
 		}
-		public function getText							():String {
-			return									_text;
+		public function getText():String {
+			return _text;
 		}
-		public function getButtonClip							():Sprite {
-			return									_button;
+		public function getButtonClip():Sprite {
+			return _button;
 		}
-		public function setSelected(s:Boolean=true) {
+		public function setSelected(s:Boolean=true):void {
 			if (!_isRadio && !_switch) return; // Only radio and switch can be set selected
 			_selected = s;
 			if (_button["_over"]) _button["_over"].visible = false;
@@ -162,149 +162,149 @@ package com.pippoflash.components {
 			if (_selected) setTextDown();
 			else setTextUp();
 		}
-		public function setActive							(b:Boolean) {
-			_active									= b;
+		public function setActive(b:Boolean):void {
+			_active = b;
 			if (_button) {
-				_button.buttonMode						= b;
-				_button.mouseEnabled						= b;
-				_button["_sleep"].visible					= !b;
+				_button.buttonMode = b;
+				_button.mouseEnabled = b;
+				_button["_sleep"].visible = !b;
 			}
 		}
-		public function toggleSelected						():void {
-			setSelected									(!_selected);
+		public function toggleSelected():void {
+			setSelected(!_selected);
 		}
-		public var setToolTip:Function = setTooltip;;
-		public function setTooltip							(s:String):void {
-			_toolTipText								= s;
+		public var setToolTip:Function = setTooltip;
+		public function setTooltip(s:String):void {
+			_toolTipText = s;
 		}
-		public function clearTooltip							():void {
-			_toolTipText								= null;
+		public function clearTooltip():void {
+			_toolTipText = null;
 		}
-		public function getTextFormat						():TextFormat { // Returns textofrmat of text field in button
-			if (_txt)									return _txt.getTextFormat();
+		public function getTextFormat():TextFormat { // Returns textofrmat of text field in button
+			if (_txt) return _txt.getTextFormat();
 			else {
-				Debug.warning							(_debugPrefix, "Requested TextFormat from button without TextField.");
+				Debug.warning(_debugPrefix, "Requested TextFormat from button without TextField.");
 			}
-			return									null;
+			return null;
 		}
-		public function setTextFormat						(tf:*):void { // TextFormat or Object
+		public function setTextFormat(tf:*):void { // TextFormat or Object
 			if (_txt) {
-				UText.setTextFormat						(_txt, tf);
-				setTextInRectangle						();
+				UText.setTextFormat(_txt, tf);
+				setTextInRectangle();
 			}
 			else {
-				Debug.warning							(_debugPrefix, "Cannot set TextFormat from button without TextField.");
+				Debug.warning(_debugPrefix, "Cannot set TextFormat from button without TextField.");
 			}
 		}
-		public function getTextField						():TextField {
-			if (_txt)									return _txt;
+		public function getTextField():TextField {
+			if (_txt) return _txt;
 			else {
-				Debug.warning							(_debugPrefix, "Cannot get getTextField() from button without TextField.");
-				return								null;
+				Debug.warning(_debugPrefix, "Cannot get getTextField() from button without TextField.");
+				return null;
 			}
 		}
 	// TRIGGER EVENT
-		public function triggerEvent							(evt:String="onPress"):void {
-			Buttonizer.triggerButtonEvent					(_button);
+		public function triggerEvent(evt:String="onPress"):void {
+			Buttonizer.triggerButtonEvent(_button);
 		}
 	// CHECKS
-		public function isSelected							():Boolean {
-			return									_selected;
+		public function isSelected():Boolean {
+			return _selected;
 		}
-		public function isActive							():Boolean {
-			return									_active;
+		public function isActive():Boolean {
+			return _active;
 		}
 // FRAMEWORK METHODS ///////////////////////////////////////////////////////////////////////////////////////
-		public override function resize						(w:Number, h:Number):void {
-			super.resize								(w, h);
-			setupButton								();
-			setTextInRectangle							();
-			if (_selected)								setSelected(true);
+		public override function resize(w:Number, h:Number):void {
+			super.resize(w, h);
+			setupButton();
+			setTextInRectangle();
+			if (_selected) setSelected(true);
 		}
-		public override function release						():void {
-			super.release								();
+		public override function release():void {
+			super.release();
 		}
-		public override function cleanup						():void {
+		public override function cleanup():void {
 			// Here I have to cleanup also for radiogroup. I remove myself, and if group is finished I remove group.
 			if (_radioGroup) {
-				UCode.removeArrayItem					(_radioGroupsList[_radioGroup], this);
+				UCode.removeArrayItem(_radioGroupsList[_radioGroup], this);
 				if (_radioGroupsList[_radioGroup].length == 0)	_radioGroupsList[_radioGroup] = null;
-				_radioGroup							= null;
+				_radioGroup = null;
 			}
 			if (_icon) {
-				UDisplay.removeClip						(_icon);
-				_icon									= null;
+				UDisplay.removeClip(_icon);
+				_icon = null;
 			}
 			if (_txt) {
-				_txt.text								= "";
-				_txt									= null;
+				_txt.text = "";
+				_txt = null;
 			}
-			Buttonizer.removeButton						(_button);
-			UDisplay.removeClip							(_button);
-			UMem.storeInstance							(_button);
-			_button									= null;
-			super.cleanup								();
+			Buttonizer.removeButton(_button);
+			UDisplay.removeClip(_button);
+			UMem.storeInstance(_button);
+			_button = null;
+			super.cleanup();
 		}
-		public override function recycle						(par:Object=null):void {
-			super.recycle								(par);
+		public override function recycle(par:Object=null):void {
+			super.recycle(par);
 		}
 // GETTERS/SETTERS ///////////////////////////////////////////////////////////////////////////////////////
-		public function set text							(s:String) {
-			setText									(s);
+		public function set text(s:String):void {
+			setText(s);
 		}
-		public function get text							():String {
-			return									getText();
+		public function get text():String {
+			return getText();
 		}
 // ICON PLACEMENT ///////////////////////////////////////////////////////////////////////////////////////
-		private function positionForIcon						() {
-			if (_icon)									UDisplay.removeClip(_icon);
-			_icon										= UDisplay.addChild(this, UCode.getInstance(_iconAttachment)) as MovieClip;
-			_icon.gotoAndStop							(_iconFrame);
-			Buttonizer.setClickThrough						(_icon);
+		private function positionForIcon():void {
+			if (_icon) UDisplay.removeClip(_icon);
+			_icon = UDisplay.addChild(this, UCode.getInstance(_iconAttachment)) as MovieClip;
+			_icon.gotoAndStop(_iconFrame);
+			Buttonizer.setClickThrough(_icon);
 			// Resize icon
 			if (_icon.height > _rect.height || _icon.width > _rect.width) {
-				UDisplay.resizeSpriteTo					(_icon, _rect);
+				UDisplay.resizeSpriteTo(_icon, _rect);
 			}
 			// Position icon
 			if (_iconPositioning == "LEFT") {
-				_horizAlign								= "LEFT";
-				_vertAlign								= "MIDDLE";
-				UDisplay.alignSpriteTo					(_icon, _rect, _horizAlign,_vertAlign);
-				resetToRectangle							(new Rectangle(_icon.width+_doubleMargin,_textMargin,(_w-_icon.width)-(_textMargin*3),_h-_doubleMargin));
-// 				_rect									= new Rectangle(_icon.width+_doubleMargin,_textMargin,(_w-_icon.width)-(_textMargin*3),_h-_doubleMargin);
+				_horizAlign = "LEFT";
+				_vertAlign = "MIDDLE";
+				UDisplay.alignSpriteTo(_icon, _rect, _horizAlign,_vertAlign);
+				resetToRectangle(new Rectangle(_icon.width+_doubleMargin,_textMargin,(_w-_icon.width)-(_textMargin*3),_h-_doubleMargin));
+// 				_rect = new Rectangle(_icon.width+_doubleMargin,_textMargin,(_w-_icon.width)-(_textMargin*3),_h-_doubleMargin);
 			}
 			else if (_iconPositioning == "CENTERED (no text)") {
-				_horizAlign								= "CENTER";
-				_vertAlign								= "MIDDLE";
-				UDisplay.alignSpriteTo					(_icon, _rect, _horizAlign,_vertAlign);
-				_txt.visible								= false;
+				_horizAlign = "CENTER";
+				_vertAlign = "MIDDLE";
+				UDisplay.alignSpriteTo(_icon, _rect, _horizAlign,_vertAlign);
+				_txt.visible = false;
 			}
 			else if (_iconPositioning == "RIGHT") {
-				_horizAlign								= "RIGHT";
-				_vertAlign								= "MIDDLE";
-				UDisplay.alignSpriteTo					(_icon, _rect, _horizAlign,_vertAlign);
-				resetToRectangle							(new Rectangle(_textMargin,_textMargin,(_w-_icon.width)-(_textMargin*3),_h-_doubleMargin));
-// 				_rect									= new Rectangle(_textMargin,_textMargin,(_w-_icon.width)-(_textMargin*3),_h-_doubleMargin);
+				_horizAlign = "RIGHT";
+				_vertAlign = "MIDDLE";
+				UDisplay.alignSpriteTo(_icon, _rect, _horizAlign,_vertAlign);
+				resetToRectangle(new Rectangle(_textMargin,_textMargin,(_w-_icon.width)-(_textMargin*3),_h-_doubleMargin));
+// 				_rect = new Rectangle(_textMargin,_textMargin,(_w-_icon.width)-(_textMargin*3),_h-_doubleMargin);
 			}
 			else if (_iconPositioning == "BOTTOM") {
-				_horizAlign								= "CENTER";
-				_vertAlign								= "BOTTOM";
-				UDisplay.alignSpriteTo					(_icon, _rect, _horizAlign,_vertAlign);
-				resetToRectangle							(new Rectangle(_textMargin,_textMargin,_w-_doubleMargin,(_h-_icon.height)-(_textMargin*3)));
+				_horizAlign = "CENTER";
+				_vertAlign = "BOTTOM";
+				UDisplay.alignSpriteTo(_icon, _rect, _horizAlign,_vertAlign);
+				resetToRectangle(new Rectangle(_textMargin,_textMargin,_w-_doubleMargin,(_h-_icon.height)-(_textMargin*3)));
 // 				_rect									= new Rectangle(_textMargin,_textMargin,_w-_doubleMargin,(_h-_icon.height)-(_textMargin*3));
 			}
 			else if (_iconPositioning == "TOP") {
-				_horizAlign								= "CENTER";
-				_vertAlign								= "TOP";
-				UDisplay.alignSpriteTo					(_icon, _rect, _horizAlign,_vertAlign);
-				resetToRectangle							(new Rectangle(_textMargin,_icon.height+_doubleMargin,_w-_doubleMargin,(_h-_icon.height)-(_textMargin*3)));
-// 				_rect									= new Rectangle(_textMargin,_icon.height+_doubleMargin,_w-_doubleMargin,(_h-_icon.height)-(_textMargin*3));
+				_horizAlign = "CENTER";
+				_vertAlign = "TOP";
+				UDisplay.alignSpriteTo(_icon, _rect, _horizAlign,_vertAlign);
+				resetToRectangle(new Rectangle(_textMargin,_icon.height+_doubleMargin,_w-_doubleMargin,(_h-_icon.height)-(_textMargin*3)));
+// 				_rect = new Rectangle(_textMargin,_icon.height+_doubleMargin,_w-_doubleMargin,(_h-_icon.height)-(_textMargin*3));
 			}
-			_icon.x									+= _xIOff;
-			_icon.y									+= _yIOff;
+			_icon.x += _xIOff;
+			_icon.y += _yIOff;
 		}
 // UTY /////////////////////////////////////////////////////////////////////////////////////////
-		private function setTextInRectangle() {
+		private function setTextInRectangle():void {
 			// Apply rectangle dimensions and overwrite rectangle positioning
 			resetToRectangle();
 			// Proceed with dynamic size 
@@ -360,14 +360,14 @@ package com.pippoflash.components {
 			}
 			// Proceed with rectangle according to margins
 // 			_rect										= new Rectangle(_textMargin,_textMargin,_w-(_doubleMargin),_h-(_doubleMargin));
-			resetToRectangle								(new Rectangle(_textMargin,_textMargin,_w-(_doubleMargin),_h-(_doubleMargin)));
-			var b										:Sprite;
+			resetToRectangle(new Rectangle(_textMargin,_textMargin,_w-(_doubleMargin),_h-(_doubleMargin)));
+			var b:Sprite;
 			for (var i:uint=0; i<_instanceList.length; i++) {
 				UCode.setParameters(_button[_instanceList[i]], {width:_w, height:_h, visible:false});
 			}
-			Buttonizer.setupButton						(_button, this, "Button", USystem.isDevice() ? "onPress" : "onPress,onRollOver,onRollOut");
-			if (_button["_up"]) _button["_up"].visible							= true;
-			if (!_active)								setActive(_active);
+			Buttonizer.setupButton(_button, this, "Button", USystem.isDevice() ? "onPress" : "onPress,onRollOver,onRollOut");
+			if (_button["_up"]) _button["_up"].visible = true;
+			if (!_active) setActive(_active);
 			if (UCode.exists(_iconAttachment) && _iconAttachment != "NO ICON") positionForIcon();
 			if (USystem.isDevice()) {
 				// I can remove rollover state if is device
@@ -376,35 +376,35 @@ package com.pippoflash.components {
 				delete _button["_over"];
 			}
 		}
-		private function resetToRectangle						(rect:Rectangle=null):void { // Resets text to original _rect dimensions, and overwrites original settings
+		private function resetToRectangle(rect:Rectangle=null):void { // Resets text to original _rect dimensions, and overwrites original settings
 // 			trace("RESETTO A RECTANGLEEEEEEEEEEEEE",_rect,_txt);
-			if (rect)									_rect = rect;
-			_txt.x									= _rect.x;
-			_txt.y									= _rect.y;
-			_txt.width									= _rect.width;
-			_txt.height									= _rect.height;
-			UText.setTextFieldOriginalRectangle				(_txt, _rect); // Overwrites stored rectangle with computed one
+			if (rect) _rect = rect;
+			_txt.x = _rect.x;
+			_txt.y = _rect.y;
+			_txt.width = _rect.width;
+			_txt.height = _rect.height;
+			UText.setTextFieldOriginalRectangle(_txt, _rect); // Overwrites stored rectangle with computed one
 		}
-		private function appearSmooth						(c:DisplayObject, a:Boolean) {
+		private function appearSmooth(c:DisplayObject, a:Boolean):void {
 			if (a) {
 				// _mover.fade(c, 0.2, 1);
-				Animator.fadeInTotal						(c, SMOOTH_APPEAR_FRAMES);
+				Animator.fadeInTotal(c, SMOOTH_APPEAR_FRAMES);
 			}
-			// else _mover.fade(c, 0.2, 0);	 	 								Animator.fadeOut(c, SMOOTH_APPEAR_FRAMES);
-			else	 									Animator.fadeOut(c, SMOOTH_APPEAR_FRAMES);
+			// else _mover.fade(c, 0.2, 0); Animator.fadeOut(c, SMOOTH_APPEAR_FRAMES);
+			else Animator.fadeOut(c, SMOOTH_APPEAR_FRAMES);
 		}
-		private function appearInstant						(c:DisplayObject, a:Boolean) {
-			c.visible									= a;
+		private function appearInstant(c:DisplayObject, a:Boolean):void {
+			c.visible = a;
 		}
-		private function doubleClickPrevented				():Boolean { // If timer for double click prevention is not expired from last click. If true, do NOT click.
-			return									getTimer() < _clickTimerOffset;
+		private function doubleClickPrevented():Boolean { // If timer for double click prevention is not expired from last click. If true, do NOT click.
+			return getTimer() < _clickTimerOffset;
 		}
-		private function updateDoubleClickTimer				():void { // Starts avain double click prevention timer
+		private function updateDoubleClickTimer():void { // Starts avain double click prevention timer
 // 			_doubleClickPreventOffset _clickTimerOffset
-			_clickTimerOffset							= getTimer() + _doubleClickPreventOffset;
+			_clickTimerOffset = getTimer() + _doubleClickPreventOffset;
 		}
 // LISTENERS //////////////////////////////////////////////////////////////////////////////////////
-		public function onPressButton(c:DisplayObject, isInternal:Boolean=false) { // This is to set button selected
+		public function onPressButton(c:DisplayObject, isInternal:Boolean=false):void { // This is to set button selected
 			if (doubleClickPrevented()) {
 				Debug.warning(_debugPrefix, "Press blocked. Double click prevention timer not elapsed.");
 				return;
@@ -416,21 +416,21 @@ package com.pippoflash.components {
 			UExec.time(0.1, onReleaseButton);
 			if (_toolTipText) UGlobal.removeToolTip(this);
 		}
-		public function onRollOverButton(c:DisplayObject) {
+		public function onRollOverButton(c:DisplayObject):void {
 			if (_toolTipText) UGlobal.setToolTip(true, _toolTipText, this);
 			if (_selected) return;
 			_appearFunction(_button["_over"], true);
 			setTexRoll();
 			broadcastEvent("onRollOver", this);
 		}
-		public function onRollOutButton						(c:DisplayObject) {
-			if (_toolTipText)							UGlobal.removeToolTip(this);
-			if (_selected)								return;
-			_appearFunction							(_button["_over"], false);
-			setTextUp									();
-			broadcastEvent						("onRollOut", this);
+		public function onRollOutButton(c:DisplayObject):void {
+			if (_toolTipText) UGlobal.removeToolTip(this);
+			if (_selected) return;
+			_appearFunction(_button["_over"], false);
+			setTextUp();
+			broadcastEvent("onRollOut", this);
 		}
-		public function onReleaseButton(j:*=null) { // I have put this parameter because once I had an error with "expected 0 received 1"
+		public function onReleaseButton(j:*=null):void { // I have put this parameter because once I had an error with "expected 0 received 1"
 			if (_isRadio && _selected) return;
 			if (_switch || (_isRadio && !_selected)) { // If radio or switch button gets selected or deselected
 				setSelected(!_selected);
@@ -441,23 +441,23 @@ package com.pippoflash.components {
 			}
 			// Otherwise continue normally
 			_appearFunction(_button["_down"], false);
-			broadcastEvent							("onRelease", this);
-			UGlobal.setToolTip							(false);
+			broadcastEvent("onRelease", this);
+			UGlobal.setToolTip(false);
 		}
 	// TEXT COLORER TO BE OVERRIDDEN ///////////////////////////////////////////////////////////////////////////////////////
-		protected function updateTextColor					():void {
+		protected function updateTextColor():void {
 			
 		}
-		protected function setTexRoll						():void {
+		protected function setTexRoll():void {
 			
 		}
-		protected function setTextUp						():void {
+		protected function setTextUp():void {
 			
 		}
-		protected function setTextDown					():void {
+		protected function setTextDown ():void {
 			
 		}
-		protected function setTextSleep					():void {
+		protected function setTextSleep ():void {
 			
 		}
 	}
