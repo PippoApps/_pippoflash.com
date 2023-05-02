@@ -142,8 +142,14 @@ package com.pippoflash.utils {
 			for (var i in l) if (d[l[i]] == undefined) d[l[i]] = s[l[i]];
 			return d;
 		}
-		public static function setListParameters(obs:Array, par:Object) {
+		public static function setListParameters(obs:Array, par:Object):void {
 			for (var i:Number=0; i<obs.length; i++) setParameters(obs[i], par);
+		}
+		public static function setVectorParameters(obs:Vector.<*>, par:Object):void {
+			for each(var o:Object in obs) {
+				setParameters(o, par);
+			}
+			// for (var i:Number=0; i<obs.length; i++) setParameters(obs[i], par);
 		}
 		public static function getBestMatchingProperty	(props:Object, id:String):* { // Retrieves the best matching properties in a hash.
 			// It looks for an id in a hash, starting from full string, and then removing a character at the end step by step
@@ -275,7 +281,7 @@ package com.pippoflash.utils {
 			UMethod.callMethodNameTunnel(o, fn, rest);
 		}
 	// Method list with ...rest
-		public static var callFunctionArray = callFunctionParams;
+		public static var callFunctionArray:Function = callFunctionParams;
 		public static function callFunctionParams(f:Function, pars:Array=null):void {
 			if (pars) UMethod.callMethodTunnel(f, pars);
 		}
@@ -284,8 +290,11 @@ package com.pippoflash.utils {
 		public static function callArrayMethodName(a:Array, fn:String, ...rest):void {
 			UMethod.callArrayMethodNameTunnel(a, fn, rest);
 		}
-	// LEGACY METHOD - with single parameter
-		public static function callGroupMethod(a:Array, fn:String, param:*=null) {
+		public static function callVectorMethodName(v:Vector.<*>, fn:String, ...rest):void {
+			UMethod.callVectorMethodNameTunnel(v, fn, rest);
+		}
+		// LEGACY METHOD - with single parameter
+		public static function callGroupMethod(a:Array, fn:String, param:*=null):void {
 			if (param) UMethod.callArrayMethodName(a, fn, param);
 			else UMethod.callArrayMethodName(a, fn);
 		}

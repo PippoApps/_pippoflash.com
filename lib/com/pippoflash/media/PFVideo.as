@@ -65,7 +65,7 @@ package com.pippoflash.media {
 		private var _showOnlyWhenPlaying			:Boolean; // If this is on, video will be visible ONLY when is playing
 		private var _delayOneFrameOnPlay			:Boolean; // If this is on, shows the video 1 frame after it is playing, to prevent the bug on Android that shows a frame of the previous video
 		private var _eventPostfix					:String;
-		private var _playEventTimer:Timer = new Timer(500, 0);
+		private var _playEventTimer:Timer = new Timer(200, 0);
 		private var _playEventTimerLastTime:Number; // Stores last time and broadcasts only if different
 		// private var _metaData:Object;
 		// LOOPING
@@ -315,7 +315,7 @@ package com.pippoflash.media {
 			_playEventTimer.stop();
 		}
 		public function onPlayEventTimer(e:TimerEvent):void {
-			trace("timer " + (_ns ? _ns.time : 0));
+			// trace("timer " + (_ns ? _ns.time : 0));
 			if (_playEventTimerLastTime != _ns.time) {
 				_playEventTimerLastTime = _ns.time;
 				PippoFlashEventsMan.broadcastInstanceEvent(this, EVT_PLAYING);

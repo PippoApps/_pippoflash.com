@@ -30,9 +30,12 @@ package com.pippoflash.utils {
 			var i:uint = rest.length;
 			for each (var o:Object in a) if (o.hasOwnProperty(fn)) _methods[i](o[fn], rest);
 		}
-		public static function callVectorMethodName		(a:Vector.<*>, fn:String, ...rest):void {
-			var i								:uint = rest.length;
-			for each (var o:Object in a)			if (o.hasOwnProperty(fn)) _methods[i](o[fn], rest);
+		public static function callVectorMethodName(a:Vector.<*>, fn:String, ...rest):void {
+			var i:uint = rest.length;
+			for each (var o:Object in a) {
+				if (o.hasOwnProperty(fn)) _methods[i](o[fn], rest);
+				else Debug.error(_debugPrefix, "Cannot find method "+fn+" in "+o);
+			}
 		}
 	// TUNNELING METHODS (...rest has already been interpretated - legacy from UCode)
 		public static function callVectorMethodNameTunnel	(a:Vector.<*>, fn:String, pars:Array):void {
