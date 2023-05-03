@@ -260,7 +260,7 @@ package com.pippoflash.components {
 			if (_icon) UDisplay.removeClip(_icon);
 			_icon = UDisplay.addChild(this, UCode.getInstance(_iconAttachment)) as MovieClip;
 			_icon.gotoAndStop(_iconFrame);
-			Buttonizer.setClickThrough(_icon);
+			Buttonizer.setClickThrough(_icon, true);
 			// Resize icon
 			if (_icon.height > _rect.height || _icon.width > _rect.width) {
 				UDisplay.resizeSpriteTo(_icon, _rect);

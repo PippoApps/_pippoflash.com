@@ -38,9 +38,9 @@ package com.pippoflash.utils {
 			}
 		}
 	// TUNNELING METHODS (...rest has already been interpretated - legacy from UCode)
-		public static function callVectorMethodNameTunnel	(a:Vector.<*>, fn:String, pars:Array):void {
-			var i								:uint = pars.length;
-			for each (var o:Object in a)			if (o.hasOwnProperty(fn)) _methods[i](o[fn], pars);
+		public static function callVectorMethodNameTunnel(a:Vector.<*>, fn:String, pars:Array):void {
+			const i:uint = pars.length;
+			for each (var o:Object in a) if (o && o.hasOwnProperty(fn)) _methods[i](o[fn], pars);
 		}
 		public static function callArrayMethodNameTunnel	(a:Array, fn:String, pars:Array):void {
 			var i								:uint = pars.length;

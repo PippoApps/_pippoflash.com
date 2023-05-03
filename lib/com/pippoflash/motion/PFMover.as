@@ -65,6 +65,7 @@ package com.pippoflash.motion {
 	import com.pippoflash.utils.*; // PippoFlash
 	import com.greensock.TweenNano; import com.greensock.easing.*; import com.greensock.BlitMask; // Greensock
 	import flash.display.DisplayObject;
+	import com.adobe.protocols.dict.Database;
 	public class PFMover {
 	// CONSTANTS
 		private static const VERBOSE:Boolean = false;
@@ -84,7 +85,7 @@ package com.pippoflash.motion {
 		private var _blitMasks:Dictionary = new Dictionary(true);
 		private var _defaultEase:String;
 		private var _allTweenNano:Vector.<TweenNano> = new Vector.<TweenNano>();
-		private const _displayObjectInitialProperties:Dictionary = new Dictionary(true); // Stores the initial properties of an object (position and scale);
+		private const _displayObjectInitialProperties:Dictionary = new Dictionary(false); // Stores the initial properties of an object (position and scale);
 		// UTY
 		private var _tw:TweenNano; // Acts as a temporary reference
 // STATIC METHODS ///////////////////////////////////////////////////////////////////////////////////////
@@ -157,11 +158,12 @@ package com.pippoflash.motion {
 		public function restoreInitialProperties(c:*):void {
 			var props:Object = _displayObjectInitialProperties[c];
 			if (_verbose) Debug.debug(_debugPrefix, "Restoring instantly initial props for " + c + Debug.object(props));
-			for(var p:String in OBJECT_INITIAL_PROPERTIES){
+			for each(var p:String in OBJECT_INITIAL_PROPERTIES){
 				c[p] = props[p];
 			}
 		}
 		public function getInitialProperty(c:*, prop:String):Number {
+			if (_verbose) Debug.debug(_debugPrefix, "Retriveing property " + prop + " for " + c + ". Is it there? " + _displayObjectInitialProperties[c]);
 			return _displayObjectInitialProperties[c][prop];
 		}
 		public function autoEnterFromZoomZero(c:*, time:Number, onComplete:Function=null, onCompleteParams:*= null, emd:String=null, resetBefore:Boolean=false, ease:String="Strong.easeOut"):TweenNano {
@@ -170,9 +172,9 @@ package com.pippoflash.motion {
 		}
 		public function autoEnterFromOffScreen(c:*, time:Number, directionFrom:String="bottom", setOffStageBeforeEnter:Boolean=false, onComplete:Function=null, onCompleteParams:*= null, emd:String=null, resetBefore:Boolean=false, ease:String="Strong.easeOut"):void {
 			const p:String = directionFrom.charAt(0).toLowerCase();
-			if (setOffStageBeforeEnter) autoSetOffScreen(c, p, resetBefore);
+			if (setOffStageBeforeEnter) autoSetOffScreen(c, p, false);
 			const prop:String = (p == "b" || p == "t") ? "y" : "x";
-			autoRestoreProp(c, time, prop, onComplete, onCompleteParams, emd, resetBefore, ease);
+			autoRestoreProp(c, time, prop, onComplete, onCompleteParams, emd, false, ease);
 		}
 		public function autoExitOffScreen(c:*, time:Number, directionTo:String="bottom", onComplete:Function=null, onCompleteParams:*= null, emd:String=null, resetBefore:Boolean=false, ease:String="Strong.easeOut"):void {
 			const p:String = directionTo.charAt(0).toLowerCase();
@@ -240,6 +242,9 @@ package com.pippoflash.motion {
 		public function fadeInFrom0(c:*, time:Number, onComplete:Function=null, onCompleteParams:*=null, emd:String=null):TweenNano {
 			c.alpha = 0;
 			return doMove(c, time, {alpha:1, onComplete:onComplete, onCompleteParams:onCompleteParams}, "Linear.easeIn", emd, "to");
+		}
+		public function fadeTo0(c:*, time:Number, onComplete:Function=null, onCompleteParams:*=null, emd:String=null):TweenNano {
+			return doMove(c, time, {alpha:0, onComplete:onComplete, onCompleteParams:onCompleteParams}, "Linear.easeIn", emd, "to");
 		}
 		public function scale(c:*, time:Number, scale:Number, onComplete:Function=null, onCompleteParams:*=null, emd:String=null, ease:String="Strong.easeOut"):TweenNano {
 			return doMove(c, time, {scaleX:scale, scaleY:scale, onComplete:onComplete, onCompleteParams:onCompleteParams}, ease, emd, "to");

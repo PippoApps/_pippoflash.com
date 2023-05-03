@@ -135,6 +135,9 @@ package com.pippoflash.utils {
 			c.scaleX							= scale;
 			c.scaleY							= scale;
 		}
+		public static function resetScale(...rest):void {
+			for each (var c:* in rest) scaleTo(c, 1)
+		}
 		public static function roundPosition			(c:DisplayObject):void {
 			c.x = Math.round(c.x); c.y = Math.round(c.y); 
 		}
