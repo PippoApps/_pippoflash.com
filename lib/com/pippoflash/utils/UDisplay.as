@@ -347,9 +347,9 @@ package com.pippoflash.utils {
 		public static function moveToTop(c:DisplayObject):void { // Moves selected sprite to higher depth
 			if (clipIsRemovable(c)) c.parent.addChild(c);
 		}
-		// public static function moveToBottom(c:DisplayObject):void { // Moves selected sprite to lowest depth
-			
-		// }
+		public static function moveToBottom(c:DisplayObject, bottomIndex:uint=0):void { // Moves selected sprite to lowest depth
+			if (clipIsRemovable(c)) c.parent.addChildAt(c, bottomIndex);
+		}
 		public static function getChildren(c:DisplayObjectContainer):Array { // Gets an array with all children
 			var a:Array = [];
 			for (_i=0; _i<c.numChildren; _i++) a[_i] = c.getChildAt(_i);
