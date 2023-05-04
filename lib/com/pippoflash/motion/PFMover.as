@@ -302,33 +302,44 @@ package com.pippoflash.motion {
 			private function doMove(c:*, steps:Number, userVars:Object, ease:String, emd:String = null, dir:String = "to", overwrite:Boolean = true):TweenNano {
 				// Check if previous motion was in place
 							//trace(_debugPrefix,"removeInternalMotion doMove");
-
+				// trace("1");
 				if (overwrite && isMoving(c)) removeInternalMotion(_allMotions[c]);
 				// Adjust ease in order to allow using move with "null" instead of easing function
+				// trace("1");
 				if (ease == null) ease = DEFAULT_EASE;
 				// Setup motions param
+				// trace("1");
 				var motionParams:Object = {};
+				// trace("1");
 				var vars:Object = UCode.duplicateObject(userVars);
+				// trace("1");
 				if (vars.scaleAll != undefined) {
+				// trace("1");
 					vars.scaleX = vars.scaleY = vars.scaleAll;
 				}
 				// Setup ease function
+				// trace("1");
 				vars.ease	= EaseLookup.find(ease ? ease : _defaultEase);
 				// Setup stuff for onComplete
+				// trace("1");
 				if (vars.onComplete) {
 					// Setup internal onComplete working
 					motionParams.onComplete			= vars.onComplete;
 					motionParams.onCompleteParams		= vars.onCompleteParams;
 				}
+				// trace("1");
 				if (emd)	motionParams.emd = emd;
 				_motionsParams[c]						= motionParams;
 				// Always set an onComplete function
 				vars.onComplete = onPFMoverComplete;
 				// Debug trace
+				// trace("1");
 				if (_verbose) Debug.debug(_debugPrefix, "Start motion", ease, c, c.name, Debug.object(vars));
 				// Setup stuff for motion
 // 				var t									:TweenNano = _allMotions[c] ? _allMotions[c] : TweenNano[dir](c, steps, vars); 
+				// trace("1");
 				var t:TweenNano = TweenNano[dir](c, steps, vars);
+				// trace("1");
 				vars.onCompleteParams					= [t];
 				_allMotions[c] = t;
 				_motions[c] = t;

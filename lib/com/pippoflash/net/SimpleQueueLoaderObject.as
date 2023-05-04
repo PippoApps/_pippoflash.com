@@ -96,6 +96,7 @@ package com.pippoflash.net {
 		public var _isSwf:Boolean; // Marks if I am loading an SWF file (useful to force same application domain on iOS)
 		// STATIC UTY
 		public static var _s						:String;
+		public var _doNotSuicide:Boolean; // Set to true if you want to keep this SQLO and prevent it to be pooled iin UMem
 // STATIC ///////////////////////////////////////////////////////////////////////////////////////
 		
 // INIT ///////////////////////////////////////////////////////////////////////////////////////
@@ -217,6 +218,11 @@ package com.pippoflash.net {
 		}
 		public function getLoaderInfo				():LoaderInfo {
 			return							_contentLoaderInfo;
+		}
+		public function getLoadedInstanceFromClassDefinition(className:String, par:*=null):* {
+			// return o.getLoaderInfo().applicationDomain.getDefinition("LibCover_FLV")  as  Class;
+			var c:Class = Class(getLoaderInfo().applicationDomain.getDefinition(className)  as  Class);
+			return par == null ? new c() : new c(par);
 		}
 		public function getUrl					():String {
 			return							_url;
@@ -341,7 +347,11 @@ package com.pippoflash.net {
 			UExec.time(0.5, suicide); // suicide after half second in order not to overlap with other operations from outside on load complete (some componenets do operations on next frame)
 			//UExec.next(suicide);
 		}
-		public function suicide() {
+		public function suicide():void {
+			if (_doNotSuicide) {
+				Debug.warning(_debugPrefix, "SUICIDE PREVENTED. This SQLO will live forever: " + _url);
+				return;
+			}
 			UMem.kill_SQLObject(this);
 		}
 	}

@@ -65,7 +65,7 @@ package com.pippoflash.media {
 		private var _showOnlyWhenPlaying			:Boolean; // If this is on, video will be visible ONLY when is playing
 		private var _delayOneFrameOnPlay			:Boolean; // If this is on, shows the video 1 frame after it is playing, to prevent the bug on Android that shows a frame of the previous video
 		private var _eventPostfix					:String;
-		private var _playEventTimer:Timer = new Timer(200, 0);
+		private var _playEventTimer:Timer = new Timer(100, 0);
 		private var _playEventTimerLastTime:Number; // Stores last time and broadcasts only if different
 		// private var _metaData:Object;
 		// LOOPING
@@ -181,8 +181,8 @@ package com.pippoflash.media {
 			_loopsPlayed = 0;
 			// Go ahead with playing
 			_url = u;
-			if (resetStream) { // this is used to prevent a bug on Android, that when I play a new video, it shows the last frame of the last played video
-				stop(true);
+			if (resetStream || !_ns) { // this is used to prevent a bug on Android, that when I play a new video, it shows the last frame of the last played video
+				stop(resetStream);
 				resetVideo();
 				createNetStream();
 			}
@@ -335,7 +335,7 @@ package com.pippoflash.media {
 			else if (o.code == "NetStream.Play.Stop") onPlayStop();
 			else if (o.code == "NetStream.Pause.Notify") {
 				deActivatePlayEventTimer();
-				Debug.warning(_debugPrefix, "REMEMBER TO INTERCEPT UNPAUSE AND REACTVATE TIMEER EvENT");
+				// Debug.warning(_debugPrefix, "REMEMBER TO INTERCEPT UNPAUSE AND REACTVATE TIMEER EvENT");
 			}
 			else if (o.code == "NetStream.Play.Complete") {
 				_loopsPlayed ++;
