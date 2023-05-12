@@ -127,7 +127,6 @@ package com.pippoflash.framework {
 		}
 		public static function removeStaticMethodListenerTo(cl:Class, evt:String, f:Function):void {
 			if (_staticListenersToFunc[cl] && _staticListenersToFunc[cl][evt])	{ // Listener exists
-				trace("G");
 				UCode.removeVectorItem(_staticListenersToFunc[cl][evt], f);
 			}
 		}

@@ -270,6 +270,7 @@ package com.pippoflash.net {
 		}
 		private static function loadNextQueueItem():void {
 			_processing = _queue.shift();
+			// QuickLoader._verbose = true;
 			_loader = QuickLoader.loadFile(_processing.uri, PreLoader, "Item", false, "", null, _forceFileStream);
 			Debug.debug(_debugPrefix, "Loading item " + _loader._url);
 		}
