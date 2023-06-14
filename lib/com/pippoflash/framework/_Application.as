@@ -35,6 +35,7 @@ package com.pippoflash.framework {
 	import flash.text.*;
 	import flash.utils.*;
 	import flash.profiler.*;
+	import com.pippoflash.framework.air.UAir;
 
 	// PROJECT IMPORT
 // 	import									AS3.*;
@@ -59,6 +60,7 @@ package com.pippoflash.framework {
 		public var SHOW_REDRAW_REGIONS:Boolean = false;
 		public var RENDER_QUALITY:Number = -1; 	// If -1 quality is not set, and keeps app (or host app) default. Otherwise uses this.
 		public var MANAGE_UNCAUGHT_ERRORS:Boolean = true; // This routes errors to _promptOk if available, otherwise throws them again.
+		public var EXIT_ON_UNCAUGHT_ERROR:Boolean = true; // This makes the app crash and close on any uncaught error
 		// 0:low, 1:medium, 2:high, 3:best, 4:8x8, 5:8x8linear, 6:16x16, 7:16x16linear
 		// SYSTEM
 		private var _sharedObject:SharedObject;
@@ -124,10 +126,10 @@ package com.pippoflash.framework {
 			_sharedObjectId = "/PippoApps"; // CAREFUL - THIS IS OVERRIDDEN BY SO ID IN CONFIG
 			Debug.debug(_debugPrefix, _applicationId, _applicationVersion);
 			//_application = this;
-			if (MANAGE_UNCAUGHT_ERRORS) handleUncaughtErrors();
+			if (MANAGE_UNCAUGHT_ERRORS || EXIT_ON_UNCAUGHT_ERROR) handleUncaughtErrors();
 			// Add stage event listener
 			addEventListener(Event.ADDED_TO_STAGE, initOnStage); // Initialize ONLY when stage is available
-			// Setup error handler
+			// Setup error handler foir standard trace action
 			this.loaderInfo.uncaughtErrorEvents.addEventListener(UncaughtErrorEvent.UNCAUGHT_ERROR, onUncaughtError);
 		}
 
@@ -149,6 +151,12 @@ package com.pippoflash.framework {
 		}
 		private function uncaughtErrorHandler(e:UncaughtErrorEvent):void {
 			Debug.error(_debugPrefix, "Uncaught error event detected:", e);
+			if (EXIT_ON_UNCAUGHT_ERROR) {
+				Debug.warning(_debugPrefix, "EXITING ON UNCAUGHT ERROR.");
+				UExec.time(2, UAir.quit);
+				promptOk("Restarting Application...");
+				return;
+			}
 			var t:String = e + "\n"; 
             if (e.error is Error) {
                 var error:Error = e.error as Error;
