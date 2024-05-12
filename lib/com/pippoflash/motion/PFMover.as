@@ -482,43 +482,43 @@ package com.pippoflash.motion {
 		public static function moveTo(c:*, frames:int, x:Number, y:Number, onComplete:Function=null, par:Object=null, useFrames:Boolean=true):void {
 			slideIn(c, {steps:frames, endPos:{x:x, y:y}, onCompleteParams:par, onComplete:onComplete}, true, useFrames )
 		}
-		public static function fadeTo						(c:*, to:Number, frames:int=5, onComplete:Function=null, par:Object=null, useFrames:Boolean=true) {
-			straightMove								(c, {steps:frames, endPos:{alpha:to}, onCompleteParams:par, onComplete:onComplete}, true, useFrames);
+		public static function fadeTo(c:*, to:Number, frames:int=5, onComplete:Function=null, par:Object=null, useFrames:Boolean=true):void {
+			straightMove(c, {steps:frames, endPos:{alpha:to}, onCompleteParams:par, onComplete:onComplete}, true, useFrames);
 		}
-		public static function fadeInTotal						(c:*, frames:int=5, onComplete:Function=null, par:Object=null, useFrames:Boolean=true) {
-			c.visible									= true;
-			c.alpha									= 0;
-			straightMove								(c, {steps:frames, endPos:{alpha:1}, onCompleteParams:par, onComplete:onComplete}, true, useFrames);
+		public static function fadeInTotal(c:*, frames:int=5, onComplete:Function=null, par:Object=null, useFrames:Boolean=true):void {
+			c.visible = true;
+			c.alpha = 0;
+			straightMove(c, {steps:frames, endPos:{alpha:1}, onCompleteParams:par, onComplete:onComplete}, true, useFrames);
 		}
-		public static function fadeIn							(c:*, frames:int=5, onComplete:Function=null, par:Object=null, useFrames:Boolean=true) {
-			straightMove								(c, {steps:frames, endPos:{alpha:1}, onCompleteParams:par, onComplete:onComplete}, true, useFrames);
+		public static function fadeIn(c:*, frames:int=5, onComplete:Function=null, par:Object=null, useFrames:Boolean=true):void {
+			straightMove(c, {steps:frames, endPos:{alpha:1}, onCompleteParams:par, onComplete:onComplete}, true, useFrames);
 		}
-		public static function fadeOut						(c:*, frames:int=5, onComplete:Function=null, par:Object=null, useFrames:Boolean=true) {
-			straightMove								(c, {steps:frames, endPos:{alpha:0}, onCompleteParams:par, onComplete:onComplete}, true, useFrames);
+		public static function fadeOut(c:*, frames:int=5, onComplete:Function=null, par:Object=null, useFrames:Boolean=true):void {
+			straightMove(c, {steps:frames, endPos:{alpha:0}, onCompleteParams:par, onComplete:onComplete}, true, useFrames);
 		}
-		public static function fadeOutAndKill					(c:*, frames:int=5, onComplete:Function=null, par:Object=null, useFrames:Boolean=true) {
-			straightMove								(c, {steps:frames, endPos:{alpha:0}, onComplete:onComplete, onCompleteParams:par, endMotionDirective:"KILL"}, true, useFrames);
+		public static function fadeOutAndKill(c:*, frames:int=5, onComplete:Function=null, par:Object=null, useFrames:Boolean=true):void {
+			straightMove(c, {steps:frames, endPos:{alpha:0}, onComplete:onComplete, onCompleteParams:par, endMotionDirective:"KILL"}, true, useFrames);
 		}
-		public static function fadeOutAndDestroy				(c:*, frames:int=5, onComplete:Function=null, par:Object=null, useFrames:Boolean=true) {
-			straightMove								(c, {steps:frames, endPos:{alpha:0}, onComplete:onComplete, onCompleteParams:par, endMotionDirective:"DESTROY"}, true, useFrames);
+		public static function fadeOutAndDestroy(c:*, frames:int=5, onComplete:Function=null, par:Object=null, useFrames:Boolean=true):void {
+			straightMove(c, {steps:frames, endPos:{alpha:0}, onComplete:onComplete, onCompleteParams:par, endMotionDirective:"DESTROY"}, true, useFrames);
 		}
-		public static function fadeOutAndInvisible				(c:*, frames:int=5, onComplete:Function=null, par:Object=null, useFrames:Boolean=true) {
-			straightMove								(c, {steps:frames, endPos:{alpha:0}, onComplete:onComplete, onCompleteParams:par, endMotionDirective:"INV"}, true, useFrames);
+		public static function fadeOutAndInvisible(c:*, frames:int=5, onComplete:Function=null, par:Object=null, useFrames:Boolean=true):void {
+			straightMove(c, {steps:frames, endPos:{alpha:0}, onComplete:onComplete, onCompleteParams:par, endMotionDirective:"INV"}, true, useFrames);
 		}
-		static public function straightMove					(c:*, p:Object, overwrite:Boolean=true, useFrames:Boolean=true) {
-			doMoveCompatible							(c, p, "Linear.easeNone", useFrames);
+		static public function straightMove(c:*, p:Object, overwrite:Boolean=true, useFrames:Boolean=true):void {
+			doMoveCompatible(c, p, "Linear.easeNone", useFrames);
 		}
-		static public function slideOut						(c:*, p:Object, overwrite:Boolean=true, useFrames:Boolean=true) {
-			doMoveCompatible							(c, p, "Strong.easeIn", useFrames);
+		static public function slideOut(c:*, p:Object, overwrite:Boolean=true, useFrames:Boolean=true):void {
+			doMoveCompatible(c, p, "Strong.easeIn", useFrames);
 		}
-		static public function slideOutIn						(c:*, p:Object, overwrite:Boolean=true, useFrames:Boolean=true) {
-			doMoveCompatible							(c, p, "Strong.easeInOut", useFrames);
+		static public function slideOutIn(c:*, p:Object, overwrite:Boolean=true, useFrames:Boolean=true):void {
+			doMoveCompatible(c, p, "Strong.easeInOut", useFrames);
 		}
-		static public function slideIn							(c:*, p:Object,overwrite:Boolean=true, useFrames:Boolean=true) {
-			doMoveCompatible							(c, p, "Strong.easeOut", useFrames);
+		static public function slideIn(c:*, p:Object,overwrite:Boolean=true, useFrames:Boolean=true):void {
+			doMoveCompatible(c, p, "Strong.easeOut", useFrames);
 		}
-		static public function removeMotion					(c:*):void {
-			_internalMover.stopMotion						(c);
+		static public function removeMotion(c:*):void {
+			_internalMover.stopMotion(c);
 		}
 		static public function removeAllMotions					():void {
 			_internalMover.stopMotions						();

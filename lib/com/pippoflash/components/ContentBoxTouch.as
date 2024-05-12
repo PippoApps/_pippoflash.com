@@ -137,11 +137,11 @@ public function set containerZoomFactor(value:Number):void {
 			if (_useMouseWheel)							addEventListener(MouseEvent.MOUSE_WHEEL, onMouseWheel, false, 0, true);
 			if (_coverBg)								renderBgCover();
 		}
-			private function renderBgCover					() {
+			private function renderBgCover					():void {
 				_bgClip								= UDisplay.addChild(this, UDisplay.getSquareClip({width:_w, height:_h, alpha:0})) as MovieClip;
 			}
 			private function setupScrollBarLink				(link:String, funcPost:String):MovieClip {
-				var sb = this.parent[link];
+				var sb:* = this.parent[link];
 				return								setupScrollBar(UCode.getPathFromString(this.parent, link), funcPost);
 			}
 				private function setupScrollBar				(sb:MovieClip, funcPost:String):MovieClip {
@@ -169,7 +169,7 @@ public function set containerZoomFactor(value:Number):void {
 		 * @param	c
 		 * @param	userBounds
 		 */
-		public function setContent							(c:*, userBounds:Rectangle=null) {
+		public function setContent							(c:*, userBounds:Rectangle=null):void {
 			if (UCode.exists(_content))						releaseContent();
 			_content									= c is Sprite || c is MovieClip ? c : UDisplay.wrapInNewSprite(c);
 			_realBounds								= getFullBounds(_content);
@@ -247,7 +247,7 @@ public function set containerZoomFactor(value:Number):void {
 		public function hasContent							():Boolean {
 			return									Boolean(_content);
 		}
-		public function scrollToPerc							(perc:Number) {
+		public function scrollToPerc							(perc:Number):void {
 			scrollToPercV								(perc);
 		}
 		public function setToPerc							(perc:Number):void {
@@ -269,7 +269,7 @@ public function set containerZoomFactor(value:Number):void {
 // 			var step									:Number = 
 			scrollToV									(down ? _targetV-_rectangle.height/2 : _targetV+_rectangle.height/2);
 		}
-		public function stepV								(step:Number) {
+		public function stepV								(step:Number):void {
 			_scrollVfunc								(_scrollVperc + step);
 		}
 		public function addToScrollV							(px:Number):void { // Adds pixels to actual scroll
@@ -284,31 +284,31 @@ public function set containerZoomFactor(value:Number):void {
 // 			if (right)									scrollToH(_targetH-px);
 // 			else										scrollToH(_targetH+px);
 		}
-		public function scrollToV							(px:Number) {
+		public function scrollToV							(px:Number):void {
 			scrollToPercV								(UCode.calculatePercent(px, _boundaries.y));
 		}
-		public function scrollToPercV						(perc:Number) {
+		public function scrollToPercV						(perc:Number):void {
 			_scrollVfunc								(perc);
 			_targetV									= Math.round(UCode.getPercent(_targetVperc, _boundaries.y));
 		}
 		public function stepH								(ahead:Boolean=true):void { // Steps +1 or -1 - moves the amount of content 1 step
 			scrollToH									(_rectangle.x + (ahead ? _w : -_w));
 		}
-		public function scrollToH							(px:Number) {
+		public function scrollToH							(px:Number):void {
 			scrollToPercH								(UCode.calculatePercent(px, _boundaries.x));
 		}
-		public function scrollToPercH						(perc:Number) {
+		public function scrollToPercH						(perc:Number):void {
 			_scrollHfunc								(perc);
 // 			_targetH									= _rectangle.x;
 			_targetH									= Math.round(UCode.getPercent(_targetHperc, _boundaries.x));
 		}
-		public function resetScroll							() {
+		public function resetScroll							():void {
 			UCode.setParameters							(_rectangle, {x:0, y:0});
 			_scrollVperc = _scrollHperc = _targetH = _targetV = _targetVperc = _targetHperc = _latestScrollH = 0;
 			if (_scrollV)								_scrollV.scrollToTop();
 			if (_scrollH)								_scrollH.scrollToTop();
 		}
-		public function updateSize							(userBounds:Rectangle=null) {
+		public function updateSize							(userBounds:Rectangle=null):void {
 			if (userBounds)								_realBounds = userBounds;
 // 			else										_realBounds= getFullBounds(_content);
 
@@ -334,19 +334,19 @@ public function set containerZoomFactor(value:Number):void {
 		public function hasHScroll							():Boolean {
 			return									_realBounds.width > _w;
 		}
-		public function scrollToTop							() {
+		public function scrollToTop							():void {
 			scrollToPerc								(0);
 		}
-		public function scrollToBottom						() {
+		public function scrollToBottom						():void {
 			scrollToPerc								(100);
 		}
-		public function restoreScroll							() { // Scrolls again to the latest position
+		public function restoreScroll							():void { // Scrolls again to the latest position
 			if (UCode.exists(_latestScrollV))					scrollToPercV(_latestScrollV);
 		}
-		public function updateLastScroll						() {
+		public function updateLastScroll						():void {
 			_latestScrollV								= _targetVperc;
 		}
-		public function scrollToShowContent					(c:DisplayObject, instant:Boolean=false, offset:Number=0) { // Scrolls to show the specified content
+		public function scrollToShowContent					(c:DisplayObject, instant:Boolean=false, offset:Number=0):void { // Scrolls to show the specified content
 			// MAKE SURE CONTENT IS REALLY INSIDE CONTENT BOX, OR BEHAVIOUR WILL BE HORRIBLE!!!
 			// This doesn't work well with tiles
 			if (c.parent == _content) {
@@ -480,13 +480,13 @@ public function set containerZoomFactor(value:Number):void {
 					}
 				}
 // LISTENERS /////////////////////////////////////////////////////////////////////////////////////
-		public function onScrollVertical						(perc:Number) {
+		public function onScrollVertical						(perc:Number):void {
 			_scrollVfunc									(perc);
 		}
-		public function onScrollHorizontal						(perc:Number) {
+		public function onScrollHorizontal						(perc:Number):void {
 			_scrollHfunc									(perc);
 		}	
-		private function onMouseWheel						(e) {
+		private function onMouseWheel						(e:*):void {
 			if (!hasVScroll())								return; // Inhibit scroll wheel if there is nothing to scroll
 			scrollSmallStepV								(Boolean(Number(e.delta)>0));
 // 			adjustScrollV								();
@@ -497,20 +497,20 @@ public function set containerZoomFactor(value:Number):void {
 		}
 // SCROLL FUNCTIONS ////////////////////////////////////////////////////////////////////////////////
 	// NORMAL SCROLL
-		private function doScrollV							(perc:Number) {
+		private function doScrollV							(perc:Number):void {
 			if (!hasVScroll())							return;
 			_targetVperc = _scrollVperc						= setInRange(perc);
 			positionContentV								();
 			broadcastV									();
 		}
-		private function doScrollH							(perc:Number) {
+		private function doScrollH							(perc:Number):void {
 			if (!hasHScroll())							return;
 			_targetHperc = _scrollHperc						= setInRange(perc);
 			positionContentH								();
 			broadcastH									();
 		}
 	// SMOOTH SCROLL
-		private function smoothScrollV						(perc:Number) {
+		private function smoothScrollV						(perc:Number):void {
 			if (!hasVScroll()) {
 				stopSmoothScrollV						();
 				return;
@@ -522,10 +522,10 @@ public function set containerZoomFactor(value:Number):void {
 			addEventListener							(Event.ENTER_FRAME, positionContentV, false, 0, true);
 			broadcastV								();
 		}
-		private function stopSmoothScrollV						() {
+		private function stopSmoothScrollV						():void {
 			removeEventListener							(Event.ENTER_FRAME, positionContentV);
 		}
-		private function smoothScrollH						(perc:Number) {
+		private function smoothScrollH						(perc:Number):void {
 			if (!hasHScroll()) {
 				stopSmoothScrollH						();
 				return;
@@ -537,7 +537,7 @@ public function set containerZoomFactor(value:Number):void {
 			addEventListener							(Event.ENTER_FRAME, positionContentH, false, 0, true);
 			broadcastH								();
 		}
-		private function stopSmoothScrollH					() {
+		private function stopSmoothScrollH					():void {
 			removeEventListener							(Event.ENTER_FRAME, positionContentH);
 		}
 		private function activateSmoothScrolling					():void {
@@ -558,12 +558,12 @@ public function set containerZoomFactor(value:Number):void {
 			else if (n < 0) return 0;
 			else return n;
 		}
-		private function checkRangeH						() {
+		private function checkRangeH						():void {
 			if (_scrollHperc < 0)							_scrollHperc = 0;
 			else if (_scrollHperc > 100)						_scrollHperc = 100;
 		}
 	// UTY - Position Content - in any situation, THESE are the methods to position content
-		private function positionContentV						(e:Event=null) {
+		private function positionContentV						(e:Event=null):void {
 			_rectangle.y								= UCode.getPercent(_boundaries.y, _scrollVperc);
 			_applyViewportV								();
 			if (_content != null) {
@@ -571,7 +571,7 @@ public function set containerZoomFactor(value:Number):void {
 				else 									_mover.scrollBlitMaskV(_content, _scrollVperc/100);
 			}
 		}
-		private function positionContentH						(e:Event=null) {
+		private function positionContentH						(e:Event=null):void {
 			_rectangle.x								= UCode.getPercent(_boundaries.x, _scrollHperc);
 			if (_content != null) {
 				if (_useScrollRect)						_content.scrollRect = _rectangle;
@@ -625,10 +625,10 @@ public function set containerZoomFactor(value:Number):void {
 			_lastVisibleTile								= lastPos;
 		}
 	// UTY - Ajust ScrollBar Position
-		private function adjustScrollV						() {
+		private function adjustScrollV						():void {
 			if (UCode.exists(_scrollV))						_scrollV.setScrollPosition(_targetVperc, false);
 		}
-		private function adjustScrollH						() {
+		private function adjustScrollH						():void {
 			if (UCode.exists(_scrollH))						_scrollH.setScrollPosition(_targetHperc, false);
 		}
 	// UTY - Fucking solution to scrollrect problem
@@ -644,10 +644,10 @@ public function set containerZoomFactor(value:Number):void {
 			return 									bounds;
 		}
 	// UTY - Broadcast scroll
-		private function broadcastH							() {
+		private function broadcastH							():void {
 			broadcastEvent								("onScrollH", _targetHperc);
 		}
-		private function broadcastV							() {
+		private function broadcastV							():void {
 			broadcastEvent								("onScrollV", _targetVperc);
 		}
 		

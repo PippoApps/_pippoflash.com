@@ -85,7 +85,7 @@
 			if (obj.filters == null) {
 				obj.filters			=	[new ColorMatrixFilter(matrix)];
 				} else {
-					var _tmp		= obj.filters;
+					var _tmp:Array		= obj.filters;
 					_tmp.push		(new ColorMatrixFilter(matrix))
 					obj.filters		= _tmp;
 					_tmp			= null
@@ -158,6 +158,24 @@
 			if (time == 0) t.progress(1);
 			// var c:DisplayObject;
 		}
+		public static function startBlink(c:DisplayObject, time:Number=1, alphaStart:Number=0, alphaEnd:Number=1):void {
+			// Starts blinking alpha value of a clip
+			killPreviousMotionIfAny(c);
+			const vars:TweenMaxVars = new TweenMaxVars();
+			c.alpha = alphaStart;
+			vars.yoyo(true);
+			vars.autoAlpha(alphaEnd);
+			vars.repeat(-1);
+			vars.ease(Linear.easeIn);
+			activateMotion(c, time, vars);
+		}
+		public static function stopBlink(c:DisplayObject, time:Number=1, targetAlpha:Number=0):void {
+			killPreviousMotionIfAny(c);
+			const vars:TweenMaxVars = new TweenMaxVars();
+			vars.autoAlpha(targetAlpha);
+			TweenMax.to(c, time, vars);
+		}
+		
 // STATIC MOTIONS MANAGEMENT ////////////////////////////////////////////////////////////////////
 
 		public static function killClipEffect(c:DisplayObject):void {

@@ -328,7 +328,39 @@ package com.pippoflash.framework.air {
 		
 		
 		
-		
+// SYSTEM RELATED USITITIES /////////////////////////////////////////////////////////////////////////////
+		public static function getAppFolderPathBySystem(basePath:String, subPath:String=null):String {
+			// Returns a path in app (included folders in AIR) correctly formatted to retrieve files according to system
+			// It can be only the basePath, or a subPath inside basePath
+			var realPath:String = basePath;
+			if (subPath) realPath = USystem.isWin() ? basePath + "\\" + subPath : basePath + "/" + subPath;
+			Debug.debug(_debugPrefix, "Local relative path: " + realPath);
+			var contentPath:String = realPath;
+			if (USystem.isIOS()) contentPath = UFile.getDestinationPath(realPath, "application", false, false, true);
+			else if (USystem.isAndroid()) {
+				Debug.debug(_debugPrefix, "Running on Android, trying to retrieve folder content for: " + realPath + ". On Android there is no need to parse real path.");
+				contentPath = realPath;
+				/* Fondamentalmente qui c'è un errore. contentPath diventa un path assoluto, ma poi la directory è chiamata con il file completo. */
+			}
+			else contentPath = UFile.getDestinationPath(realPath, "application");
+			Debug.debug(_debugPrefix, "Processed contentPath: " + contentPath);
+			/* On Mac OSX a bug inserts app:// also in local folders, I have to track and remove this. */
+			if (USystem.isMac()) {
+				Debug.warning(_debugPrefix, "Amrita is running on a MAC, I need to remove app:/ and convert %5C to / if present in " + contentPath);
+				if (contentPath.indexOf("app:/") != -1) {
+					//Debug.warning(_debugPrefix, "FOUND APP:/ !!!!!!!");
+					contentPath = contentPath.split("app:/").join("");
+					Debug.warning(_debugPrefix, "app:/ was found, new contentPath: " + contentPath);
+				}
+				if (contentPath.indexOf("%5C") != -1) {
+					//Debug.warning(_debugPrefix, "FOUND APP:/ !!!!!!!");
+					contentPath = contentPath.split("%5C").join("/");
+					
+				}
+				Debug.debug(_debugPrefix, "New contentPath formatted for Mac: " + contentPath);
+			}
+			return contentPath;
+		}		
 		
 		
 		

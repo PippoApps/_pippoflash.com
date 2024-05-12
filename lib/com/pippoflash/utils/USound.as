@@ -37,11 +37,11 @@ package com.pippoflash.utils {
 		public static var _soundLists					:Object = {DEFAULT:{active:true, soundsById:[]}}; // this stores special sound lists
 		private static var _soundListsIdToAttachId		:Object = {}; // Stores a direct connection to sound saved with custom ID, so that they can be played with playSound
 		// UTY
-		public static var _list;						// Reference to a listener
+		public static var _list:*;						// Reference to a listener
 		public static var _i						:int;
 		public static var _s						:String;
 		public static var _o						:Object;
-		public static var _j;
+		public static var _j:*;
 		public static var _b						:Boolean;
 		public static var _spectrum					:Array;
 		public static var _byteArray					:ByteArray = new ByteArray();
@@ -102,9 +102,9 @@ package com.pippoflash.utils {
 		}
 // GENERAL //////////////////////////////////////////////////////////////////////////////
 // METHODS ///////////////////////////////////////////////////////////////////////////////////////
-		public static function reset				() {
+		public static function reset				():void {
 		}
-		public static function setActive				(a:Boolean) {
+		public static function setActive				(a:Boolean):void {
 		}
 	// Sound system management
 		public static function disposeLoadedSound	():void {
@@ -148,11 +148,11 @@ package com.pippoflash.utils {
 			list.dispose						();
 		}
 	// LISTENERS
-		public static function addListener			(list:*) {
+		public static function addListener			(list:*):void {
 			// Adds a general listener
 			if (_listeners.indexOf(list) == -1)		_listeners.push(list);
 		}
-		public static function removeListener			(list:*) {
+		public static function removeListener			(list:*):void {
 			// Removes a general listener
 			UCode.removeArrayItem				(_listeners, list);
 		}
@@ -360,7 +360,7 @@ package com.pippoflash.utils {
 		}
 		// METHODS - Framework
 		public function recycle					(id:String, isExternal:Boolean=false, autoPlay:Boolean=false):void {
-			_loaded							= null;
+			_loaded							= false;
 			_listeners							= [];
 			_autoPlay							= autoPlay;
 			_id								= id;
@@ -378,11 +378,11 @@ package com.pippoflash.utils {
 			return							_isExternal;
 		}
 		// METHODS - LISTENERS
-		public function addListener					(list:*) {
+		public function addListener					(list:*):void {
 			// Adds a general listener
 			if (_listeners.indexOf(list) == -1)			_listeners.push(list);
 		}
-		public function removeListener				(list:*) {
+		public function removeListener				(list:*):void {
 			// Removes a general listener
 			UCode.removeArrayItem				(_listeners, list);
 		}

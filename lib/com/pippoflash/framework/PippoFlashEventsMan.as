@@ -200,6 +200,7 @@ package com.pippoflash.framework {
 		
 	// Broadcasting events
 		public static function broadcastInstanceEvent(c:Object, evt:String, ...rest):void {
+			// trace(typeof rest);
 			// First its own listeners
 			if (_staticInstanceListeners[c]) broadcastIPFGroupEvent(_staticInstanceListeners[c], evt, rest);
 			if (_staticInstanceListenersTo[c] && _staticInstanceListenersTo[c][evt]) broadcastIPFGroupEvent(_staticInstanceListenersTo[c][evt], evt, rest);
@@ -286,11 +287,13 @@ package com.pippoflash.framework {
 			}
 			return false;
 		}
-		private static function callMethodPar0			(m:Function, p:Array=null):void {
-			m								();
+		private static function callMethodPar0(m:Function, p:Array=null):void {
+			m();
 		}
-		private static function callMethodPar1			(m:Function, p:Array):void {
-			m								(p[0]);
+		private static function callMethodPar1(m:Function, p:Array):void {
+			trace(p)
+			trace(typeof p);
+			m(p[0]);
 		}
 		private static function callMethodPar2			(m:Function, p:Array):void {
 			m								(p[0], p[1]);

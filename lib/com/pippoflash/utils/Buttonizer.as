@@ -180,7 +180,7 @@ package com.pippoflash.utils {
 		public static function autoButtons				(a:*, listener:*, actions:String="onPress,onRollOver,onRollOut"):void { // Array or Vector
 			for each (var c:InteractiveObject in a)		autoButton(c, listener, actions);
 		}
-		public static function setupButtons			(a:*, listener:*, post:String="", actions:String="onPress,onRollOver,onRollOut") { // Array or Vector
+		public static function setupButtons			(a:*, listener:*, post:String="", actions:String="onPress,onRollOver,onRollOut"):void { // Array or Vector
 			for each (var c:InteractiveObject in a)		setupButton(c, listener, post, actions);
 		}
 		public static function setupChildrenButtons		(c:DisplayObjectContainer, listener:*, post:String=null, actions:String="onPress,onRollOver,onRollOut"):void {
@@ -191,14 +191,14 @@ package com.pippoflash.utils {
 			else								autoButtons(buttons, listener, actions);
 		}
 	// REMOVE BUTTONS
-		public static function removeButton			(c:InteractiveObject) {
+		public static function removeButton			(c:InteractiveObject):void {
 			if (!getItem(c)) 						return;
 			setButtonActive						(c, false);
 			removeInteraction					(c);
 			getItem(c).harakiri					();
 			delete							_buttonsItem[c];
 		}
-			private static function removeInteraction	(c):void { // This only removes all interactions from an object
+			private static function removeInteraction	(c:*):void { // This only removes all interactions from an object
 				c.removeEventListener				(MouseEvent.CLICK, onClick);
 				c.removeEventListener				(MouseEvent.MOUSE_DOWN, onPress);
 				c.removeEventListener				(MouseEvent.MOUSE_OVER, onRollOver);
@@ -209,7 +209,7 @@ package com.pippoflash.utils {
 				}
 			}
 		public static var removeButtons				:Function = removeButtonList;
-		public static function removeButtonList			(l:*) {  // Array or Vector
+		public static function removeButtonList			(l:*):void {  // Array or Vector
 			for (var i:uint=0; i<l.length; i++)		removeButton(l[i]);
 		}
 	// TOOLTIP
@@ -237,7 +237,7 @@ package com.pippoflash.utils {
 			_onClickGeneralMethod = clickMethod;
 		}
 // MAKE BUTTONS LIST ///////////////////////////////////////////////////////////////////
-		public static function makeList				(a:*, listener:*, post:String="", listId:String=null) {  // Array or Vector // Gets an array and preselected index. -1 to preselect none, true to make buttons deselectable
+		public static function makeList				(a:*, listener:*, post:String="", listId:String=null):void {  // Array or Vector // Gets an array and preselected index. -1 to preselect none, true to make buttons deselectable
 			// Creates a list of buttons, sets them all with the same listener, and sends an event with the index of the button
 			// The list does not pre-select an item, to select it we must use the setSelected(c);
 			var c								:InteractiveObject;
@@ -255,14 +255,14 @@ package com.pippoflash.utils {
 			if (i)								i.setSelected(s);
 		}
 // SWITCH /////////////////////////////////////////////////////////////////////////////
-		public static function setupSwitch				(c:InteractiveObject, listener:*, post:String="", actions:String=null) {
+		public static function setupSwitch				(c:InteractiveObject, listener:*, post:String="", actions:String=null):void {
 			setupButton						(c, listener, post, actions);
 			setToSwitch						(c, true);
 		}
-		public static function setupSwitchList			(a:*, listener:*, actions:String=null) {  // Array or Vector // Automatic as before
+		public static function setupSwitchList			(a:*, listener:*, actions:String=null):void {  // Array or Vector // Automatic as before
 			for each (var c:InteractiveObject in a) 		setupSwitch(c, listener, c.name.substr(5), actions);
 		}
-		public static function setToSwitch				(c:InteractiveObject, s:Boolean=true) {
+		public static function setToSwitch				(c:InteractiveObject, s:Boolean=true):void {
 			// Remember, to have toolTip working, on the actions also onRollOver and onRollOut must be activated
 			var item							:ButtonizerItem = getItem(c);
 			if (item) {
@@ -343,13 +343,13 @@ package com.pippoflash.utils {
 				removeOnReleaseListener			();
 				_lastPressedItemWaitingRelease		= null;			
 			}
-		public static function onRollOver				(e:MouseEvent) {
+		public static function onRollOver				(e:MouseEvent):void {
 			processEvent						(e);
 			if (_lastInteractedItem && _lastInteractedItem.active) {
 				_lastInteractedItem.onRollOver		(e);
 			}
 		}
-		public static function onRollOut				(e:MouseEvent) {
+		public static function onRollOut				(e:MouseEvent):void {
 			processEvent						(e);
 			if (_lastInteractedItem && _lastInteractedItem.active) {
 				_lastInteractedItem.onRollOut		(e);
@@ -366,16 +366,16 @@ package com.pippoflash.utils {
 				//}
 			}
 // UTY ///////////////////////////////////////////////////////////////////////////////
-		public static function setActive(c:InteractiveObject, a:Boolean) {
+		public static function setActive(c:InteractiveObject, a:Boolean):void {
 			setButtonActive(c, a);
 		}
-		public static function setButtonActive(c:InteractiveObject, a:Boolean) {
+		public static function setButtonActive(c:InteractiveObject, a:Boolean):void {
 			if (getItem(c)) { 
 				setToButton(c, a);
 				getItem(c).setActive(a);
 			}
 		}
-		private static function setToButton(c:InteractiveObject, a:Boolean) {
+		private static function setToButton(c:InteractiveObject, a:Boolean):void {
 			if (c is Sprite) {
 				(c as Sprite).buttonMode = a;
 				(c as Sprite).mouseChildren = !a;
@@ -384,10 +384,10 @@ package com.pippoflash.utils {
 				(c as DisplayObjectContainer).mouseChildren = !a;
 			}
 		}
-		public static function setClickThroughList		(a, through:Boolean=true) { // Gets an ARRAY or an OBJECT
+		public static function setClickThroughList		(a:*, through:Boolean=true):void { // Gets an ARRAY or an OBJECT
 			for each (var c:InteractiveObject in a) setClickThrough(c, through);
 		}
-		public static function setClickThrough(c:InteractiveObject, through:Boolean=true) {
+		public static function setClickThrough(c:InteractiveObject, through:Boolean=true):void {
 			c.mouseEnabled = !through;
 			if (c is DisplayObjectContainer) {
 				(c as DisplayObjectContainer).mouseChildren = !through;

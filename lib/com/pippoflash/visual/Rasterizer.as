@@ -208,7 +208,7 @@ package com.pippoflash.visual {
 				if (_sourceParent) {
 					_sourceParent.addChildAt(_source, _sourceIndex);
 					_sourceParent = null;
-					_sourceIndex = null;
+					_sourceIndex = NaN;
 				}
 				_source = null;
 			}

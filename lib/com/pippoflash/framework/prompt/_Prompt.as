@@ -97,7 +97,7 @@ package com.pippoflash.framework.prompt {
 		protected var _par:Object = {}; // All user variables are stored into _par
 		protected var _popupNode:XML; // If prompt is triggered by an XML node
 		// SYSTEM
-		protected var _timeout;								// Stores the setTimeout
+		protected var _timeout:*;								// Stores the setTimeout
 		protected var _sideLimits:Rectangle; // Stores the minimum position x,y,w,h  left,top,right,bottom
 		protected var _boundariesRectangle:Rectangle; // This stores a rectangle for boundaries. Tries "_boundaries first, then "_bg", the "this".
 		// REFERENCES
@@ -382,7 +382,7 @@ package com.pippoflash.framework.prompt {
 			_defaultPar[defName]							= value;
 		}
 // FADE //////////////////////////////////////////////////////////////////////////////////////
-		public function fadeIn(e=null):void {
+		public function fadeIn(e:*=null):void {
 			if (_visible) return; // do not trigger visible on if its already visible
 			setIn();
 			this["fadeIn_"+_fadeType]();
@@ -398,7 +398,7 @@ package com.pippoflash.framework.prompt {
 				scaleX = scaleY = 0;
 				PFMover.slideIn(this, {steps:5, pow:2, endPos:{scaleX:1, scaleY:1}, onComplete:setIn});
 			}
-		public function fadeOut(e=null):void {
+		public function fadeOut(e:*=null):void {
 			if (!_visible) return; // do not trigger visible off if its already invisible
 			_visible = false;
 			this["fadeOut_"+_fadeType]();
@@ -683,7 +683,7 @@ package com.pippoflash.framework.prompt {
 					if (func == null) return;
 					// Tries to launch the function with _par, otherwise launches it with nothing
 					// Here function needs to be called next frame BUT I need to construct an unnamed function in order to try both next frame
-					function __executeFunctionWithOrWithoutParams() {
+					function __executeFunctionWithOrWithoutParams():* {
 						try {
 							var p:Object = par ? par : _par;
 							if (func.length) {
@@ -695,7 +695,7 @@ package com.pippoflash.framework.prompt {
 							}
 						}
 						catch (e:Error) {
-							Debug.debugError(_debugPrefix, e, "Lunaching function " + id + " from prompt " + this);
+							Debug.debugError(_debugPrefix, e, "Lunaching function " + id + " from prompt " + _pfId);
 						}
 					}
 					UExec.next(__executeFunctionWithOrWithoutParams);
@@ -718,7 +718,7 @@ package com.pippoflash.framework.prompt {
 		private var _globalPoint:Point; // Local point converted to global point
 		private var _offsetPoint:Point; // Difference between prompt position and dragger position
 		private static const DRAGGING_MULTIPLIER:Number = 0.2; // Speed multiplier
-		public function onPressDragger(c:MovieClip=null) {
+		public function onPressDragger(c:MovieClip=null):void {
 			onRollOutDragger(); // this is for tooltip
 			// Reposition dragger on stage and create points
 			updateBoundaries();
@@ -727,7 +727,7 @@ package com.pippoflash.framework.prompt {
 			parent.addChild(_dragger);
 			_dragger.alpha = 0;
 			UDisplay.positionToPoint(_dragger, _globalPoint);
-			var globalCenter = this.localToGlobal(new Point(0, 0));
+			var globalCenter:Point = this.localToGlobal(new Point(0, 0));
 			_offsetPoint = new Point(globalCenter.x-_globalPoint.x, globalCenter.y-_globalPoint.y);
 			// Reposition boundaries
 // 			addChildAt									(this["_boundaries"], 0);
@@ -738,7 +738,7 @@ package com.pippoflash.framework.prompt {
 			// Activate caching
 			if (_cacheAsBitmapWhenDragging) UDisplay.cacheAsBitmapMatrix(this, true);
 		}
-		public function onReleaseDragger(c:MovieClip=null) {
+		public function onReleaseDragger(c:MovieClip=null):void {
 			// Stop dragging dragger, and reclaim it inside prompt
 			_dragger.stopDrag();
 			addChild(_dragger); // I take it back here
@@ -756,10 +756,10 @@ package com.pippoflash.framework.prompt {
 		public function onReleaseOutsideDragger(c:MovieClip=null):void {
 			onReleaseDragger();
 		}
-		public function onRollOverDragger(c:MovieClip=null) {
+		public function onRollOverDragger(c:MovieClip=null):void {
 			if (_draggerToolTip) UGlobal.setToolTip(true, _draggerToolTip);
 		}
-		public function onRollOutDragger(c:MovieClip=null) {
+		public function onRollOutDragger(c:MovieClip=null):void {
 			if (_draggerToolTip) UGlobal.setToolTip(false);
 		}
 	}

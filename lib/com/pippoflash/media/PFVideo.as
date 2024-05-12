@@ -35,7 +35,7 @@ package com.pippoflash.media {
 		private static var _debugPrefix				:String = "PFVideo";
 		private static var _stageVideosUsed			:uint = 0; // This lets us know if
 		private static var _pfVideos					:Array = [];
-		private static var _verbose					:Boolean = true;
+		public static var _verbose					:Boolean = true;
 
 		private var _triggerEventsWithBytes:Boolean;
 
@@ -239,6 +239,10 @@ package com.pippoflash.media {
 			if (_myVideo is Video)				_myVideo.clear();
 			if (_showOnlyWhenPlaying)				_myVideo.visible = false;
 		}
+		public function replay():void {
+			_ns.seek(0);
+			_ns.resume();
+		}
 		public function resetLoops					():void { // starts loop counting again from 0
 			_loopsPlayed						= 0;
 		}
@@ -346,46 +350,47 @@ package com.pippoflash.media {
 				onStreamNotFound();
 			}
 		}
-		private function onPlayStarted				():void {
+		private function onPlayStarted():void {
 			if (_verbose) Debug.debug(_debugPrefix, "onPlayStarted()");
 			if (_showOnlyWhenPlaying) {
 				if (_delayOneFrameOnPlay && _loopsPlayed == 0) { // Only does this on first play, if it is looping, no need to hide the video
 					setVideoVisible				(false);
 					UExec.time(SECONDS_DELAY_VISIBLE, onPlayDelayElapsed);
 				}
-				else							_myVideo.visible = true;
+				else _myVideo.visible = true;
 			}
-			broadcastEvent						(PLAY_START_EVENT+_eventPostfix);
+			broadcastEvent(PLAY_START_EVENT, this);
 			activatePlayEventTimer();
 		}
-		private function onPlayDelayElapsed			(e:*=null):void {
-			setVideoVisible						(true);
-			broadcastEvent						(PLAY_DELAY_ELAPSED_EVENT+_eventPostfix);
+		private function onPlayDelayElapsed(e:*=null):void {
+			setVideoVisible(true);
+			broadcastEvent(PLAY_DELAY_ELAPSED_EVENT);
 		}
 		// private function onPlayReachedEnd():void {
 		// 	broadcastEvent						(EVT_PLAY_REACHED_END+_eventPostfix);
 		// }
 		private function onLoopComplete():void {
 			Debug.debug(_debugPrefix, "Loop Complete.");
-			broadcastEvent(LOOP_COMPLETE_EVENT+_eventPostfix, _loopsPlayed);
+			broadcastEvent(LOOP_COMPLETE_EVENT, _loopsPlayed);
 			_ns.seek(0);
 		}
 		private function onPlayStop(e:*=null):void {
 			if (_verbose) Debug.debug(_debugPrefix, "onPlayStop()");
 			// _ns.seek(_ns.info.);
 			// _ns.pause();
-			broadcastEvent(EVT_PLAY_STOP+_eventPostfix);
+			broadcastEvent(EVT_PLAY_STOP);
 			deActivatePlayEventTimer();
+			if (_repeat) replay();
 		}
 		private function onPlayComplete():void {
 			Debug.debug(_debugPrefix, "onPlayComplete()");
 			// if (_showOnlyWhenPlaying) _myVideo.visible = false;
-			broadcastEvent(PLAY_COMPLETE_EVENT+_eventPostfix);
+			broadcastEvent(PLAY_COMPLETE_EVENT);
 			// if (_repeat) _ns.seek(0);
 		}
 		private function onStreamNotFound			():void {
 			Debug.debug						(_debugPrefix, "Stream not found: " + _url + ". Broadcasting " + STREAM_NOT_FOUND_EVENT+_eventPostfix+"()");
-			broadcastEvent						(STREAM_NOT_FOUND_EVENT+_eventPostfix);
+			broadcastEvent						(STREAM_NOT_FOUND_EVENT);
 		}
 		// For full description please look: http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/net/NetStream.html#client
 		public function onCuePoint				(o:Object):void {

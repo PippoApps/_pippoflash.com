@@ -266,51 +266,51 @@ package com.pippoflash.net {
 			}
 			catch(e){}
 		}
-		private function killListeners					(o:Object) {
-			o.removeEventListener					(Event.OPEN, onLoadStartLoader);
-			o.removeEventListener					(Event.INIT, onLoadInitLoader);
-			o.removeEventListener					(Event.COMPLETE, onLoadCompleteLoader);
-			o.removeEventListener					(IOErrorEvent.IO_ERROR, onLoadErrorLoader);
-			o.removeEventListener					(ProgressEvent.PROGRESS, onLoadProgressLoader);
-			o.removeEventListener					(SecurityErrorEvent.SECURITY_ERROR, onLoadErrorLoader);
+		private function killListeners(o:Object):void {
+			o.removeEventListener(Event.OPEN, onLoadStartLoader);
+			o.removeEventListener(Event.INIT, onLoadInitLoader);
+			o.removeEventListener(Event.COMPLETE, onLoadCompleteLoader);
+			o.removeEventListener(IOErrorEvent.IO_ERROR, onLoadErrorLoader);
+			o.removeEventListener(ProgressEvent.PROGRESS, onLoadProgressLoader);
+			o.removeEventListener(SecurityErrorEvent.SECURITY_ERROR, onLoadErrorLoader);
 		}
 		// LISTENERS ////////////////////////////////////////////////////////////////////////////////
 		// LOADER
-		public function onLoadStartLoader					(e:Event) {
-			if (_killed)								return;
-			_loading								= true;
-			if (_verbose)							Debug.debug(_debugPrefix, EVT_START+_funcPostfix, _loader, _url);
-			UCode.broadcastEvent						(_listener, EVT_START+_funcPostfix, [this])	
-			if (UCode.exists(_loaderListener))				_loaderListener.onLoadStart(this);
+		public function onLoadStartLoader(e:Event):void {
+			if (_killed) return;
+			_loading = true;
+			if (_verbose) Debug.debug(_debugPrefix, EVT_START+_funcPostfix, _loader, _url);
+			UCode.broadcastEvent(_listener, EVT_START+_funcPostfix, [this])	
+			if (UCode.exists(_loaderListener)) _loaderListener.onLoadStart(this);
 		}
-		public function onLoadInitLoader					(e:Event) {
-			if (_killed)								return;
-			if (_verbose)							Debug.debug(_debugPrefix, EVT_INIT+_funcPostfix);
+		public function onLoadInitLoader(e:Event):void {
+			if (_killed) return;
+			if (_verbose) Debug.debug(_debugPrefix, EVT_INIT+_funcPostfix);
 			if (_contentLoaderInfo) {
-				_width							= _contentLoaderInfo.width;
-				_height							= _contentLoaderInfo.height;
+				_width = _contentLoaderInfo.width;
+				_height = _contentLoaderInfo.height;
 			}
-			UCode.broadcastEvent						(_listener, EVT_INIT+_funcPostfix, [this])			
-			if (UCode.exists(_loaderListener))				_loaderListener.onLoadInit(this);	
+			UCode.broadcastEvent(_listener, EVT_INIT+_funcPostfix, [this])			
+			if (UCode.exists(_loaderListener)) _loaderListener.onLoadInit(this);	
 		}
-		public function onLoadCompleteLoader				(e:Event) {
-			if (_killed)								return;
-			if (_verbose)							Debug.debug(_debugPrefix, EVT_COMPLETE+_funcPostfix);
-			_loading								= false;
-			_loaded								= true;
-			UCode.callMethod						(_listener, EVT_COMPLETE+_funcPostfix, this);
-			if (UCode.exists(_loaderListener))			_loaderListener.onLoadComplete(this);
-			if (_isSuperLoaderQueue)					SimpleQueueLoader.onLoadCompleteLoader(this);
-			completeLoadingProcess					();
+		public function onLoadCompleteLoader(e:Event):void {
+			if (_killed) return;
+			if (_verbose) Debug.debug(_debugPrefix, EVT_COMPLETE+_funcPostfix);
+			_loading = false;
+			_loaded = true;
+			UCode.callMethod(_listener, EVT_COMPLETE+_funcPostfix, this);
+			if (UCode.exists(_loaderListener)) _loaderListener.onLoadComplete(this);
+			if (_isSuperLoaderQueue) SimpleQueueLoader.onLoadCompleteLoader(this);
+			completeLoadingProcess();
 		}
 // 		public function onLoadHttpStatus					(e):void {
 // 			
 // 		}
-		public function onLoadErrorLoader(e:ErrorEvent) {
-			if (_killed)								return;
-			_loading								= false;
-			_loaded								= false;
-			_isError								= true;
+		public function onLoadErrorLoader(e:ErrorEvent):void {
+			if (_killed) return;
+			_loading = false;
+			_loaded = false;
+			_isError = true;
 			// if (_verbose)							
 			Debug.debug(_debugPrefix, "ERROR:",_funcPostfix,e); // This is always triggered
 			UCode.callMethod(_listener, EVT_ERROR+_funcPostfix, this, String(e));
@@ -318,12 +318,12 @@ package com.pippoflash.net {
 			if (_isSuperLoaderQueue) SimpleQueueLoader.onLoadCompleteLoader(this);
 			completeLoadingProcess();
 		}
-		public function onLoadProgressLoader				(e:ProgressEvent) {
-			if (_killed)								return;
-			_bytesLoaded							= e.bytesLoaded;
-			_bytesTotal							= e.bytesTotal;
-			_percent								= Math.round(UCode.calculatePercent(e.bytesLoaded, e.bytesTotal));
-			if (_verbose)							Debug.debug(_debugPrefix, EVT_PROGRESS+_funcPostfix,e.bytesLoaded,_percent,"%");
+		public function onLoadProgressLoader(e:ProgressEvent):void {
+			if (_killed) return;
+			_bytesLoaded = e.bytesLoaded;
+			_bytesTotal = e.bytesTotal;
+			_percent = Math.round(UCode.calculatePercent(e.bytesLoaded, e.bytesTotal));
+			if (_verbose) Debug.debug(_debugPrefix, EVT_PROGRESS+_funcPostfix,e.bytesLoaded,_percent,"%");
 			UCode.broadcastEvent						(_listener, EVT_PROGRESS+_funcPostfix, [this]);			
 			if (UCode.exists(_loaderListener))				_loaderListener.onLoadProgress(this);
 		}
@@ -341,7 +341,7 @@ package com.pippoflash.net {
 			return getLoaderByFileType(a[a.length-1].toLowerCase()); 
 		}
 		// LOAD COMPLETE, GARBAGE COLLECTION, ETC:
-		private function completeLoadingProcess() {
+		private function completeLoadingProcess():void {
 			// Now, I have to setup in UGlobal the libraries for the app
 			//setTimeout							(suicide, 50);
 			UExec.time(0.5, suicide); // suicide after half second in order not to overlap with other operations from outside on load complete (some componenets do operations on next frame)

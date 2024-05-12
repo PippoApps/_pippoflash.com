@@ -34,6 +34,8 @@ package com.pippoflash.framework {
 		}
 		public function broadcastEvent(methodName:String, ...rest):void {
 			//trace("VROADCASTOOOOOOOOOOOOOOOOOOOO",this, methodName);
+			// trace(rest.length);
+			// trace(typeof rest);
 			if (rest.length) PippoFlashEventsMan.broadcastInstanceEvent(this, methodName, rest);
 			else PippoFlashEventsMan.broadcastInstanceEvent(this, methodName);
 		}

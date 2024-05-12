@@ -287,6 +287,7 @@ package com.pippoflash.framework.air.webview
 		 * @return	true if it is a recognized commmand
 		 */
 		private function processJavaScriptMessage(location:String):Boolean {
+			Debug.debug(_debugPrefix, "Processing javascript message (string length "+location.length+"): " + location);
 			// Remove airBridge: if it is remained (not needed anymore since on Windows we use NativeWeb View anyway.
 			if (location.indexOf("airbridge:") == 0) { // Crop Distriqt specific webview links (useful when testing in old WebViews)
 				location = location.substr(10);
@@ -316,9 +317,9 @@ package com.pippoflash.framework.air.webview
 			}
 			else if (UText.stringContains(location, COMMAND_AS)) { // AcrtionScript command
 				const splitted:Array = location.split("__ALL_PARAMETERS__");
-				trace(location);
-				trace(splitted);
-				trace(splitted.length);
+				// trace(location);
+				// trace(splitted);
+				// trace(splitted.length);
 				splitted[0] = UText.removeTextUpTo(splitted[0], COMMAND_AS); // Remove suffix "actionscript:" from isntance id
 				if (splitted.length > 1) _PippoFlashBase.callPippoFlashInstanceMethod(splitted[0], splitted[1].split("__PARAM__"));
 				else _PippoFlashBase.callPippoFlashInstanceMethod(splitted[0]);

@@ -136,7 +136,7 @@ package com.pippoflash.utils {
 			Buttonizer.init();
 			USound.init();
 		}
-		public static function setup(c:*, resizeDelay:uint = 500, stageAlign:String = null, stageScaleMode:String = null, originalStageSize:Rectangle=null) {
+		public static function setup(c:*, resizeDelay:uint = 500, stageAlign:String = null, stageScaleMode:String = null, originalStageSize:Rectangle=null):void {
 			if (_isSetup) {
 				Debug.warning(_debugPrefix, "Already setup, aborting setup();");
 				return;
@@ -335,7 +335,7 @@ package com.pippoflash.utils {
 			}
 		}
 	// This is called by INIT
-		private static function setStage(s:Stage, stageAlign:String=null, stageScaleMode:String=null, originalStageSize:Rectangle=null) {
+		private static function setStage(s:Stage, stageAlign:String=null, stageScaleMode:String=null, originalStageSize:Rectangle=null):void {
 			Debug.debug(_debugPrefix, "setStage()");
 			if (!s) {
 				Debug.error(_debugPrefix, "Stage is not defined. Cannot proceed setting up stage.");
@@ -374,7 +374,7 @@ package com.pippoflash.utils {
 			_stageResizeDelay = n;
 		}
 		
-		public static function resetStageSizes(e:*= null) {
+		public static function resetStageSizes(e:*= null):void {
 			// Resets internal stage sizes to real stage dimensions
 			var x:int = 0; var y:int = 0; _stageRect = new Rectangle(0, 0, _stage.stageWidth, _stage.stageHeight);
 			Debug.debug(_debugPrefix, "resetStageSizes();",_stageRect);
@@ -444,13 +444,13 @@ package com.pippoflash.utils {
 						f();
 					}
 				}
-		public static function addResizeListener(func:Function) { // Adds a listener for a resize event, only if listener is not already there
+		public static function addResizeListener(func:Function):void { // Adds a listener for a resize event, only if listener is not already there
 			if (_stageResizeListeners.indexOf(func) == -1) _stageResizeListeners.push(func);
 		}
 		public static function removeResizeListener(func:Function):void {
 			if (_stageResizeListeners.indexOf(func) != -1) UCode.removeArrayItem(_stageResizeListeners, func);
 		}
-		public static function resizeToStage(c:DisplayObject) {
+		public static function resizeToStage(c:DisplayObject):void {
 			c.width = _sw; c.height = _sh;
 		}
 		public static function getOriginalSizeRect():Rectangle {
@@ -518,7 +518,7 @@ package com.pippoflash.utils {
 		public static function getRelativeStageRect		(c:DisplayObject):Rectangle { // Returns a rectangle with position relative to the coordinate space of container clip
 // 			return							c.parent.getRect(c);
 			var topLeft:Point = c.globalToLocal(_startCorner);
-			var bottomRight = c.globalToLocal(_endCorner);
+			var bottomRight:Point = c.globalToLocal(_endCorner);
 			bottomRight.x += topLeft.x > 0 ? -topLeft.x : Math.abs(topLeft.x);
 			bottomRight.y += topLeft.y > 0 ? -topLeft.y : Math.abs(topLeft.y);
 			return							new Rectangle(topLeft.x, topLeft.y, bottomRight.x, bottomRight.y);
@@ -620,7 +620,7 @@ package com.pippoflash.utils {
 			delete _global[name];
 		}
 // FOCUS MANAGEMENT ///////////////////////////////////////////////////////////////////////////////////////
-		public static function resetFocus() {
+		public static function resetFocus():void {
 			_stage.focus = null;
 		}
 		public static function setFocus(t:TextField):void {
@@ -685,15 +685,27 @@ package com.pippoflash.utils {
 			_colorShield.width = _shield.width = _sw; _colorShield.height = _shield.height = _sh;
 		}
 // QUALITY ///////////////////////////////////////////////////////////////////////////////////////
-		private static const RENDER_QUALITIES		:Vector.<String> = new <String>[StageQuality.HIGH_16X16_LINEAR,	StageQuality.HIGH_16X16,	StageQuality.HIGH_8X8_LINEAR,	StageQuality.HIGH_8X8,	StageQuality.BEST,	StageQuality.HIGH,	StageQuality.MEDIUM,	StageQuality.LOW]; 
+		private static const RENDER_QUALITIES:Vector.<String> = new <String>[
+				StageQuality.HIGH_16X16_LINEAR,	// 0
+				StageQuality.HIGH_16X16, // 1
+				StageQuality.HIGH_8X8_LINEAR, // 2	
+				StageQuality.HIGH_8X8, // 3
+				StageQuality.BEST, // 4
+				StageQuality.HIGH, // 5
+				StageQuality.MEDIUM, // 6
+				StageQuality.LOW // 7
+		]; 
 		public static function setRenderQuality		(q:int):void {
-			// 0 = best, 7 = minimum.
+			// StageQuality.LOW—Low rendering quality. Graphics are not anti-aliased, and bitmaps are not smoothed, but runtimes still use mip-mapping.
+			// StageQuality.MEDIUM—Medium rendering quality. Graphics are anti-aliased using a 2 x 2 pixel grid, bitmap smoothing is dependent on the Bitmap.smoothing setting. Runtimes use mip-mapping. This setting is suitable for movies that do not contain text.
+			// StageQuality.HIGH—High rendering quality. Graphics are anti-aliased using a 4 x 4 pixel grid, and bitmap smoothing is dependent on the Bitmap.smoothing setting. Runtimes use mip-mapping. This is the default rendering quality setting that Flash Player uses.
+			// StageQuality.BEST—Very high rendering quality. Graphics are anti-aliased using a 4 x 4 pixel grid. If Bitmap.smoothing is true the runtime uses a high quality downscale algorithm that produces fewer artifacts (however, using StageQuality.BEST with Bitmap.smoothing set to true slows performance significantly and is not a recommended setting).
 			if (q < 0) {
 				Debug.debug					(_debugPrefix, "Render quality has not been set, using default one: " + _stage.quality);
 				return;
 			}
 			if (q > RENDER_QUALITIES.length-1)		q = RENDER_QUALITIES.length-1;
-// 			var qualities						:Array = ["best","high","medium","low"];
+			// var qualities						:Array = ["best","high","medium","low"];
 			var quality							:String = RENDER_QUALITIES[q];
 			Debug.debug						(_debugPrefix, "Setting render quality to",quality);
 			_renderQuality = q;
@@ -704,10 +716,10 @@ package com.pippoflash.utils {
 		}
 
 // MOUSE EVENTS //////////////////////////////////////////////////////////////////////////////////////
-		public static function addStageOnMouseUp		(f:Function) {
+		public static function addStageOnMouseUp		(f:Function):void {
 			if (_stage)						_stage.addEventListener(MouseEvent.MOUSE_UP, f);
 		}
-		public static function removeStageOnMouseUp	(f:Function) {
+		public static function removeStageOnMouseUp	(f:Function):void {
 			if (_stage)						_stage.removeEventListener(MouseEvent.MOUSE_UP, f);
 		}
 		public static function addMouseMoveListener	(f:Function):void {
@@ -814,7 +826,7 @@ package com.pippoflash.utils {
 				return						null;
 			}
 		}
-		public static function get root				() {
+		public static function get root				():* {
 			if (_isSetup)						return _root;
 			else								Debug.debug(_debugPrefix, "someone called _root but nothing is defined yet");
 		}

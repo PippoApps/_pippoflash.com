@@ -160,11 +160,14 @@ package com.pippoflash.framework.air.ane.distriqt
 			}
 			// Proceed requesting authorisation
 			else {
+				Debug.debug(_debugPrefix, "Bluetooth not yet authorized, requesting for authorization.");
 				BluetoothLE.service.addEventListener(AuthorisationEvent.CHANGED, authorisationChangedHandler);
-				UExec.next(BluetoothLE.service.requestAuthorisation);
+				// UExec.next(BluetoothLE.service.requestAuthorisation);
+				BluetoothLE.service.requestAuthorisation();
 			}
 		}
 		static private function authorisationChangedHandler( event:AuthorisationEvent ):void {
+			Debug.debug(_debugPrefix, "Callback from Bluetooth: authorisationChangedHandler() " + event.status);
 			BluetoothLE.service.removeEventListener(AuthorisationEvent.CHANGED, authorisationChangedHandler);
 			updateAuthorizationStatus(false, true, "authorisationChangedHandler");
 		}
@@ -178,7 +181,7 @@ package com.pippoflash.framework.air.ane.distriqt
 					if (broadcast) PippoFlashEventsMan.broadcastStaticEvent(DistriqtBluetoothLE, EVT_AUTHORIZATION_PROVIDED);
 					break;
 				case AuthorisationStatus.NOT_DETERMINED:
-					break;
+					// break;
 				case AuthorisationStatus.SHOULD_EXPLAIN:
 					// The user has not yet been asked or 
 					// has denied once and you should explain

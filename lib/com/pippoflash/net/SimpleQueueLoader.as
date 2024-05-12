@@ -76,11 +76,11 @@ package com.pippoflash.net {
 		// MARKERS
 		public static var _loadsActive				:uint = 0; // The number of loads actually active
 		// METHODS ////////////////////////////////////////////////////////////////////////////////////////////////////
-		public static function reset					() {
+		public static function reset():void {
 			// Resets all lists, all items, stops all loadings, and resets, ONLY QUEUES!!!!!
 			return;
 		}
-		public static function remove				(uri:String) {
+		public static function remove(uri:String):void {
 			// Removes the selected load item
 // 			_loadedContent[uri].harakiri				();
 		}
@@ -120,11 +120,11 @@ package com.pippoflash.net {
 			slo.startLoad						();
 			return							slo;
 		}
-		public static function addListener				(o:Object) {
+		public static function addListener				(o:Object):void {
 			for (var i:Number=0; i<_listenersList.length; i++) if (_listenersList[i] == o) return;
 			_listenersList.push					(o);
 		}
-		public static function removeListener			(o:Object) {
+		public static function removeListener			(o:Object):void {
 			for (var i:Number=0; i<_listenersList.length; i++) {
 				if (_listenersList[i] == o) {
 // 					delete					_listenersList[i];
@@ -133,22 +133,22 @@ package com.pippoflash.net {
 				}
 			}
 		}
-		public static function destroyObject			(s:String) {
+		public static function destroyObject			(s:String):void {
 			delete							_loadedContent[s];
 		}
-		public static function getObject				(s:String) {
+		public static function getObject				(s:String):* {
 			if (_loadedContent[s] == undefined)		Debug.debug(_debugPrefix, "LOADER NOT PRESENT:",s);
 			else								return _loadedContent[s];
 		}
-		public static function getData				(s:String) {
+		public static function getData				(s:String):* {
 			return							getObject(s)._loader.data;
 		}
-		public static function getContent				(s:String) {
+		public static function getContent				(s:String):* {
 			return							getObject(s).getContent();
 		}
 // UTY //////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// LIST LOAD MANAGEMENT
-		private static function onStepCompleted			(o:SimpleQueueLoaderObject) {
+		private static function onStepCompleted			(o:SimpleQueueLoaderObject):void {
 			if (_verbose) {
 				if (o._isError)						Debug.debug(_debugPrefix, "Error loading:",o._url);
 				else								Debug.debug(_debugPrefix, "Loading complete:",o._url);
@@ -158,30 +158,30 @@ package com.pippoflash.net {
 			_loadsActive						--;
 			checkForQueue						();
 		}
-		private static function checkForQueue			() {
+		private static function checkForQueue			():void {
 			if (_loadsActive < _maxConcurrentLoads)	activateNextLoader();
 		}
-		private static function activateNextLoader		() {
+		private static function activateNextLoader		():void {
 			if (_loadList.length == 0)				UCode.broadcastEventList(_listenersList, "onQueueComplete");
 			else								loadNextItem();
 		}
-		private static function loadNextItem			() {
+		private static function loadNextItem			():void {
 			startLoadObject						(_loadList.shift());
 		}
-		public static function startLoadObject			(o:Object) {
+		public static function startLoadObject			(o:Object):void {
 			if (_verbose)						Debug.debug(_debugPrefix, "Start loading:",o._url);
 			_activeLoaders[o._url]					= o._listNum;
 			o.startLoad							();
 			_loadsActive						++;
 		}
-		private static function addToList				(o:SimpleQueueLoaderObject) {
+		private static function addToList				(o:SimpleQueueLoaderObject):void {
 			// If prioritized add it at the beginning of first list
 			if (o._prioritize) 						_loadList.unshift(o);
 			else  							_loadList.push(o);
 		}
 // LISTENERS////////////////////////////////////////////////////////////////////////////////////////////////////
 		// LOADER
-		public static function onLoadCompleteLoader		(o:SimpleQueueLoaderObject) { // Called by SQLObj when the loading process is completed with a success or with an error
+		public static function onLoadCompleteLoader		(o:SimpleQueueLoaderObject):void { // Called by SQLObj when the loading process is completed with a success or with an error
 			onStepCompleted						(o);
 		}
 	}
