@@ -17,7 +17,7 @@ package com.pippoflash.framework {
 	import flash.geom.Rectangle;
 
 	
-	public dynamic class Config {
+	public class Config {
 // UTYLITIES ////////////////////////////////////////////////////////////////////////////
 		// CONSTANTS
 		protected static const _verbose:Boolean = true;
@@ -47,41 +47,47 @@ package com.pippoflash.framework {
 		public var _data:XML;
 		public var _vocabulary:Object;
 		public var _words:Object;
-		public var _urls:Object;
-		public var _settings:Object;
-		//public var _structure						:Object;
-		//public var _contents						:Object;
-		public var _keywords:Object;
-		public var _variables:Object;
-		public var _dynamic:Object;
-		public var _pippoflashWords:Object; // Stores all nodes into VOCABULARY.PIPPOFLASH;
-		public var _prompts:Object; // Stores all nodes in VOCABULARY.PROMPTS
-		private var _preferencesDefault:XML; // Direct reference to DEFAULT PREFERENCES node retrieved from config.xml
-		private var _preferences:XML; // Direct reference to PREFERENCES node
-		private var _uri_location:Object;
-		private var ___coordinateNodes:Object = {}; // Populated with "add coordinates list"
-		
-		
-		private var _dynamic_settings:Object; // Holds nodes to subsitute
-		private var _dynamic_settings_conditions:Object; // substitutes _uri_location
+		public var _urls:XML;
+		protected var _settings:XML;
+		public var _application:XML;
+		protected var _ignorewhitespace:XML;
+		protected var _keywords:XML;
+		protected var _style:XML;
+		protected var _info:XML;
+		protected var _devices:XML;
+		protected var _sounds:XML;
+		protected var _variables:XML;
+		protected var _actions:XML;
+		protected var _locale:XML;
+		protected var _locale_vocabulary:XML;
+		protected var _dynamic:Object;
+		protected var _pippoflashWords:Object; // Stores all nodes into VOCABULARY.PIPPOFLASH;
+		protected var _prompts:Object; // Stores all nodes in VOCABULARY.PROMPTS
+		protected var _preferencesDefault:XML; // Direct reference to DEFAULT PREFERENCES node retrieved from config.xml
+		protected var _preferences:XML; // Direct reference to PREFERENCES node
+		protected var _uri_location:Object;
+		protected var ___coordinateNodes:Object = {}; // Populated with "add coordinates list"
+		protected var _device_dynamic_settings:XML; // Holds nodes to subsitute
+		protected var _dynamic_settings:XML; // Holds nodes to subsitute
+		protected var _dynamic_settings_conditions:XML; // substitutes _uri_location
 		//private var _languageName					:String;
-		private var _languageCode:String;
-		private var _locationCode:String = "en"; // Default if dynamic locations is not set
-		private var _configAddOnPath:String = ""; // This can be set with setConfigPath();
+		protected var _languageCode:String;
+		protected var _locationCode:String = "en"; // Default if dynamic locations is not set
+		protected var _configAddOnPath:String = ""; // This can be set with setConfigPath();
 		// LOCALE
-		private var _localeVocabulary:XML;
+		protected var _localeVocabulary:XML;
 		// CONTENTS
-		private var _contentSrcPrefix:String = ""; // Adds this to all content src urls
+		protected var _contentSrcPrefix:String = ""; // Adds this to all content src urls
 		// MARKERS
-		private var _isComplete					:Boolean; // Config is already complete and initialized (to load language)
+		protected var _isComplete:Boolean; // Config is already complete and initialized (to load language)
 		// STATIC UTY
-		protected static var _o					:Object;
-		protected static var _node					:XML;
-		protected static var _s						:String;
-		protected static var _c					:*;
-		protected static var _a					:Array;
-		protected static var _i						:int;
-		private static var _instance				:Config;
+		protected static var _o:Object;
+		protected static var _node:XML;
+		protected static var _s:String;
+		protected static var _c:*;
+		protected static var _a:Array;
+		protected static var _i:int;
+		private static var _instance:Config;
 // STATIC ///////////////////////////////////////////////////////////////////////////////////////
 		public static function get instance():Config {
 			return _instance;

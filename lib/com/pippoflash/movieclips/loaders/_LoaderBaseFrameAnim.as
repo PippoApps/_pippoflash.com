@@ -11,7 +11,6 @@ package com.pippoflash.movieclips.loaders
 	 */
 	public class _LoaderBaseFrameAnim extends _LoaderBase 
 	{
-		trace("GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG");
 		private static const FADE_TIME:Number = 1;
 		private var _removeCallback:Function;
 		public function _LoaderBaseFrameAnim(id:String="_LoaderBase", cl:Class=null) 
