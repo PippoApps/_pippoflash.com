@@ -41,7 +41,7 @@ package com.pippoflash.utils {
 		public static var _s						:String;
 		public static var _i						:int;
 		public static var _b						:Boolean;
-		public static var _j;						// Jolly variable, can be anything
+		public static var _j:*;						// Jolly variable, can be anything
 		public static var _n						:Number;
 		public static var _counter					:int;
 		public static var _tfo						:TextFormat;
@@ -61,7 +61,7 @@ package com.pippoflash.utils {
 		public static var _dummyTextField			:TextField = new TextField();
 // SETUP	///////////////////////////////////////////////////////////////////////////////////////
 		public static var init						:Function = firstTimeInit;
-		private static function firstTimeInit			() {
+		private static function firstTimeInit			():void {
 			_initFunction						= UCode.dummyFunction;
 			init								= UCode.dummyFunction;
 			_allGlyphs							= _numbers + " " + _uppercase + _lowercase + _european;
@@ -76,7 +76,7 @@ package com.pippoflash.utils {
 			}
 			else								return getEmbeddedFont(fn).hasGlyphs(s);
 		}
-		public static function setToUniversalFont			(t:TextField) {
+		public static function setToUniversalFont			(t:TextField):void {
 			t.embedFonts						= false;
 			for each (_s in _deviceUniversalFonts) {
 				if (UCode.exists(getDeviceFont(_s))) {
@@ -89,7 +89,7 @@ package com.pippoflash.utils {
 			setTextFormat						(t, {font:"_sans"});
 			Debug.debug						(_debugPrefix,"no universal font is available on system. Setting _sans as device font.");
 		}
-		public static function updateFontsList			() {
+		public static function updateFontsList			():void {
 			_initFunction						();
 			_totalList							= Font.enumerateFonts(true);
 			_embeddedList						= Font.enumerateFonts();
@@ -160,7 +160,7 @@ package com.pippoflash.utils {
 			return							true;
 		}
 	// Dynamic resizing of text
-		public static function setTextDynamicSize		(tf:TextField, s:String=""):void {
+		public static function setTextDynamicSize(tf:TextField, s:String=""):void {
 			var format							:TextFormat = new TextFormat();
 			format.size							= getTextFieldOriginalTextFormat(tf).size;
 			tf.defaultTextFormat					= format;
@@ -171,7 +171,7 @@ package com.pippoflash.utils {
 				tf.text						= s;
 			}
 		}
-		public static function setHtmlTextDynamicSize	(tf:TextField, s:String="", boldIt:Boolean=false, minSize:uint=99):void {
+		public static function setHtmlTextDynamicSize(tf:TextField, s:String="", boldIt:Boolean=false, minSize:uint=99):void {
 			// Here I DO NOT need to store original textfield data, since html sizing is in text, doesnt change textfield properties
 			var format:TextFormat  = getTextFieldOriginalTextFormat(tf);
 			tf.defaultTextFormat					= format;
@@ -185,35 +185,35 @@ package com.pippoflash.utils {
 				size							++;
 			}
 		}
-		public static function centerTextInOriginalRectangle	(tf:TextField, useTextBounds:Boolean=false):void { // Centers TextField vertically and horizontally according to original rectangle
+		public static function centerTextInOriginalRectangle(tf:TextField, useTextBounds:Boolean=false):void { // Centers TextField vertically and horizontally according to original rectangle
 			var rect							:Rectangle = getTextFieldOriginalRectangle(tf);
 			UDisplay.alignSpriteTo				(tf, rect);
 			if (useTextBounds) { // Center according to real text dimensions and not textfield dimensions
 				// TextField is already centered to rectangle, I just need to adjust according to textWidth and textHeihgt
 // 				if (tf.autoSize == TextFieldAutoSize.NONE)	tf.autoSize = TextFieldAutoSize.CENTER;
-				var hoffset						= (tf.width - tf.textWidth) / 2;
-				var voffset						= (tf.height - tf.textHeight) / 2;
-				tf.x							+= hoffset;
-				tf.y							+= voffset;
+				var hoffset:Number = (tf.width - tf.textWidth) / 2;
+				var voffset:Number = (tf.height - tf.textHeight) / 2;
+				tf.x += hoffset;
+				tf.y += voffset;
 			}
 		}
 	// Center text vertically
-		public static function centerTextVertically		(tf:TextField, txt:String, html:Boolean=true, halign:String="center"):void { // Centers textfield inside original textfield vertical dimensions.
+		public static function centerTextVertically(tf:TextField, txt:String, html:Boolean=true, halign:String="center"):void { // Centers textfield inside original textfield vertical dimensions.
 			// I collect textfield data initially so that it will not be changed in case it has not been stored before
-			var data							:Object = getTextFieldData(tf);
-			var h							:Number = data.height;
-			resetTextFieldToOriginal				(tf);
-			tf.autoSize							= halign;
-			if (html)							tf.htmlText = txt;
-			else								tf.text = txt;
+			var data:Object = getTextFieldData(tf);
+			var h:Number = data.height;
+			resetTextFieldToOriginal(tf);
+			tf.autoSize = halign;
+			if (html) tf.htmlText = txt;
+			else tf.text = txt;
 			// Height of rendered TextField is larger than original height. Therefore I just set it up normally.
 			if (tf.height > h) {
-				tf.autoSize						= "none";
-				tf.height						= h;
+				tf.autoSize = "none";
+				tf.height = h;
 			}
 			// Instead size is less, therefore I position it centrally vertical.
 			else {
-				tf.y							= getTextFieldData(tf).y + ((h-tf.height)/2);
+				tf.y = getTextFieldData(tf).y + ((h-tf.height)/2);
 			}
 		}
 // TEXTFIELD AUTOMATIC MANAGEMENT ///////////////////////////////////////////////////////////////////////////////////////
@@ -274,11 +274,11 @@ package com.pippoflash.utils {
 			return							_originalTextFieldsData[tf].rect;
 		}
 // TEXTFIELD //////////////////////////////////////////////////////////////////////
-		public static function makeTextFieldAutoSize		(t:TextField, s:String="left") {
+		public static function makeTextFieldAutoSize		(t:TextField, s:String="left"):void {
 			t.autoSize							= s;
 			if (s == TextFieldAutoSize.LEFT || s == TextFieldAutoSize.RIGHT) t.wordWrap = true;
 		}
-		public static function copyTextFieldProperties		(dest:TextField, source:TextField) {
+		public static function copyTextFieldProperties		(dest:TextField, source:TextField):void {
 			Debug.debug						(_debugPrefix, "Copying properties from",source,"to",dest);
 			for each (_s in _textFieldProperties) {
 // 				trace(_s, dest[_s]);
@@ -286,66 +286,66 @@ package com.pippoflash.utils {
 			}
 		}
 		public static function getTextFieldVisualProperties	(t:TextField):Object {
-			var o								:Object = {};
+			var o:Object = {};
 			for each (_s in _textFieldVisualProperties)	o[_s] = t[_s];
 			return							o;
 		}
-		public static function copyStyle				(dest:TextField, source:TextField) {
-			setTextFormat						(dest, source.getTextFormat());
-			copyTextFieldProperties				(dest, source);
+		public static function copyStyle(dest:TextField, source:TextField):void {
+			setTextFormat (dest, source.getTextFormat());
+			copyTextFieldProperties (dest, source);
 		}
-		public static function scrollToBottom			(t:TextField) {
-			t.scrollV							= t.maxScrollV;
+		public static function scrollToBottom(t:TextField):void {
+			t.scrollV = t.maxScrollV;
 		}
-		public static function scrollToTop				(t:TextField) {
-			t.scrollV							= 0;
+		public static function scrollToTop(t:TextField):void {
+			t.scrollV = 0;
 		}
-		public static function addToScroll				(t:TextField, n:int):void {
-			t.scrollV							+= n;
+		public static function addToScroll(t:TextField, n:int):void {
+			t.scrollV += n;
 		}
-		public static function scrollPage				(t:TextField, n:int):void {
-			t.scrollV							+= (t.bottomScrollV - t.scrollV)*n;
+		public static function scrollPage(t:TextField, n:int):void {
+			t.scrollV += (t.bottomScrollV - t.scrollV)*n;
 		}
-		public static function resetScroll				(t:TextField):void {
-			scrollToTop							(t);
-			t.scrollH							= 0;
+		public static function resetScroll(t:TextField):void {
+			scrollToTop(t);
+			t.scrollH = 0;
 		}
-		public static function setTextColor				(tf:TextField, c:uint):void { // Sets color of text in a textfield using textformat
-			setTextFormat						(tf, {color:c});
+		public static function setTextColor(tf:TextField, c:uint):void { // Sets color of text in a textfield using textformat
+			setTextFormat(tf, {color:c});
 		}
 		
 		
 		
 // TEXTFORMAT //////////////////////////////////////////////////////////////////////
-		public static function makeTextFormat			(props:Object):TextFormat {
+		public static function makeTextFormat(props:Object):TextFormat {
 			// Creates a text format object with properties
-			var t								:TextFormat = new TextFormat();
-			for (var i in props)					t[i] = props[i];
-			return							t;
+			var t:TextFormat = new TextFormat();
+			for (var i:String in props) t[i] = props[i];
+			return t;
 		}
-		public static function setTextFormat			(targ:TextField, props:*) { // this can get a TextFormat or an object with properties
-			var t								:TextFormat = props is TextFormat ? props : makeTextFormat(props);
-			targ.defaultTextFormat					= t;
-			targ.setTextFormat					(t);
+		public static function setTextFormat(targ:TextField, props:*):void { // this can get a TextFormat or an object with properties
+			var t:TextFormat = props is TextFormat ? props : makeTextFormat(props);
+			targ.defaultTextFormat = t;
+			targ.setTextFormat(t);
 		}
-		public static function updateTextFormat			(t:TextField, props:Object):void {
-			_tfo								= t.getTextFormat();
-			for (_s in props)					_tfo[_s] = props[_s];
-			setTextFormat						(t, _tfo);
+		public static function updateTextFormat(t:TextField, props:Object):void {
+			_tfo = t.getTextFormat();
+			for (_s in props) _tfo[_s] = props[_s];
+			setTextFormat(t, _tfo);
 		}
-		public static function duplicateTextFormat		(t:TextFormat):TextFormat {
-			var tf							:TextFormat = new TextFormat();
-			for each (_s in _textFormatProperties)		if (t[_s] != null) tf[_s] = t[_s];
-			return							tf;
+		public static function duplicateTextFormat(t:TextFormat):TextFormat {
+			var tf:TextFormat = new TextFormat();
+			for each (_s in _textFormatProperties) if (t[_s] != null) tf[_s] = t[_s];
+			return tf;
 		}
-		public static function convertTextFormatToObject	(t:TextField):Object {
-			var o								:Object = new Object();
-			var tf							:TextFormat = t.getTextFormat();
-			for each (_s in _textFormatProperties)		if (tf[_s]) o[_s] = tf[_s];
-			return							o;
+		public static function convertTextFormatToObject(t:TextField):Object {
+			var o:Object = new Object();
+			var tf:TextFormat = t.getTextFormat();
+			for each (_s in _textFormatProperties) if (tf[_s]) o[_s] = tf[_s];
+			return o;
 		}
-		public static function setXmlTextFormat			(tf:TextField, xf:*, setTextFieldProps:Boolean=false):void {
-			setTextFormat						(tf, convertXmlTextFormat(xf));
+		public static function setXmlTextFormat(tf:TextField, xf:*, setTextFieldProps:Boolean=false):void {
+			setTextFormat(tf, convertXmlTextFormat(xf));
 			if (setTextFieldProps) {
 				// Also text field props have to be set here
 			}
@@ -363,20 +363,6 @@ package com.pippoflash.utils {
 			return							tf.defaultTextFormat;
 		}
 		 
-// var xml:XML = <example id='123' color='blue'/>
-// var attNamesList:XMLList = xml.@*;
-
-// trace (attNamesList is XMLList); // true
-// trace (attNamesList.length()); // 2
-
-// for (var i:int = 0; i < attNamesList.length(); i++)
-// { 
-//     trace (typeof (attNamesList[i])); // xml
-//     trace (attNamesList[i].nodeKind()); // attribute
-//     trace (attNamesList[i].name()); // id and color
-// } 
-
-
 
 // CHECKS /////////////////////////////////////////////////////////////////////////////////////
 		public static function hasScroll				(t:TextField):Boolean {
@@ -400,35 +386,63 @@ package com.pippoflash.utils {
 			const split:Array = source.split(key);
 			return split.length -1;
 		}
+		/**
+		 * Checks if string contains any value from the array
+		 */
+		public static function stringIsArrayItem(s:String, a:Array):Boolean {
+			for each(var item:String in a) {
+				// trace(s, a, value, s.indexOf(value))
+				// if (s.indexOf(value) != -1) return true;
+				if (s == item) return true;
+			}
+			return false;
+		}
+		/**
+		 * If checkString contains ALL characters in fromString, checked one by one 
+		 */
+		public static function stringContainsAllCharactersFromString(checkString:String, fromString:String):Boolean {
+			var len:int = fromString.length;
+			for(var i:int = 0; i < len; i++) {
+				if (checkString.indexOf(fromString.charAt(i)) == -1) return false;
+			}
+			return true;
+		}
+		/**
+		 * If checkString contains ONE character in fromString, checked one by one 
+		 */
+		public static function stringContainsOneCharacterFromString(checkString:String, fromString:String):Boolean {
+			var len:int = fromString.length;
+			for(var i:int = 0; i < len; i++) {
+				if (checkString.indexOf(fromString.charAt(i)) != -1) return true;
+			}
+			return false;
+		}
 		
 		
 		
 // STRING ///////////////////////////////////////////////////////////////////////////////////////
-		public static function insertParams				(s:String, pars:Object=null):String {
-			// this one gets a sting with params names ("[name] is pretty"), a parameters object {name:"Sally"}, and returns a formatted string: "Sally is pretty". Multiple param names can be used of course
-// 			trace("TextUtils.insert",s,pars);
-// 			UCode.listObject(pars)
+		public static function insertParams(s:String, pars:Object=null):String {
 			s = String(s);
-			if (pars) for (var i in pars) s = s.split("["+i+"]").join(String(pars[i]));
+			if (pars) for (var i:String in pars) s = s.split("["+i+"]").join(String(pars[i]));
 			return s;
 		}
 		public static function insertParam(s:String, par:String, cont:Object):String {
 			return s.split("["+par+"]").join(cont);
 		}
-		public static function getRandomString			(n:uint = 10):String {
-			var s								:String = "";
-			var l								:uint = _stringRandomList.length;
+		public static function getRandomString(n:uint = 10):String {
+			var s:String = "";
+			var l:uint = _stringRandomList.length;
 			for (var i:Number=0; i<n; i++) {
-				s							+= _stringRandomList.charAt(Math.floor(Math.random()*l));
+				s += _stringRandomList.charAt(Math.floor(Math.random()*l));
 			}
-			return							s;
+			return s;
 		}
-		public static function stripSpaces				(s:String):String {
-			var initialSpace						:uint = 0;
-			var finalSpace						:uint = s.length-1;
-			while (s.charAt(initialSpace) == " ")		initialSpace++;
-			while (s.charAt(finalSpace) == " ")		finalSpace--;
-			return							s.substr(initialSpace, (finalSpace-initialSpace)+1);
+		public static function stripSpaces(s:String):String {
+			var initialSpace:uint = 0;
+			var finalSpace:uint = s.length-1;
+			while (s.charAt(initialSpace) == " ") initialSpace++;
+			while (s.charAt(finalSpace) == " ") finalSpace--;
+			return s.substr(initialSpace, (finalSpace-initialSpace)+1);
 		}
 		static public function stripCharacters(source:String, stripChars:String, joinChar:String="_"):String {
 			for (var i:int = 0; i < stripChars.length; i++) {
@@ -452,28 +466,39 @@ package com.pippoflash.utils {
 			}
 			return s;
 		}
-		
-		
+		/**
+		 * Adds single characters from source to target only if that character is not already in target
+		 */
+		public static function addCharactersToStringIfNotPresent(target:String, source:String):String {
+			var len:int = source.length;
+			var char:String;
+			for(var i:int = 0; i < len; i++) {
+				char = source.charAt(i);
+				if (target.indexOf(char) == -1) target += char;
+			}
+			return target;
+		}
 		
 		
 // FORMATTING ////////////////////////////////////////////////////////////////////////////////
 // STRING - NUMBERS //////////////////////////////////////////////////////////////////////////////////
 	// This gets a number or a string, and converts it to human readable format
 	// 9999 = 9.9999; -12.23 = -12,23;
-		public static function formatNumber			(n):String {
-			var source							:String = String(n);
+		public static function formatNumber(n:*):String {
+			var source:String = String(n);
 			var a:Array = source.split("."); var s:String = a[0]; var hasMinus:Boolean = false;
 			if (a[0].indexOf("-") != -1) {
-				hasMinus = true;	s = a[0].substr(1,9999999);
+				hasMinus = true;	
+				s = a[0].substr(1,9999999);
 			}
-			var f								:String = "";
+			var f:String = "";
 			while (s.length > 3) {
 				f = f + "," + s.substr(s.length-3,3); s = s.substr(0,s.length-3);
 			}
-			f								= s + f;
-			if (hasMinus)						f = "-" + f;
-			if (a.length == 2)					f = f + "," + a[1];
-			return							f;
+			f = s + f;
+			if (hasMinus) f = "-" + f;
+			if (a.length == 2) f = f + "," + a[1];
+			return f;
 		}
 	// Fomrats a number to a complete money+cents format. I.e.: 2345678 = 23.456,78. In case of ,00 it can be chosen to omit it.
 		public static function formatMoneyCents		(amount:Number, removeCentsIf00:Boolean=true, if0:String="0"):String {
@@ -540,15 +565,15 @@ package com.pippoflash.utils {
 			}
 			return							isMinus ? "-" + result : result;
 		}
-		public static function millisecondsToTimeString		(n:Number) { // Number holds a larger amount. uint collapses with a smaller number. Use Number.
+		public static function millisecondsToTimeString(n:Number):String { // Number holds a larger amount. uint collapses with a smaller number. Use Number.
 			// This converts an amout of milliseconds into a 00:30 format.
-			if (n < 60000)						return "00:"+checkOneZero(Math.round(n/1000),2);
-			var secs							:uint = Math.round(n/1000);
-			var mins							:uint = Math.floor(secs/60);
-			_a								= String(secs/60).split(".");
-			var s								:String = checkOneZero(mins)+":";
-			if (_a.length == 1)					return s + "00";
-			var remainingSecs					:uint = secs%60;
+			if (n < 60000) return "00:"+checkOneZero(Math.round(n/1000),2);
+			var secs:uint = Math.round(n/1000);
+			var mins:uint = Math.floor(secs/60);
+			_a = String(secs/60).split(".");
+			var s:String = checkOneZero(mins)+":";
+			if (_a.length == 1) return s + "00";
+			var remainingSecs:uint = secs%60;
 			return s+checkOneZero(remainingSecs);
 		}
 		public static function checkOneZero			(n:Number, digits:uint=2):String {
@@ -588,9 +613,9 @@ package com.pippoflash.utils {
 		// with addStringSub(source, change); I can set a text to be changed in a string, i.e. addStringSub("http://www.server.com/_data/", "c:\_data\")
 		// I can set an unlimited number of keywords to search
 		// then, with <myString = UCode.stringSub(myString);> all occurrances of set changes will be done
-		public static var _stringSubsList				:Array = new Array();
-		public static function addStringSub			(source:String, change:String) {
-			_stringSubsList.push					({s:source, x:change});
+		public static var _stringSubsList:Array = new Array();
+		public static function addStringSub(source:String, change:String):void {
+			_stringSubsList.push({s:source, x:change});
 		}
 		public static function stringSub				(s:String):String {
 			Debug.debug						(_debugPrefix,"check for stringSub: <" + s + ">");
@@ -619,9 +644,9 @@ package com.pippoflash.utils {
 			s								+= ">"
 			return							s + t + "</font>";
 		}
-		public static function fontSize				(t:String, size:*, boldize:Boolean=false):String { // size can be a number or a string ("-1", "+3", 8)
-			var t								:String = "<font size='"+size+"'>"+t+"</font>";
-			return							boldize ? bold(t) : t;
+		public static function fontSize(t:String, size:*, boldize:Boolean=false):String { // size can be a number or a string ("-1", "+3", 8)
+			t = "<font size='"+size+"'>"+t+"</font>";
+			return boldize ? bold(t) : t;
 		}
 		public static function link					(t:String, link:String, underline:Boolean=false, target:String="_self"):String {
 			if (underline)						t = "<u>"+t+"</u>";
@@ -681,8 +706,8 @@ package com.pippoflash.utils {
 // 			resetFocus							();
 // 		}
 	// FOCUS /////////////////////////////////////////////////////////////
-		public static function resetFocus				() {
-			UGlobal.resetFocus					();
+		public static function resetFocus():void {
+			UGlobal.resetFocus();
 		}
 		public static function setFocus				(t:TextField):void {
 			UGlobal.setFocus					(t);

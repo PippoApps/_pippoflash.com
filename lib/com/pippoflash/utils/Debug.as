@@ -264,6 +264,10 @@ package com.pippoflash.utils {
 		public static function debugError(id:String, e:Error, comment:String):void {
 			error(id, comment + "\n" + comment + "\n" + e.getStackTrace());
 		}
+	// Title
+		public static function title(tit:String):void {
+			traceNormal("\n---------------------------------------------------------------------------------------------------------------["+tit+"]");
+		}
 	// Forces output to browser console
 		public static function debugToJSConsole(id:String, t:String):void { // This forces output to console, and also adds to debug chain 
 			debug(id, t);

@@ -420,6 +420,24 @@ package com.pippoflash.utils {
 		public static function arrayContains(a:Array, item:*):Boolean {
 			return a.indexOf(item) != -1;
 		}
+		/**
+		 * Compares 2 arrays, if lookIntoArray contains at least one item from fromArray, returns true
+		 */
+		public static function arrayContainsItemFromTheOtherArray(lookIntoArray:Array, fromArray:Array):Boolean {
+			var len:int = fromArray.length;
+			for(var i:int = 0; i < len; i++) {
+				if (lookIntoArray.indexOf(fromArray[i]) != -1) return true; // Found one item
+			}
+			return false; // No items found in lookIntoArray
+		}
+		/**
+		 * Adds elements from sourceArray to targetArray only if elements are not already in the array
+		 */
+		public static function addToArrayIfNotPresent(targetArray:Array, sourceArray:Array):void {
+			for each (var element:* in sourceArray) {
+				if (targetArray.indexOf(element) == -1) targetArray.push(element);
+			}
+		}
 // VECTOR ///////////////////////////////////////////////////////////////////////////////////////
 		public static function getVectorRandom(a:*):* {
 			return a[Math.floor(Math.random()*a.length)];
