@@ -188,25 +188,28 @@ package com.pippoflash.framework.air {
 				_file.copyTo(newFile, overwrite);
 			}
 		}
-		public static function getDestinationPath(fileName:String, target:String = "storage", isUrl:Boolean = true, canonicalize:Boolean = true, verbose:Boolean=false):String { // To load file (i.e. from an image conponent) the url must be used instead of nativePath
+		public static function getDestinationPath(fileName:String, target:String = "storage", isUrl:Boolean = true, canonicalize:Boolean = false, verbose:Boolean=false):String { // To load file (i.e. from an image conponent) the url must be used instead of nativePath
 			//trace("1");
-			var f:File = _filePaths[target].resolvePath(fileName);
+			var ff:File = _filePaths[target].resolvePath(fileName);
+			if (canonicalize) {
+				ff.canonicalize();
+				Debug.warning(_debugPrefix, ff.nativePath + " File path has been canonicalized: " + ff.nativePath);
+			}
 			if (_verbose || verbose) {
 				Debug.debug(_debugPrefix, "Returning destination path for: ", _filePaths[target], fileName);
-				Debug.scream(_debugPrefix, "Prova per urls!!!", _filePaths.application.url, _filePaths.application.nativePath);
-				Debug.debug(_debugPrefix, "File founbd? " + f.exists);
-				Debug.debug(_debugPrefix, "Container  : " + (_filePaths[target] as File).isDirectory);
-				Debug.debug(_debugPrefix, "Container file path: " + (_filePaths[target] as File).url);
+				Debug.debug(_debugPrefix, "Application URL: ", _filePaths.application.url);
+				Debug.debug(_debugPrefix, "Application PATH: ", _filePaths.application.nativePath);
+				Debug.debug(_debugPrefix, "File or folder found: " + ff.exists);
+				Debug.debug(_debugPrefix, "Is it a folder: " + ff.isDirectory);
+				Debug.debug(_debugPrefix, "Url: " + ff.url);
+				Debug.debug(_debugPrefix, "Url: " + ff.nativePath);
 			}
-			//trace("2");
-			if (canonicalize) {
-				Debug.warning(_debugPrefix, fileName + " File path has been canonicalized: " + fileName);
-				f.canonicalize();
-			}
-			//Debug.debug(_debugPrefix,  "canonicalize!! " + f.nativePath);
-			//Debug.debug(_debugPrefix, "canonicalize!! " + f.url);
-			var p:String = isUrl ? f.url : f.nativePath;
-			if (_verbose || verbose) Debug.debug(_debugPrefix, "getDestinationPath('"+fileName+"') --> " + (isUrl ? " URL: " : "NATIVE PATH: ") + p);
+
+			// Debug.debug(_debugPrefix,  "canonicalize!! " + f.nativePath);
+			Debug.debug(_debugPrefix, "canonicalize!! " + ff.url);
+
+			var p:String = isUrl ? ff.url : ff.nativePath;
+			Debug.debug(_debugPrefix, "getDestinationPath('"+fileName+"') --> " + (isUrl ? " URL: " : "NATIVE PATH: ") + p);
 			return p;
 		}
 		
@@ -305,11 +308,11 @@ package com.pippoflash.framework.air {
 			}
 			return							null;
 		}
-		public static function saveFile(path:String, file:*, target:String="storage"):* { // This savea a ByteArray as a binary or a string as an UTF8 somewhere...
+		public static function saveFile(path:String, file:*, target:String="storage", canonicalize:Boolean = false):* { // This savea a ByteArray as a binary or a string as an UTF8 somewhere...
 			try {
 				var fBase:File = _filePaths[target] ? _filePaths[target] : new File(target); // Use a default folder or get a custom one if default is not defined
 				var f:File = fBase.resolvePath(path); 
-				f.canonicalize();
+				if (canonicalize) f.canonicalize();
 				Debug.debug(_debugPrefix, "Saving file in " +target +" : " + f.nativePath);
 				// create a file stream
 				var fs:FileStream = new FileStream();
@@ -329,7 +332,7 @@ package com.pippoflash.framework.air {
 		
 		
 // SYSTEM RELATED USITITIES /////////////////////////////////////////////////////////////////////////////
-		public static function getAppFolderPathBySystem(basePath:String, subPath:String=null):String {
+		public static function getAppFolderPathBySystem(basePath:String, subPath:String=null, isUrl:Boolean=true, canonicalize:Boolean=false):String {
 			// Returns a path in app (included folders in AIR) correctly formatted to retrieve files according to system
 			// It can be only the basePath, or a subPath inside basePath
 			var realPath:String = basePath;
@@ -342,7 +345,7 @@ package com.pippoflash.framework.air {
 				contentPath = realPath;
 				/* Fondamentalmente qui c'è un errore. contentPath diventa un path assoluto, ma poi la directory è chiamata con il file completo. */
 			}
-			else contentPath = UFile.getDestinationPath(realPath, "application");
+			else contentPath = UFile.getDestinationPath(realPath, "application", isUrl, canonicalize);
 			Debug.debug(_debugPrefix, "Processed contentPath: " + contentPath);
 			/* On Mac OSX a bug inserts app:// also in local folders, I have to track and remove this. */
 			if (USystem.isMac()) {
@@ -365,12 +368,12 @@ package com.pippoflash.framework.air {
 		
 		
 // DIRECTORY ///////////////////////////////////////////////////////////////////////////////////////
-		public static function getDirectoryListing		(path:String, target:String = "application", listFiles:Boolean=false):Array { // Returns an array of File with all content of directory (no subdirs)
+		public static function getDirectoryListing(path:String, target:String = "application", listFiles:Boolean=false, canonicalize:Boolean=false):Array { // Returns an array of File with all content of directory (no subdirs)
 			Debug.debug(_debugPrefix, "getDirectoryListing() in folder " + target + " (" + _filePaths[target] + ") " + path );
 			var d:File = _filePaths[target].resolvePath(path); 
 			Debug.debug(_debugPrefix, "Is folder: " + d.isDirectory);
 			Debug.debug(_debugPrefix, "Native path: " + d.nativePath);
-			d.canonicalize();
+			if (canonicalize) d.canonicalize();
 			if (!d.exists) {
 				Debug.error(_debugPrefix, path + " does not exist.");
 				return [];
@@ -416,10 +419,10 @@ package com.pippoflash.framework.air {
 			if (f.exists && f.isDirectory) f.deleteDirectory(deleteContents);
 			else Debug.debug(_debugPrefix, "Folder does not exist, no need to delete.");
 		}
-		static public function getDirectoryUrl(path:String, target:String="storage"):String { // Returns the URL of a directory
+		static public function getDirectoryUrl(path:String, target:String="storage", canonicalize:Boolean=false):String { // Returns the URL of a directory
 			createDirectory(path, target);
 			var f:File = _filePaths[target].resolvePath(path);
-			f.canonicalize();
+			if (canonicalize) f.canonicalize();
 			var pathUrl:String = f.nativePath;
 			Debug.debug(_debugPrefix, "Lookig for URL of folder " + path + " in " + target + ": " + pathUrl);
 			return pathUrl;

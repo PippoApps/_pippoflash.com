@@ -391,7 +391,7 @@ package com.pippoflash.utils {
 		 */
 		public static function stringIsArrayItem(s:String, a:Array):Boolean {
 			for each(var item:String in a) {
-				// trace(s, a, value, s.indexOf(value))
+				// trace(s, a, item, s == item)
 				// if (s.indexOf(value) != -1) return true;
 				if (s == item) return true;
 			}
@@ -408,7 +408,7 @@ package com.pippoflash.utils {
 			return true;
 		}
 		/**
-		 * If checkString contains ONE character in fromString, checked one by one 
+		 * If checkString contains at least ONE character in fromString, checked one by one 
 		 */
 		public static function stringContainsOneCharacterFromString(checkString:String, fromString:String):Boolean {
 			var len:int = fromString.length;
@@ -557,7 +557,6 @@ package com.pippoflash.utils {
 				}
 			}
 			if (UCode.hasDecimals(amount)) { // Number has decimals
-// 				trace("STO qUA??? " + amount,result);
 				result							+= cents + String(amount%1).substr(2,2);
 			}
 			else if (addCentsToNoCents) { // Has no decimeals, but I have to add ,00 at the end
@@ -590,14 +589,12 @@ package com.pippoflash.utils {
 		 */
 		static public function convertStringToNumber(s:String):Number {
 			if (s.indexOf("/") != -1) { // Random timing
-				//trace("RANDOMICO");
 				const a:Array = s.split("/");
 				const min:Number = Number(a[0]);
 				const max:Number = Number(a[1]);
 				const missingAmount:Number = max - min;
 				const randomAmount:Number = Math.random() * missingAmount;
 				//const randomAmount:Number = Math.round(Math.random() * missingAmount);
-				//trace(min, max, missingAmount, randomAmount);
 				return min + randomAmount;
 			}
 			return Number(s);
@@ -676,14 +673,10 @@ package com.pippoflash.utils {
 			var char:String;
 			for (loopInt = 0; loopInt <= source.length; loopInt++) {
 				char = source.charAt(loopInt);
-				//trace(loopInt,char,characters.indexOf(char));
 				if (loopInt < source.length && characters.indexOf(char) != -1) { // Char is of special characters
 					foundString += char;
-					//trace("TROVATO CARATTERE",foundString);
 				} else { // Analyzed character is not special
-					//trace("Carattere non special " + char, foundString.length);
 					if (foundString.length) { // I have found some special characters before, so I need to add special string to string
-						//trace("aggiungo"+(tagPre + foundString + tagPost));
 						changedString += (tagPre + foundString + tagPost);
 						foundString = "";  // Reset string of found special characters
 					} 

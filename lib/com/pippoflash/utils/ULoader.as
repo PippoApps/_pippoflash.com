@@ -21,6 +21,7 @@ package com.pippoflash.utils {
 	import flash.system.*;
 	import flash.text.*;
 	import flash.utils.*;
+	import com.pippoflash.framework._PippoFlashBase;
 
 	
 	public class ULoader {
@@ -41,17 +42,21 @@ package com.pippoflash.utils {
 		public static function setMainLoaderClassId(id:String):void {
 			_defaultLoaderId = id;
 			if (_stageLoaderInstance) {
-				UMem.killInstance(_stageLoaderInstance);
 				UDisplay.removeClip(_stageLoaderInstance);
+				// Instance is killed only if the base class is UMEM-able
+				if (!_stageLoaderInstance is _PippoFlashBase) UMem.killInstance(_stageLoaderInstance);
 				_stageLoaderInstance = null;
 			}
 		}
 // MAIN LOADER ///////////////////////////////////////////////////////////////////////////////////////
 		public static function setLoader(v:Boolean, t:String = "", shield:Boolean = true, onArrivedOrHidden:Function = null):_LoaderBase {
-			//trace("AAAAAAAAAAAAAAA");
+			Debug.debug(_debugPrefix, "Seetting loader instance:",_defaultLoaderId,"exists already:",_PippoFlashBase.instanceExists(_defaultLoaderId));
 			if (!_stageLoaderInstance) {
-				var loaderClass:Class = Class(getDefinitionByName(_defaultLoaderId));
-				_stageLoaderInstance = new loaderClass();
+				if (_PippoFlashBase.instanceExists(_defaultLoaderId)) _stageLoaderInstance = _PippoFlashBase.getInstanceExisting(_defaultLoaderId) as _LoaderBase;
+				else {
+					var loaderClass:Class = Class(getDefinitionByName(_defaultLoaderId));
+					_stageLoaderInstance = new loaderClass();
+				}
 			}
 			if (v) { // Activate loader
 				//if (!_stageLoaderInstance) { // Create loader clip if it doesnt exist

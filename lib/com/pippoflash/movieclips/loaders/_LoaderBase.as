@@ -2,17 +2,11 @@
 /* This is the base class for all Loaders */
 
 package com.pippoflash.movieclips.loaders {
-	import									com.pippoflash.utils.*;
+	import com.pippoflash.utils.*;
 	import com.pippoflash.framework._PippoFlashBase;
-	import									flash.geom.*;
-	import									flash.display.*;
-	import									flash.text.*;
-	import									flash.net.*;
-	import									flash.events.*;
-	import 									flash.utils.*;
-	import									com.pippoflash.net.SimpleQueueLoaderObject;
+	import flash.utils.*;
+	import com.pippoflash.net.SimpleQueueLoaderObject;
 	import com.pippoflash.motion.Animator;
-	import com.pippoflash.motion.PFMover;
 	import com.pippoflash.utils.UDisplay;
 	import com.pippoflash.utils.UGlobal;
 	
@@ -23,18 +17,18 @@ package com.pippoflash.movieclips.loaders {
 		public static var _fadeInFrames:uint = 30;
 		public static var _fadeOutFrames:uint = 30;
 		// SYSTEM
-		public var _id							:uint;
+		public var _id:uint;
 		// USER VARIABLES
 		// REFERENCES
 		// MARKERS
 		protected var _active:Boolean = false;
 		protected var _hasStageShield:Boolean=false;
 		// DATA HOLDERS
-		protected var _percent					:Number;
-		protected var _text						:String;
+		protected var _percent:Number;
+		protected var _text:String;
 // INIT //////////////////////////////////////////////////////////////////////////////////////////
-		public function _LoaderBase(id:String="_LoaderBase", cl:Class=null) {
-			super(id, cl ? cl : _LoaderBase);
+		public function _LoaderBase(id:String=null, cl:Class=null) {
+			super(id ? id : getQualifiedClassName(this).split("::").join("."), cl ? cl : _LoaderBase);
 		}
 		public function harakiri():void {
 			
@@ -58,6 +52,7 @@ package com.pippoflash.movieclips.loaders {
 			appear(instant, onArrived);
 		}
 			protected function appear(instant:Boolean=true, onArrived:Function=null):void {
+				resizeToStage();
 				visible = true;
 				if (instant) onAppeared(onArrived);
 				else {
@@ -83,31 +78,31 @@ package com.pippoflash.movieclips.loaders {
 					UDisplay.removeClip(this);
 					if (onHidden) UExec.next(onHidden);
 			}
-		public function shieldStage					(shield:Boolean):void {
+		public function shieldStage(shield:Boolean):void {
 			
 		}
-		public function startAnim					():void {
+		public function startAnim():void {
 		}
-		public function stopAnim					():void {
+		public function stopAnim():void {
 		}
-		public function setActive					(a:Boolean):void {
-			_active							= a;
+		public function setActive(a:Boolean):void {
+			_active = a;
 		}
-		public function isActive					():Boolean {
-			return							_active;
+		public function isActive():Boolean {
+			return _active;
 		}
-		public function setText					(t:String):void {
-			_text								= t;
+		public function setText(t:String):void {
+			_text = t;
 		}
 		public function setTextInTextField(textFieldName:String, txt:String):void {
 			// trace(this[textFieldName], textFieldName)
 			if (this[textFieldName]) this[textFieldName].text = txt;
 		}
-		public function setPercent					(n:Number):void {
-			_percent							= n;
+		public function setPercent(n:Number):void {
+			_percent = n;
 		}
-		public function setAmounts					(total:Number, loaded:Number):void {
-			setPercent							(UCode.calculatePercent(loaded, total));
+		public function setAmounts(total:Number, loaded:Number):void {
+			setPercent(UCode.calculatePercent(loaded, total));
 		}
 // UTY /////////////////////////////////////////////////////////////////////////////////////////
 		public function connectToLoader(loader:SimpleQueueLoaderObject):void {
@@ -122,24 +117,27 @@ package com.pippoflash.movieclips.loaders {
 			_hasStageShield = shield;
 		}
 		public function resizeToStage():void { // Makes sure that loader screen fits into stage
-			UDisplay.resizeTo(this, UGlobal.getStageRect());
-			UDisplay.centerToStage(this);
+		if (this["_shield"]) UDisplay.removeClip(this["_shield"]);
+		// Debug.error(_debugPrefix, "RESIZING this ",width,height,UGlobal.stageRect);
+			UDisplay.resizeTo(this, UGlobal.stageRect);
+			UDisplay.alignToStage(this);
+		// Debug.error(_debugPrefix, "RESIZING this ",width,height,UGlobal.stageRect, UGlobal.stage.getRect(stage));
 			setStageShield(_hasStageShield);
 		}
 // LISTENERS //////////////////////////////////////////////////////////////////////////////////////
-		public function onLoadStart					(o:SimpleQueueLoaderObject):void {
+		public function onLoadStart(o:SimpleQueueLoaderObject):void {
 		}
-		public function onLoadInit					(o:SimpleQueueLoaderObject):void {
+		public function onLoadInit(o:SimpleQueueLoaderObject):void {
 			
 		}
-		public function onLoadComplete				(o:SimpleQueueLoaderObject):void {
+		public function onLoadComplete(o:SimpleQueueLoaderObject):void {
 			hide();
 		}
-		public function onLoadError					(o:SimpleQueueLoaderObject):void {
+		public function onLoadError(o:SimpleQueueLoaderObject):void {
 			hide();
 		}
-		public function onLoadProgress				(o:SimpleQueueLoaderObject):void {
-			setPercent							(o._percent);
+		public function onLoadProgress(o:SimpleQueueLoaderObject):void {
+			setPercent(o._percent);
 		}
 	}
 }

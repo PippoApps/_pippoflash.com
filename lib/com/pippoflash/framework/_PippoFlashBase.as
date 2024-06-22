@@ -53,6 +53,7 @@ package com.pippoflash.framework {
 		protected var _childrenObj:Object; // This gets populated eventually with populateChildrenObj();
 // INIT //////////////////////////////////////////////////////////////////////////////////////////
 		public function _PippoFlashBase(id:String, cl:Class=null) {
+			trace(_debugPrefix, ">>>>>>-------------- Instantiating: " + id);
 			if (_instancesById[id]) {
 				Debug.error(id, "FRAMEWORK ERROR -------->>>>> This singleton class has been instantiated twice. App will probably fail.");
 				// return;
@@ -125,6 +126,16 @@ package com.pippoflash.framework {
 		}
 		public static function setInstanceStatic(id:String, instance:MovieClip):void {
 			_instancesById[id] = instance;
+		}
+		public static function instanceExists(id:String):Boolean {
+			return Boolean(_instancesById[id]);
+		}
+		public static function getInstanceExisting(id:String):_PippoFlashBase {
+			if (!instanceExists(id)) {
+				Debug.error("_PippoFlashBase", "Requested existing instance " + id + " does not exist. Application will probably break.",_instancesById,Debug.object(_instancesById));
+				return null;
+			}
+			return _instancesById[id];
 		}
 		//public static function get instance():MovieClip {
 			//return _instance;

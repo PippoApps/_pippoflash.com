@@ -42,7 +42,7 @@ package com.pippoflash.components {
 			addChild									(_mainGraphics);
 			render									();
 		}
-		private function render							() {
+		private function render							():void {
 // 			UDisplay.removeChild							(this, _mainGraphics);
 			if (!_mainGraphics)							return; // This is needed to prevend calling resize() before graphics are actually rendered
 			_startX									= _mainGraphics["_sizer"].x;
@@ -56,7 +56,7 @@ package com.pippoflash.components {
 			setupVideoMode								();
 			complete									();
 		}
-		private function setupVideoMode						() {
+		private function setupVideoMode						():void {
 			if (_mainGraphics) 							UCode.setGroupParameters([_mainGraphics["_borderProgress"],_mainGraphics["_progress"],_mainGraphics["_bgProgress"]], {visible:_isVideo});
 		}
 		public override function resize						(w:Number, h:Number):void {
@@ -65,33 +65,33 @@ package com.pippoflash.components {
 // 			if (_isText)									updateTextFieldScrollers();
 		}
 // METHODS //////////////////////////////////////////////////////////////////////////////////////
-		public function setPosition							(n:Number) {
-			setPercent									(n);
+		public function setPosition(n:Number):void {
+			setPercent(n);
 		}
-		public function setPercent							(n:Number) {
-			_handle.x									= Math.round(_startX + percentToPixels(n));
-			checkHandlePosition							();
+		public function setPercent(n:Number):void {
+			_handle.x = Math.round(_startX + percentToPixels(n));
+			checkHandlePosition();
 		}
-		public function setProgress							(n:Number) {
-			_mainGraphics["_progress"].width					= percentToPixels(n);
-			checkHandlePosition							();
+		public function setProgress(n:Number):void {
+			_mainGraphics["_progress"].width = percentToPixels(n);
+			checkHandlePosition();
 		}
-		public function getPercent							():Number {
-			return									_percent;
+		public function getPercent():Number {
+			return _percent;
 		}
-		public function stepPlus							() {
-			setPercent									(_percent+5);
-			broadcastEvent								("onSliderUpdate", _percent);
+		public function stepPlus():void {
+			setPercent(_percent+5);
+			broadcastEvent("onSliderUpdate", _percent);
 		}
-		public function stepMinus							() {
-			setPercent									(_percent-5);
-			broadcastEvent								("onSliderUpdate", _percent);
+		public function stepMinus():void {
+			setPercent(_percent-5);
+			broadcastEvent("onSliderUpdate", _percent);
 		}
 // UTY /////////////////////////////////////////////////////////////////////////////////////////
 		private function percentToPixels						(n:Number):Number {
 			return									UCode.getPercent(UCode.checkPercentRange(n), _slideW);
 		}
-		private function checkHandlePosition					() {
+		private function checkHandlePosition					():void {
 // 			trace("CHECCKO");
 			if (_isVideo && (_handle.x-_startX)>_mainGraphics["_progress"].width) _handle.x = _mainGraphics["_progress"].width+_startX;
 // 			else if (_handle.x < _startX)					_handle.x = _startX;
@@ -104,12 +104,12 @@ package com.pippoflash.components {
 // LISTENERS //////////////////////////////////////////////////////////////////////////////////////
 // 		private static const SLIDE_MIN_OFFSET					:uint = 1;
 // 		private static const SLIDE_MAX_OFFSET				:uint = 1;
-		public function onPressHandle						(c:DisplayObject=null) {
+		public function onPressHandle						(c:DisplayObject=null):void {
 			broadcastEvent								("onSliderPress");
 // 			_handle.startDrag							(false, new Rectangle(_startX-SLIDE_MIN_OFFSET, 0, _endX+SLIDE_MAX_OFFSET, 0));
 			UGlobal.stage.addEventListener					(MouseEvent.MOUSE_MOVE, onMouseMoveSlider);
 		}
-		public function onReleaseHandle						(c:DisplayObject=null) {
+		public function onReleaseHandle						(c:DisplayObject=null):void {
 			broadcastEvent								("onSliderRelease");
 // 			_handle.stopDrag							();
 			UGlobal.stage.removeEventListener				(MouseEvent.MOUSE_MOVE, onMouseMoveSlider);
@@ -121,7 +121,7 @@ package com.pippoflash.components {
 		public function onReleaseOutsideHandle					(c:DisplayObject=null):void {
 			onReleaseHandle								(c);
 		}
-		public function onMouseMoveSlider					(e:Event=null) {
+		public function onMouseMoveSlider					(e:Event=null):void {
 // 			_handle.x									= Math.round(_handle.x);
 // 			adjustHandlePosition							();
 			var xPos									:Number = mouseX;

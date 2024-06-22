@@ -5,7 +5,6 @@
 
 package com.pippoflash.utils {
 
-	import com.adobe.protocols.dict.DictionaryServer;
 	import flash.display.*;
 	import flash.system.*;
 	import flash.events.*;

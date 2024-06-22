@@ -132,8 +132,17 @@ package com.pippoflash.framework {
 			// Setup error handler foir standard trace action
 			this.loaderInfo.uncaughtErrorEvents.addEventListener(UncaughtErrorEvent.UNCAUGHT_ERROR, onUncaughtError);
 		}
-
-
+		protected function checkDeployMode():void {
+			if (DEPLOY) switchOffDebugSwitchesOnDeploy();
+			else Debug.warning(_debugPrefix, "Application is in DEBUG mode.");
+		}
+		/**
+		 * Override this and DEPLOY switches will be turned off
+		 */
+		protected function switchOffDebugSwitchesOnDeploy():void {
+			Debug.warning(_debugPrefix, "App in in DEPLOY mode. Switching off debug switches.");
+			DEBUG = false;
+		}
 
 		private function onUncaughtError(e : UncaughtErrorEvent) : void
 		{
@@ -190,6 +199,7 @@ package com.pippoflash.framework {
 				callOnAll("onRefReady");
 			}
 		protected function initOnStage(e:Event=null):void { // Once stage is available to application, this initialization is performed
+			checkDeployMode();
 			initCommonFeatures();
 			initSwfFeatures();
 			completeCommonInit();

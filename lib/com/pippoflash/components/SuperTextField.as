@@ -36,32 +36,32 @@ package com.pippoflash.components {
 		[Inspectable 									(name="TXT - Text", type=String, defaultValue="")]
 		public var _lastText								:String = "";
 		[Inspectable 									(name="TXT - Max Characters", type=Number, defaultValue=0)]
-		public function set maxChars							(n:int) {
+		public function set maxChars							(n:int):void {
 			_txt.maxChars								= n;
 		}
 		[Inspectable 									(name="TXT - Restrict", type=String)]
-		public function set restrict							(s:String) {
+		public function set restrict							(s:String):void {
 			_txt.restrict								= s;
 		}
 		[Inspectable 									(name="TXT - Type", type=String, defaultValue="input", enumeration="input,dynamic")]
-		public function set type							(s:String) {
+		public function set type							(s:String):void {
 			_txt.type									= s;
 		}
 		[Inspectable	 								(name="TXT - Password", type=Boolean, defaultValue=false)]
-		public function set displayAsPassword					(b:Boolean) {
+		public function set displayAsPassword					(b:Boolean):void {
 			_txt.displayAsPassword						= b;
 			_isPassword								= b;
 		}
 		[Inspectable 									(name="TXT - Selectable", type=Boolean, defaultValue=true)]
-		public function set selectable						(b:Boolean) {
+		public function set selectable						(b:Boolean):void {
 			_txt.selectable								= b;
 		}
 		[Inspectable 									(name="TXT - Embed Fonts", type=Boolean, defaultValue=false)]
-		public function set embedFonts						(b:Boolean) {	
+		public function set embedFonts						(b:Boolean):void {	
 			_txt.embedFonts								= b;
 		}
 		[Inspectable 									(name="TXT - Multiline", type=Boolean, defaultValue=false)]
-		public function set multiline							(b:Boolean) {
+		public function set multiline							(b:Boolean):void {
 			_txt.multiline								= b;
 			_txt.wordWrap								= b;
 		}
@@ -137,7 +137,7 @@ package com.pippoflash.components {
 		public function get textField							():TextField {
 			return									_txt;
 		}
-		public function set text							(s:String) {
+		public function set text							(s:String):void {
 			setText									(s ? s : "");
 		}
 		public function get text							():String {
@@ -210,7 +210,7 @@ package com.pippoflash.components {
 			setAutoPost								("_txt");
 			super.initAfterVariables						();
 		}
-		private function addToTabGroup						() {
+		private function addToTabGroup						():void {
 			if (!_tabGroups[_tabGroup])						_tabGroups[_tabGroup] = new Array();
 			_tabGroups[_tabGroup][_tabIndex]					= this;
 			addInstanceToGroup							(_tabGroup);
@@ -223,34 +223,34 @@ package com.pippoflash.components {
 			setTextMargins								(_defaultTextMargins);
 		}
 // METHODS //////////////////////////////////////////////////////////////////////////////////////
-		public function setTextMargins						(a:Array) {
+		public function setTextMargins						(a:Array):void {
 			_userMargins								= a;
-			for (var i in _userMargins)						_userMargins[i] = uint(_userMargins[i]);
+			for (var i:* in _userMargins)						_userMargins[i] = uint(_userMargins[i]);
 			UCode.setParameters							(_txt, {y:_userMargins[0], x:_userMargins[2], height:(_h-(_userMargins[0]+_userMargins[1])), width:(_w-(_userMargins[2]+_userMargins[3]))});
 		}
-		public function setBlockTabbing						(b:Boolean) {
+		public function setBlockTabbing						(b:Boolean):void {
 			_blockTabbing								= b;
 		}
-		public function setDefaultText						(s:String) {
+		public function setDefaultText						(s:String):void {
 			_defaultText								= s;
 			restoreDefaultText							();
 		}
-		public function setText							(s:String) {
+		public function setText							(s:String):void {
 			_lastText									= _txt.text;
 			_txt.text									= s;
 			UText.setTextFormat							(_txt, {color:_colorNorm});
 		}
-		public function selectAll							(e:*=null) {
+		public function selectAll							(e:*=null):void {
 			_txt.setSelection								(0, _txt.text.length);
 		}
 		public function focus								():void {
 			UGlobal.setFocus							(_txt);
 		}
-		public function focusAndSelectAll						(e:*=null) {
+		public function focusAndSelectAll						(e:*=null):void {
 			focus										();
 			selectAll									();
 		}
-		public function clearFocus							() {
+		public function clearFocus							():void {
 			UGlobal.resetFocus							();
 		}
 		public function getText							():String {
@@ -262,7 +262,7 @@ package com.pippoflash.components {
 		public function setTextFormat						(tf:*):void { // Object or TextFormat. Do not set color, it will be overridden by internal default colors
 			UText.setTextFormat							(_txt, tf);
 		}
-		public function setActive							(a:Boolean) {
+		public function setActive							(a:Boolean):void {
 			_txt.type									= a ? "input" : "dynamic";
 			_txt.alpha									= a ? 1 : 0.4;
 			_txt.selectable								= a;
@@ -272,10 +272,10 @@ package com.pippoflash.components {
 			else if (isDefault())							setDefaultColor();
 			else										setNormalColor();
 		}
-		public function setColor							(c:uint) {
+		public function setColor							(c:uint):void {
 			UText.setTextFormat							(_txt, {color:c});
 		}
-		public function setDefaultColor						() {
+		public function setDefaultColor						():void {
 			setColor									(_colorDefault);
 		}
 		public function setNormalColor						():void {
@@ -287,7 +287,7 @@ package com.pippoflash.components {
 		public function scrollParentToMe						(cb:ContentBox=null):void { // This tells a content box to scroll enough to make this TF visible...
 			// If cb is not defined, it will try to look for one itself...
 			if (!cb) { // finds the content box
-				var c									= this;
+				var c:*									= this;
 				while (c.parent) {
 					if (c.parent is ContentBox) {
 						c.parent.scrollToShowContent		(this);
@@ -298,7 +298,7 @@ package com.pippoflash.components {
 			}
 			else										cb.scrollToShowContent(this);
 		}
-		public function restoreDefaultText					() {
+		public function restoreDefaultText					():void {
 			_lastText									= null;
 			_txt.text									= _defaultText;
 			UText.resetScroll							(_txt);
@@ -338,13 +338,13 @@ package com.pippoflash.components {
 			return									true;
 		}
 // UTY /////////////////////////////////////////////////////////////////////////////////////////
-		private function broadcastCommitChange				() {
+		private function broadcastCommitChange				():void {
 			if (_txt.text != _lastText) {
 				broadcastEvent							(EVT_COMMITCHANGES, this);
 			}
 			else										_txt.text = _lastText;
 		}
-		private function performAfterReturn					(e:*=null) {
+		private function performAfterReturn					(e:*=null):void {
 			// First I grab text from textfield, before setting all default behaviours
 			var txt									:String = UText.stripSpaces(_txt.text);
 			// 1.2 - EVT_TEXTCHANGERETURN is now triggered only if input text is different from previous, default, and it is not only spèaces
@@ -356,12 +356,12 @@ package com.pippoflash.components {
 			else									 	clearFocus();
 		}
 // LISTENERS //////////////////////////////////////////////////////////////////////////////////////
-		private function activateListeners						() {
+		private function activateListeners						():void {
 			_txt.addEventListener							(Event.CHANGE, onTextChange);
 			_txt.addEventListener							(FocusEvent.FOCUS_IN, onSetMyFocus);
 			_txt.addEventListener							(FocusEvent.FOCUS_OUT, onLooseMyFocus);
 		}
-		public function onTextChange						(e:Event=null) {
+		public function onTextChange						(e:Event=null):void {
 			 if (_preventHtml) {
 				if (HTML_STRIP_CHARS.indexOf(_txt.text.charAt(_txt.text.length-1)) != -1) {
 					Debug.debug						(_debugPrefix, "Removed HTML special character.");
@@ -370,7 +370,7 @@ package com.pippoflash.components {
 			}
 			broadcastEvent								(EVT_CHANGETEXT, this);
 		}
-		public function onMyKeyDown						(e:KeyboardEvent) {
+		public function onMyKeyDown						(e:KeyboardEvent):void {
 			if (UKey.isEsc(e)) {
 				if (_txt.text != _lastText) {
 					if (_lastText)						setText(_lastText);
@@ -391,7 +391,7 @@ package com.pippoflash.components {
 // 				UCode.execNextMoment					(afterTabActions);
 			} 
 		}
-		private function afterTabActions						(shiftPressed:Boolean=false) {
+		private function afterTabActions						(shiftPressed:Boolean=false):void {
 			// If tab is bloccked, reselect. If index is -1, select nothing. If its a group, select next one.
 			// If none of the 3, proceed with normal flash selection
 			if (_blockTabbing)							focusAndSelectAll(); // Reselct this one if tabbing is blocked
@@ -414,7 +414,7 @@ package com.pippoflash.components {
 		private function compareTabIndex						(t1:SuperTextField, t2:SuperTextField):int {
 			return									t1._tabIndex < t2._tabIndex ? -1 : t1._tabIndex  > t2._tabIndex ? 1 : 0;
 		}
-		public function onSetMyFocus						(e:FocusEvent) {
+		public function onSetMyFocus						(e:FocusEvent):void {
 			if (_txt.type == "dynamic")						return;
 			if (PREVENT_FULLSCREEN_INPUT_ERROR && UGlobal.isFullScreen()) {
 				if (EXIT_FULLSCREEN_ON_FOCUS) {
@@ -443,7 +443,7 @@ package com.pippoflash.components {
 // 			public function reselectAfterExitFullScreen			():void {
 // 				focusAndSelectAll						();
 // 			}
-		public function onLooseMyFocus						(e:FocusEvent) {
+		public function onLooseMyFocus						(e:FocusEvent):void {
 			if (_txt.type == "dynamic")						return; // It's not an input textfield, therefore all checks for input are disabled
 			if (_clearOnSelect && (_txt.text == EMPTY_TEXT_ON_DEFAULT || _txt.text == "")) restoreDefaultText();
 			_select.visible								= false;

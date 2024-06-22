@@ -35,7 +35,7 @@ package com.pippoflash.utils {
 		private static const _debugPrefix:String = "Debug";
 // 		private static const DUMMY_FUNCTION			:Function = new Function():void {}; // Dummy function to be used (without ...rest to allocate an array)
 		// SWITCHES
-		private static var MAXLINES:uint = 500;
+		private static var MAXLINES:uint = 2000;
 		private static var MAXCHARSCHECK:uint = 20; // Maximum amounts of chars to check for a ">" to convert to ID
 		private static var EXPORT_TO_CONSOLE:Object = {ALL:false, ERRORS:false, WARNING:false}; // What to export to JS console. Defaults to false. Must be set with set export to console.
 		// UTY
@@ -266,7 +266,7 @@ package com.pippoflash.utils {
 		}
 	// Title
 		public static function title(tit:String):void {
-			traceNormal("\n---------------------------------------------------------------------------------------------------------------["+tit+"]");
+			traceNormal("\n\n\n()()()()()()()()---------------------------------["+tit+"]---------------------------------()()()()()()()()\n");
 		}
 	// Forces output to browser console
 		public static function debugToJSConsole(id:String, t:String):void { // This forces output to console, and also adds to debug chain 

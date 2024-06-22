@@ -48,8 +48,12 @@ package com.pippoflash.framework {
 			// I internally use the UAir fake class, so that I can extend from this also from desktop apps. In the mainapp for air I will point this to the REAL UAir
 			_uAir = UAirFake; // This is to be able to run projects also on Flash Player
 		}
+		override protected function switchOffDebugSwitchesOnDeploy():void{
+			super.switchOffDebugSwitchesOnDeploy();
+		}
 		protected override function initOnStage(e:Event = null):void {
 			removeEventListener(Event.ADDED_TO_STAGE, initOnStage);
+			checkDeployMode();
 			initOnStageAIR();
 		}
 		private function initOnStageAIR():void {

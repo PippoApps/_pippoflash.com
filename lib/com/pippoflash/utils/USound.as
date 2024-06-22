@@ -184,14 +184,14 @@ package com.pippoflash.utils {
 			startPlaying(id, 0, loops, listener, vol);
 		}
 		public static function stopSound				(id:String):void {
-			if (_soundListsIdToAttachId[id])			id = _soundListsIdToAttachId[id]; // If it was a list sound with custom ID, I set the ID as for the real attach id
-			if (_channels[id])					_channels[id].stop();
+			if (_soundListsIdToAttachId[id]) id = _soundListsIdToAttachId[id]; // If it was a list sound with custom ID, I set the ID as for the real attach id
+			if (_channels[id]) _channels[id].stop();
 		}
 		public static function stopAllSounds():void {
 			disposeLoadedSound();
 			for each (_j in _channels) _j.stop();
 		}
-		public static function stopListSounds			(listId:String="DEFAULT"):void {
+		public static function stopListSounds(listId:String="DEFAULT"):void {
 			if (!_soundLists[listId]) {
 				Debug.error(_debugPrefix, "stopListSounds() fail, list doesn't exist: " + listId);
 				return;
@@ -247,12 +247,18 @@ package com.pippoflash.utils {
 			return							_soundMixerTransform.volume;			
 		}
 	// LOAD SOUND
-		public static function loadSound				(id:String, stopPrevious:Boolean=true, autoPlay:Boolean=true, listener:*=null):void {
-			if (_verbose)						Debug.debug(_debugPrefix, "Loading sound: " + id + " autoPlay: " + autoPlay);
-			if (stopPrevious) { // There is a loaded sound already playing, therefore I stop it before loading another one
-				disposeLoadedSound				();
+		public static function loadSound(id:String, autoPlay:Boolean=true, listener:*=null):void {
+			if (_verbose) Debug.debug(_debugPrefix, "Loading sound: " + id + " autoPlay: " + autoPlay);
+			// if (stopPrevious) { // There is a loaded sound already playing, therefore I stop it before loading another one
+			// 	Debug.debug(_debugPrefix, "There was a loaded sound already playing to be disposed: " + _loadedSoundId)
+			// 	disposeLoadedSound();
+			// }
+			if (!_sounds[id]) {
+				createLoadedSound(id, listener, autoPlay);
+			} else {
+				if (_verbose) Debug.debug(_debugPrefix, "Sound already created. Using existing laoder.");
+				UExec.next(playSound, id);
 			}
-			if (!_sounds[id])						createLoadedSound(id, listener, autoPlay);
 // 			if (autoPlay) {
 // 				startPlaying					(id, listener);
 // 			_loadedSoundId						= id;
@@ -272,43 +278,43 @@ package com.pippoflash.utils {
 			return							_spectrumVector;
 		}
 // UTY ///////////////////////////////////////////////////////////////////////////////////////	
-		private static function initializeSound			(id:String, listener:*=null):Boolean {
-			if (!_sounds[id])					return createSound(id, listener);
-			else								return true;
+		private static function initializeSound(id:String, listener:*=null):Boolean {
+			if (!_sounds[id]) return createSound(id, listener);
+			else return true;
 		}
 		private static function createSound			(id:String, listener:*=null):Boolean {
 			return							doCreateSound(id, listener, false);
 		}
-		private static function createLoadedSound		(id:String, listener:*=null, autoPlay:Boolean=false):Boolean {
-			return							doCreateSound(id, listener, true, autoPlay);
+		private static function createLoadedSound(id:String, listener:*=null, autoPlay:Boolean=false):Boolean {
+			return doCreateSound(id, listener, true, autoPlay);
 		}
 				private static function doCreateSound(id:String, listener:*=null, isExternal:Boolean=false, autoPlay:Boolean=false, soundInstance:Sound=null):Boolean {
 					// Sound instance can be used o inject directly a sound instance without having UCode to look in library exports. This is useful when a plugin wants to add sounds to the host application domain USoiund.
-					var sound					:Sound;
+					Debug.debug(_debugPrefix, "Creating sound : " + id);
+					var sound:Sound;
 					try {
-						if (soundInstance)		sound = soundInstance;
-						else					sound = isExternal ? new Sound(new URLRequest(id)) : UCode.getInstance(id);
+						if (soundInstance) sound = soundInstance;
+						else sound = isExternal ? new Sound(new URLRequest(id)) : UCode.getInstance(id);
 					} catch (e) {
-						Debug.error			(_debugPrefix, "ERROR CREATING SOUND",id);
-						return				false;
+						Debug.error(_debugPrefix, "ERROR CREATING SOUND",id);
+						return false;
 					}
 					if (!sound) {
-						Debug.error			(_debugPrefix, "Sound not found:",id);
-						return				false;
+						Debug.error(_debugPrefix, "Sound not found:",id);
+						return false;
 					}
-					var transform				:SoundTransform = new SoundTransform();
-					var list					:USoundListener = UMem.getInstance(USoundListener, id, isExternal, autoPlay);
-// 					var list					:USoundListener = new USoundListener(id, isExternal);
-					sound.addEventListener		(IOErrorEvent.IO_ERROR, list.onLoadError);
-					sound.addEventListener		(Event.COMPLETE, list.onLoadComplete);
-					sound.addEventListener		(Event.ID3, list.onID3);
-					sound.addEventListener		(Event.OPEN, list.onLoadStart);
-					sound.addEventListener		(ProgressEvent.PROGRESS, list.onLoadProgress);
-					if (listener)				list.addListener(listener);
-					_sounds[id]				= sound;
-					_transforms[id]				= transform;
-					_internalListeners[id]		= list;
-					return					true;
+					var transform:SoundTransform = new SoundTransform();
+					var list:USoundListener = UMem.getInstance(USoundListener, id, isExternal, autoPlay);
+					sound.addEventListener(IOErrorEvent.IO_ERROR, list.onLoadError);
+					sound.addEventListener(Event.COMPLETE, list.onLoadComplete);
+					sound.addEventListener(Event.ID3, list.onID3);
+					sound.addEventListener(Event.OPEN, list.onLoadStart);
+					sound.addEventListener(ProgressEvent.PROGRESS, list.onLoadProgress);
+					if (listener)list.addListener(listener);
+					_sounds[id] = sound;
+					_transforms[id] = transform;
+					_internalListeners[id] = list;
+					return true;
 				}
 		private static function startPlaying			(id:String, startAt:uint=0, loops:uint=1, listener:*=null, vol:Number=1):void {
 			try {

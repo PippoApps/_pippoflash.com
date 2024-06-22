@@ -1,4 +1,4 @@
-/* Buttonizer - 2.3 - Filippo Gregoretti - www.pippoflash.com - Added tunneling events
+﻿/* Buttonizer - 2.3 - Filippo Gregoretti - www.pippoflash.com - Added tunneling events
 
 
 2.3	Added tunneling function.
@@ -42,7 +42,6 @@ REVISIONS
 */
 package com.pippoflash.utils {
 	
-	import com.adobe.protocols.dict.Database;
 	import flash.text.engine.DigitWidth;
 	import flash.utils.Timer;
 	import flash.events.TimerEvent;

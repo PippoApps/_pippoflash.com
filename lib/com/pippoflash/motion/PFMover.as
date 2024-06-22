@@ -65,7 +65,6 @@ package com.pippoflash.motion {
 	import com.pippoflash.utils.*; // PippoFlash
 	import com.greensock.TweenNano; import com.greensock.easing.*; import com.greensock.BlitMask; // Greensock
 	import flash.display.DisplayObject;
-	import com.adobe.protocols.dict.Database;
 	public class PFMover {
 	// CONSTANTS
 		private static const VERBOSE:Boolean = false;

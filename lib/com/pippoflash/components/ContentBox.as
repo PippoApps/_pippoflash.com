@@ -99,7 +99,7 @@
 				_rectangle								= new Rectangle(0, 0, _w, _h);
 				if (hasContent())						setContent(_content);
 			}
-		public function setContent							(c:*, userBounds:Rectangle=null) {
+		public function setContent							(c:*, userBounds:Rectangle=null):void {
 			if (UCode.exists(_content))						releaseContent();
 			_scrollVfunc								= _smoothScrollOn ? smoothScrollV : doScrollV; // I set those here since stopping scroll I could remove them
 			_scrollHfunc								= _smoothScrollOn ? smoothScrollH : doScrollH; // I set those here since stopping scroll I could remove them
@@ -147,43 +147,43 @@
 		public function hasContent							():Boolean {
 			return									Boolean(_content);
 		}
-		public function scrollToPerc							(perc:Number) {
-			scrollToPercV								(perc);
+		public function scrollToPerc(perc:Number):void {
+			scrollToPercV(perc);
 		}
-		public function scrollSmallStepV						(down:Boolean):void {
+		public function scrollSmallStepV(down:Boolean):void {
 			// Here I scroll 1 third of the total
 // 			var step									:Number = 
-			scrollToV									(down ? _targetV-_rectangle.height/2 : _targetV+_rectangle.height/2);
+			scrollToV(down ? _targetV-_rectangle.height/2 : _targetV+_rectangle.height/2);
 		}
-		public function stepV								(step:Number) {
-			_scrollVfunc								(_scrollVperc + step);
+		public function stepV(step:Number):void {
+			_scrollVfunc(_scrollVperc + step);
 		}
-		public function scrollToV							(px:Number) {
-			scrollToPercV								(UCode.calculatePercent(px, _boundaries.y));
+		public function scrollToV(px:Number):void {
+			scrollToPercV(UCode.calculatePercent(px, _boundaries.y));
 		}
-		public function scrollToPercV							(perc:Number) {
-			_scrollVfunc								(perc);
+		public function scrollToPercV(perc:Number):void {
+			_scrollVfunc(perc);
 			_targetV									= _rectangle.y;
 // 			_targetV									= Math.round(UCode.getPercent(_targetVperc, _boundaries.x));
 		}
 		public function stepH								(ahead:Boolean=true):void { // Steps +1 or -1 - moves the amount of content 1 step
 			scrollToH									(_rectangle.x + (ahead ? _w : -_w));
 		}
-		public function scrollToH							(px:Number) {
+		public function scrollToH							(px:Number):void {
 			scrollToPercH								(UCode.calculatePercent(px, _boundaries.x));
 		}
-		public function scrollToPercH							(perc:Number) {
+		public function scrollToPercH							(perc:Number):void {
 			_scrollHfunc								(perc);
 // 			_targetH									= _rectangle.x;
 			_targetH									= Math.round(UCode.getPercent(_targetHperc, _boundaries.x));
 		}
-		public function resetScroll							() {
+		public function resetScroll							():void {
 			UCode.setParameters							(_rectangle, {x:0, y:0});
 			_scrollVperc = _scrollHperc = _targetH = _targetV = _targetVperc = _targetHperc = _latestScrollH = 0;
 			if (_scrollV)								_scrollV.scrollToTop();
 			if (_scrollH)								_scrollH.scrollToTop();
 		}
-		public function updateSize							(userBounds:Rectangle=null) {
+		public function updateSize							(userBounds:Rectangle=null):void {
 			if (userBounds)								_realBounds = userBounds;
 			_boundaries								= new Rectangle(_realBounds.width-_w, _realBounds.height-_h, _w, _h);
 			if (UCode.exists(_scrollV)) {
@@ -207,19 +207,19 @@
 		public function hasHScroll							():Boolean {
 			return									_realBounds.width > _w;
 		}
-		public function scrollToTop							() {
+		public function scrollToTop							():void {
 			scrollToPerc								(0);
 		}
-		public function scrollToBottom						() {
+		public function scrollToBottom						():void {
 			scrollToPerc								(100);
 		}
-		public function restoreScroll							() { // Scrolls again to the latest position
+		public function restoreScroll							():void { // Scrolls again to the latest position
 			if (UCode.exists(_latestScrollV))					scrollToPercV(_latestScrollV);
 		}
-		public function updateLastScroll						() {
+		public function updateLastScroll						():void {
 			_latestScrollV								= _targetVperc;
 		}
-		public function scrollToShowContent					(c:DisplayObject) { // Scrolls to show the specified content
+		public function scrollToShowContent					(c:DisplayObject):void { // Scrolls to show the specified content
 			// MAKE SURE CONTENT IS REALLY INSIDE CONTENT BOX, OR BEHAVIOUR WILL BE HORRIBLE!!!
 			if (_rectangle.y > (c.y-_autoScrollMargin))			scrollToV(c.y-_autoScrollMargin); // Scroll up if object is on top of scroll area
 			else if (c.y > ((_rectangle.y+_rectangle.height)-(c.height+_autoScrollMargin))) scrollToV((c.y-(_rectangle.height-c.height))+_autoScrollMargin); // Scroll down if object is below visible area
@@ -243,13 +243,13 @@
 			stopSmoothScrollV							();
 		}
 // LISTENERS /////////////////////////////////////////////////////////////////////////////////////
-		public function onScrollVertical						(perc:Number) {
+		public function onScrollVertical						(perc:Number):void {
 			_scrollVfunc								(perc);
 		}
-		public function onScrollHorizontal						(perc:Number) {
+		public function onScrollHorizontal						(perc:Number):void {
 			_scrollHfunc								(perc);
 		}
-		private function onMouseWheel						(e) {
+		private function onMouseWheel						(e:*):void {
 			if (!hasVScroll())								return; // Inhibit scroll wheel if there is nothing to scroll
 			scrollSmallStepV								(Boolean(Number(e.delta)>0));
 // 			adjustScrollV								();
@@ -260,20 +260,20 @@
 		}
 // SCROLL FUNCTIONS ////////////////////////////////////////////////////////////////////////////////
 	// NORMAL SCROLL
-		private function doScrollV							(perc:Number) {
+		private function doScrollV							(perc:Number):void {
 			if (!hasVScroll())								return;
 			_targetVperc = _scrollVperc						= setInRange(perc);
 			positionContentV								();
 			broadcastV									();
 		}
-		private function doScrollH							(perc:Number) {
+		private function doScrollH							(perc:Number):void {
 			if (!hasHScroll())								return;
 			_targetHperc = _scrollHperc						= setInRange(perc);
 			positionContentH								();
 			broadcastH									();
 		}
 	// SMOOTH SCROLL
-		private function smoothScrollV						(perc:Number) {
+		private function smoothScrollV						(perc:Number):void {
 			if (!hasVScroll()) {
 				stopSmoothScrollH						();
 				return;
@@ -286,10 +286,10 @@
 			addEventListener								(Event.ENTER_FRAME, positionContentV);
 			broadcastV									();
 		}
-		private function stopSmoothScrollV						() {
+		private function stopSmoothScrollV						():void {
 			removeEventListener							(Event.ENTER_FRAME, positionContentV);
 		}
-		private function smoothScrollH						(perc:Number) {
+		private function smoothScrollH						(perc:Number):void {
 			if (!hasHScroll()) {
 				stopSmoothScrollH						();
 				return;
@@ -301,7 +301,7 @@
 			addEventListener								(Event.ENTER_FRAME, positionContentH);
 			broadcastH									();
 		}
-		private function stopSmoothScrollH					() {
+		private function stopSmoothScrollH					():void {
 			removeEventListener							(Event.ENTER_FRAME, positionContentH);
 		}
 		private function activateSmoothScrolling					():void {
@@ -313,26 +313,26 @@
 			else if (n < 0)								return 0;
 			else										return n;
 		}
-		private function checkRangeH						() {
+		private function checkRangeH						():void {
 			if (_scrollHperc < 0)							_scrollHperc = 0;
 			else if (_scrollHperc > 100)						_scrollHperc = 100;
 		}
 	// UTY - Position Content
-		private function positionContentV						(e=0) {
+		private function positionContentV						(e:Number=0):void {
 			_rectangle.y								= UCode.getPercent(_boundaries.y, _scrollVperc);
 			if (_content != null)
 				_content.scrollRect						= _rectangle;
 		}
-		private function positionContentH						(e=0) {
+		private function positionContentH						(e:Number=0):void {
 // 			trace(name,_rectangle,_rectangle.x,_scrollHperc,_boundaries.x,_content);
 			_rectangle.x								= UCode.getPercent(_boundaries.x, _scrollHperc);
 			_content.scrollRect							= _rectangle;
 		}
 	// UTY - Ajust ScrollBar Position
-		private function adjustScrollV						() {
+		private function adjustScrollV						():void {
 			if (UCode.exists(_scrollV))						_scrollV.setScrollPosition(_targetVperc, false);
 		}
-		private function adjustScrollH						() {
+		private function adjustScrollH						():void {
 			if (UCode.exists(_scrollH))						_scrollH.setScrollPosition(_targetHperc, false);
 		}
 // 		private function checkScrollBarsVisible					():void {
@@ -340,27 +340,27 @@
 // 			if (_scrollH)								_scrollH.checkVisibility();
 // 		}
 	// UTY - Fucking solution to scrollrect problem
-		private function getFullBounds 						(displayObject:DisplayObject):Rectangle {
+		private function getFullBounds(displayObject:DisplayObject):Rectangle {
 			var bounds:Rectangle, transform:Transform, toGlobalMatrix:Matrix, currentMatrix:Matrix;
-			transform 									= displayObject.transform;
-			currentMatrix 								= transform.matrix;
-			toGlobalMatrix 								= transform.concatenatedMatrix;
-			toGlobalMatrix.invert							();
-			transform.matrix 								= toGlobalMatrix;
-			bounds 									= transform.pixelBounds.clone();
-			transform.matrix 								= currentMatrix;
-			return 									bounds;
+			transform = displayObject.transform;
+			currentMatrix = transform.matrix;
+			toGlobalMatrix = transform.concatenatedMatrix;
+			toGlobalMatrix.invert();
+			transform.matrix = toGlobalMatrix;
+			bounds = transform.pixelBounds.clone();
+			transform.matrix = currentMatrix;
+			return bounds;
 		}
 	// UTY - Broadcast scroll
-		private function broadcastH							() {
-			broadcastEvent								("onScrollH", _targetHperc);
+		private function broadcastH():void {
+			broadcastEvent("onScrollH", _targetHperc);
 		}
-		private function broadcastV							() {
-			broadcastEvent								("onScrollV", _targetVperc);
+		private function broadcastV():void {
+			broadcastEvent("onScrollV", _targetVperc);
 		}
 		
 	// UTY - Get reference to _content
-		public function getContent () {
+		public function getContent():* {
 			return _content
 		}
 

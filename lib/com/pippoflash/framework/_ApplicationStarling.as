@@ -36,6 +36,11 @@ package com.pippoflash.framework {
 			//_uAir								= UAirFake;
 			_instance = this;
 		}
+		override protected function switchOffDebugSwitchesOnDeploy():void{
+			super.switchOffDebugSwitchesOnDeploy();
+		}
+
+
 		/* FOR A STARLING APPLICATION, AFTER APPLICATION STARTED, WE MUST CALL initStarlingFeatures() and HANDLE STARLING INT IN THE CALLBACK readyMethod */
 		
 		// This has to be called after all initialization outside of starling happened
