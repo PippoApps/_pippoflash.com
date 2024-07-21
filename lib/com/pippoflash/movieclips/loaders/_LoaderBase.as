@@ -9,6 +9,7 @@ package com.pippoflash.movieclips.loaders {
 	import com.pippoflash.motion.Animator;
 	import com.pippoflash.utils.UDisplay;
 	import com.pippoflash.utils.UGlobal;
+	import com.pippoflash.smartfox.PFRoom;
 	
 	
 	public dynamic class _LoaderBase extends _PippoFlashBase {
@@ -53,6 +54,7 @@ package com.pippoflash.movieclips.loaders {
 		}
 			protected function appear(instant:Boolean=true, onArrived:Function=null):void {
 				resizeToStage();
+				UGlobal.addResizeListener(onStageResize);
 				visible = true;
 				if (instant) onAppeared(onArrived);
 				else {
@@ -76,6 +78,7 @@ package com.pippoflash.movieclips.loaders {
 					visible = false;
 					setActive(false);
 					UDisplay.removeClip(this);
+					UGlobal.removeResizeListener(onStageResize);
 					if (onHidden) UExec.next(onHidden);
 			}
 		public function shieldStage(shield:Boolean):void {
@@ -118,11 +121,15 @@ package com.pippoflash.movieclips.loaders {
 		}
 		public function resizeToStage():void { // Makes sure that loader screen fits into stage
 		if (this["_shield"]) UDisplay.removeClip(this["_shield"]);
-		// Debug.error(_debugPrefix, "RESIZING this ",width,height,UGlobal.stageRect);
+		Debug.error(_debugPrefix, "RESIZING this ",width,height,UGlobal.stageRect);
 			UDisplay.resizeTo(this, UGlobal.stageRect);
 			UDisplay.alignToStage(this);
 		// Debug.error(_debugPrefix, "RESIZING this ",width,height,UGlobal.stageRect, UGlobal.stage.getRect(stage));
 			setStageShield(_hasStageShield);
+		}
+		private function onStageResize():void {
+			Debug.debug("_LoaderBase", "Resizing loader after stage resize.")
+			resizeToStage();
 		}
 // LISTENERS //////////////////////////////////////////////////////////////////////////////////////
 		public function onLoadStart(o:SimpleQueueLoaderObject):void {
