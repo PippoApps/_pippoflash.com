@@ -298,6 +298,7 @@ package com.pippoflash.net {
 			if (_verbose) Debug.debug(_debugPrefix, EVT_COMPLETE+_funcPostfix);
 			_loading = false;
 			_loaded = true;
+			// trace(_listener, _funcPostfix)
 			UCode.callMethod(_listener, EVT_COMPLETE+_funcPostfix, this);
 			if (UCode.exists(_loaderListener)) _loaderListener.onLoadComplete(this);
 			if (_isSuperLoaderQueue) SimpleQueueLoader.onLoadCompleteLoader(this);

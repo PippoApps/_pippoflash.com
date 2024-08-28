@@ -18,6 +18,7 @@ package com.pippoflash.utils {
 	import flash.text.*;
 	import flash.utils.*;
 	import com.pippoflash.net.SimpleQueueLoaderObject;
+	import com.pippoflash.framework.starling.gui.parts.Line;
 
 	
 	public class UXml {
@@ -97,13 +98,13 @@ package com.pippoflash.utils {
 			System.disposeXML				(n);
 		}
 		public static function removeReferenceRecursive(n:XML):void {
-			removeReference					(n);
-			if (hasChildren(n))				for each (_node in n.children()) removeReferenceRecursive(_node);
+			removeReference(n);
+			if (hasChildren(n)) for each (_node in n.children()) removeReferenceRecursive(_node);
 		}
-		public static function removeReference		(n:XML):void {
+		public static function removeReference(n:XML):void {
 			if (hasId(n)) {
-				delete					_nodesReference[n.@[_xmlIdName]];
-				delete					n.@[_xmlIdName];
+				delete _nodesReference[n.@[_xmlIdName]];
+				delete n.@[_xmlIdName];
 			}
 		}
 // FORMATTING - Website 1.0 ///////////////////////////////////////////////////////////////////////////////////////
@@ -148,14 +149,14 @@ package com.pippoflash.utils {
 				return					UText.insertParams(fn, getAttributesObject(tn));
 			}
 // GENERAL UTY ///////////////////////////////////////////////////////////////////////////////////////
-		public static function hasChildren			(n:*):Boolean {
-			return						Boolean(n.children().length());
+		public static function hasChildren(n:*):Boolean {
+			return Boolean(n.children().length());
 		}
-		public static function hasAttribute			(n:XML, id:String, ns:Namespace=null):Boolean { // Attribute exists
-			return						ns ? n.@ns::[id] != undefined : n.@[id] != undefined;
+		public static function hasAttribute(n:XML, id:String, ns:Namespace=null):Boolean { // Attribute exists
+			return ns ? n.@ns::[id] != undefined : n.@[id] != undefined;
 		}
-		public static function hasFullAttribute		(n:XML, id:String, ns:Namespace=null):Boolean { // Attribute exists and contains data
-			return						ns ? n.@ns::[id] != undefined && n.@ns::[id] != "" : n.@[id] != undefined && n.@[id] != "";
+		public static function hasFullAttribute(n:XML, id:String, ns:Namespace=null):Boolean { // Attribute exists and contains data
+			return ns ? n.@ns::[id] != undefined && n.@ns::[id] != "" : n.@[id] != undefined && n.@[id] != "";
 		}
 		public static function isTrue(n:XML, id:String):Boolean {
 			return hasAttribute(n, id) && (String(n.@[id]) == "1" || String(n.@[id]) == "true");
@@ -163,18 +164,26 @@ package com.pippoflash.utils {
 		static public function isAttributeTrue(att:Object):Boolean {
 			return (String(att) == "1" || String(att) == "true");
 		}
-		public static function getAttributesObject	(n:XML):Object { // Converts attributes in a name/string pairs object
-			var o							:Object = new Object();
+		public static function getAttributesObject(n:XML):Object { // Converts attributes in a name/string pairs object
+			var o:Object = new Object();
 			for (var i:uint=0; i<n.attributes().length(); i++) {
 				o[String(n.attributes()[i].name())] = String(n.attributes()[i]);
 			}
-			return						o;
+			return o;
 		}
-		public static function exists				(n:*):Boolean {
-			return						n != null && n != undefined;
+		public static function exists(n:*):Boolean {
+			return n != null && n != undefined;
 		}
-		public static function hasContent			(n:*):Boolean { // XML or XMLList, If a node has some content: <N/> = false, <N>p</N> = true;
-			return						Boolean(n.toString());
+		public static function hasContent(n:*):Boolean { // XML or XMLList, If a node has some content: <N/> = false, <N>p</N> = true;
+			return Boolean(n.toString());
+		}
+// MANAGE AND DELETE CHILDREN ///////////////////////////////////////////////////////////////////////////////
+		public static function deleteChildByName(n:XML, childName:String):void {
+
+		}
+		public static function replaceChildByName(n:XML, newChild:XML):void {
+			const localName:String = newChild.localName();
+			n.replace(localName, newChild);
 		}
 // LOADERS AND LOADING ///////////////////////////////////////////////////////////////////////////////////////
 		public static function getXML				(s:String):XML {

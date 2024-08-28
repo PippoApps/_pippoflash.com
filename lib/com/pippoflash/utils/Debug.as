@@ -28,9 +28,9 @@ package com.pippoflash.utils {
 		private static const EVT_UPDATED_PREFIX:String = "onNewDebugLine"; // This gets triggered when you add a listener to an event with setListenerFor(_debugPrefix:String, f:Funtcion); - This sets ONE listener for each debugPrefix
 		private static const LINE_SOURCE:String = "-------------------------------------------<[ID]>-------------------------------------------";
 		private static const ERROR_DISPLAY_PREFIX:String = "\n**********************************************************************\nERROR |\t"; // Prefix error line
-		private static const ERROR_DISPLAY_POSTFIX:String = "\n**********************************************************************"; // Postfix after entire error line
+		private static const ERROR_DISPLAY_POSTFIX:String = "\n**********************************************************************\n"; // Postfix after entire error line
 		private static const WARNING_DISPLAY_PREFIX:String = "\n---------------------------------------------------------\nWARNING |\t"; // Prefix error line
-		private static const WARNING_DISPLAY_POSTFIX:String = "\n---------------------------------------------------------"; // Postfix after entire error line
+		private static const WARNING_DISPLAY_POSTFIX:String = "\n---------------------------------------------------------\n"; // Postfix after entire error line
 		private static const OBJECT_STRING_EOF:String = ""; // Set this to "\n" to have line feed on each object property
 		private static const _debugPrefix:String = "Debug";
 // 		private static const DUMMY_FUNCTION			:Function = new Function():void {}; // Dummy function to be used (without ...rest to allocate an array)

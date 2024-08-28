@@ -30,7 +30,8 @@ package com.pippoflash.utils {
 		static private var _timedExecutionsByMethods:Dictionary = new Dictionary();
 		// COMMANDS BY ID
 		private static var _allCommandsListsById:Object = {};
-		
+		// Enter Frame
+		private static var _enterFrameListeners:Vector.<Function> = new Vector.<Function>();
 		
 		// Sequenced execution
 		private static var _sequenceCounter:int;
@@ -79,16 +80,6 @@ package com.pippoflash.utils {
 		public static function time(realSeconds:Number, f:Function, ...rest):void {
 			var o:Object = makeCommandObject(f, rest);
 			activateTimerForObject(o, realSeconds);
-			// if (realSeconds <= 0) {
-			// 	execObject(o);
-			// 	return;
-			// }
-			// var t:Timer = new Timer(realSeconds*1000, 1);
-			// o.timer = t;
-			// _timedExecutions[t] = o;
-			// _timedExecutionsByMethods[f] = o;
-			// t.addEventListener(TimerEvent.TIMER_COMPLETE, onTimerComplete, false, 0, true);
-			// t.start();
 		}
 		public static function timeWithID(id:String, realSeconds:Number, f:Function, ...rest):void {
 			var o:Object = makeCommandObjectWithID(id, f, rest);
@@ -184,10 +175,19 @@ package com.pippoflash.utils {
 			checkStop();
 		}
 		public static function addEnterFrameListener(f:Function):void {
-			_myClip.addEventListener(Event.ENTER_FRAME, f, false, 0, true);
+			if (_enterFrameListeners.indexOf(f) == -1) {
+				_enterFrameListeners.push(f);
+				_myClip.addEventListener(Event.ENTER_FRAME, f, false, 0, true);
+			}
+			else Debug.error(_debugPrefix, "addEnterFrameListener() error: function is already added.");
 		}
 		public static function removeEnterFrameListener(f:Function):void {
 			_myClip.removeEventListener(Event.ENTER_FRAME, f, false);
+			var newList:Vector.<Function> = new Vector.<Function>();
+			for each (var func:Function in _enterFrameListeners) {
+				if (func != f) newList.push(func);
+			}
+			_enterFrameListeners = newList;
 		}
 	// UTY ///////////////////////////////////////////////////////////////////////////////////////
 			private static function makeCommandObject(f:Function=null, par:Array=null):Object {

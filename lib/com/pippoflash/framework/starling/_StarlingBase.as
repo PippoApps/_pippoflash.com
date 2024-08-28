@@ -24,6 +24,8 @@ package com.pippoflash.framework.starling
 	 * This is the main to extend for Starling singleton visual sprites.
 	 */
 	public class _StarlingBase extends Sprite {
+		// DEBUG SWITCHES
+		public static var LOADING_VERBOSE:Boolean = false;
 		// STATIC REFERENCES
 		static private var _mainApp:_ApplicationStarling;
 		static private var _starlingCore:Starling;
@@ -88,15 +90,15 @@ package com.pippoflash.framework.starling
 		private var _onAssetsLoadSuccessParam:Object;
 		private var _onAssetsLoadError:Function;
 		protected function loadAssetsList(paths:Array, onSuccess:Function, onSuccessParam:Object=null, onError:Function = null, useFullPathAsReference:Boolean=false):void {
-			Debug.debug(_debugPrefix, "Loading assets list: " + paths);
+			if (LOADING_VERBOSE) Debug.debug(_debugPrefix, "Loading assets list: " + paths);
 			doLoadAssets(paths, onSuccess, onSuccessParam, onError, useFullPathAsReference);
 		}
 		protected function loadSingleAsset(path:String, onSuccess:Function, onSuccessParam:Object=null, onError:Function = null, useFullPathAsReference:Boolean=false):void { // This loads a single asset with a single callback
-			Debug.debug(_debugPrefix, "Loading single asset: " + path);
+			if (LOADING_VERBOSE) Debug.debug(_debugPrefix, "Loading single asset: " + path);
 			doLoadAssets(path, onSuccess, onSuccessParam, onError, useFullPathAsReference);
 		}
 		protected function unloadAssetUrl(url:String):void {
-			Debug.debug(_debugPrefix, "Unloading Asset", url);
+			if (LOADING_VERBOSE) Debug.debug(_debugPrefix, "Unloading Asset", url);
 			mainAssets.removeTexture(getAssetTextureNameFromPath(url), true);
 		}
 		private function doLoadAssets(pathOrPaths:*, onSuccess:Function, onSuccessParam:Object=null, onError:Function = null, useFullPathAsReference:Boolean=false):void {
@@ -104,12 +106,12 @@ package com.pippoflash.framework.starling
 				Debug.error(_debugPrefix, "AssetsManager busy loading. Aborting single asset load.");
 				return;
 			}
-			Debug.debug(_debugPrefix, "Enqueing files: " + pathOrPaths);
+			if (LOADING_VERBOSE) Debug.debug(_debugPrefix, "Enqueing files: " + pathOrPaths);
 			_onAssetsLoadSuccess = onSuccess;
 			_onAssetsLoadSuccessParam = onSuccessParam;
 			_onAssetsLoadError = onError;
 			if (useFullPathAsReference) {
-				Debug.debug(_debugPrefix, "Full file path is used as reference.");
+				if (LOADING_VERBOSE) Debug.debug(_debugPrefix, "Full file path is used as reference.");
 				if (pathOrPaths is String) _mainAssets.enqueueSingle(pathOrPaths, pathOrPaths);
 				else { // It is an array or vector of paths, looping through each
 					for each (var path:String in pathOrPaths) _mainAssets.enqueueSingle(path, path);
@@ -119,7 +121,7 @@ package com.pippoflash.framework.starling
 			_mainAssets.loadQueue(onAssetsLoadSuccess, onAssetsLoadError);
 		}
 		private function onAssetsLoadSuccess():void {
-			Debug.debug(_debugPrefix, "Assets load operation complete.");
+			if (LOADING_VERBOSE) Debug.debug(_debugPrefix, "Assets load operation complete.");
 			// Storing and resetting callbacks before calling in case in callback another load operation is called.
 			var success:Function = _onAssetsLoadSuccess;
 			var par:Object =  _onAssetsLoadSuccessParam;
@@ -147,8 +149,6 @@ package com.pippoflash.framework.starling
 		protected function getAssetTextureNameFromPath(source:String):String {
 			return source.split("/").pop().split(".")[0];
 		}
-		
-		
 		// GET IMAGES
 		public function getImage(id:String, resizeRect:Rectangle=null, resizeMode:String="FILL"):Image {
 			var img:Image = new Image(mainAssets.getTexture(id));

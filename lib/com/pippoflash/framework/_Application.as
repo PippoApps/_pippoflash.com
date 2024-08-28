@@ -802,26 +802,26 @@ package com.pippoflash.framework {
 			//Debug.error(_debugPrefix, "isFirstRun() queried, but is ids not possible if initSharedObject() is not called before.");
 		}
 	// ALL FRAMERATE FUNCTIONS ARE OVERRIDDEN BY APPLICATION AIR
-		public function isShitFramerate				():Boolean { // not OK or BEST
-			return							false;
+		public function isShitFramerate():Boolean { // not OK or BEST
+			return false;
 		}
-		public function isGoodFramerate			():Boolean { // OK or BEST
-			return							true;
+		public function isGoodFramerate():Boolean { // OK or BEST
+			return true;
 		}
-		public function isWorseFramerate			():Boolean { // WORSE
-			return							false;
+		public function isWorseFramerate():Boolean { // WORSE
+			return false;
 		}
-		public function isOkFramerate				():Boolean { // OK
-			return							false;
+		public function isOkFramerate():Boolean { // OK
+			return false;
 		}
-		public function isBestFramerate				():Boolean { // BEST
-			return							false;
+		public function isBestFramerate():Boolean { // BEST
+			return false;
 		}
-		public function getFramerate				():Number {
-			return							UGlobal.stage.frameRate;
+		public function getFramerate():Number {
+			return UGlobal.stage.frameRate;
 		}
-		public function getFramerateLevel			():String {
-			return							"BEST";
+		public function getFramerateLevel():String {
+			return "BEST";
 		}
 		// The varibale MUST be set in extension or will default to desktop version
 	// RESIZE LISTENER

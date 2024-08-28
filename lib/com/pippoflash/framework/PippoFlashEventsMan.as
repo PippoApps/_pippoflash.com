@@ -102,7 +102,7 @@ package com.pippoflash.framework {
 			if (_staticListeners[cl].indexOf(listener) == -1) _staticListeners[cl].push(listener);
 		}
 		public static function removeStaticListener(cl:Class, listener:Object):void {
-			trace("E");
+			// trace("E");
 			if (_staticListeners[cl]) UCode.removeVectorItem(_staticListeners[cl], listener);	
 		}
 		public static function addStaticListenerTo(cl:Class, evt:String, listener:Object):void {
@@ -132,6 +132,9 @@ package com.pippoflash.framework {
 		}
 	// Broadcasting events
 		public static function broadcastStaticEvent(cl:Class, evt:String, ...rest):void {
+			// Debug.traceObject(_staticListeners[cl])
+			// Debug.traceObject(_staticListenersTo[cl])
+			// Debug.traceObject(_staticListenersToFunc[cl])
 			if (_staticListeners[cl]) broadcastIPFGroupEvent(_staticListeners[cl], evt, rest);
 			if (_staticListenersTo[cl] && _staticListenersTo[cl][evt]) broadcastIPFGroupEvent(_staticListenersTo[cl][evt], evt, rest);
 			if (_staticListenersToFunc[cl] && _staticListenersToFunc[cl][evt]) callMethods(_staticListenersToFunc[cl][evt], rest);
@@ -202,6 +205,9 @@ package com.pippoflash.framework {
 		public static function broadcastInstanceEvent(c:Object, evt:String, ...rest):void {
 			// trace(typeof rest);
 			// First its own listeners
+			// Debug.traceObject(_staticInstanceListeners[c])
+			// Debug.traceObject(_staticInstanceListenersTo[c])
+			// Debug.traceObject(_staticInstanceListenersToFunc[c])
 			if (_staticInstanceListeners[c]) broadcastIPFGroupEvent(_staticInstanceListeners[c], evt, rest);
 			if (_staticInstanceListenersTo[c] && _staticInstanceListenersTo[c][evt]) broadcastIPFGroupEvent(_staticInstanceListenersTo[c][evt], evt, rest);
 			if (_staticInstanceListenersToFunc[c] && _staticInstanceListenersToFunc[c][evt]) callMethods(_staticInstanceListenersToFunc[c][evt], rest);

@@ -88,12 +88,13 @@ package com.pippoflash.framework {
 			_starlingShield.drawRectangle(0, 0, 100, 100);
 			_starlingShield.alpha = 0;
 			//return;
-			_StarlingApp.instance.start(); // 'start' needs to be defined in the 'Game' class
+			_StarlingApp.instance.start(); // 'start' needs to be defined in the 'MainApp' class
 			//if (_starlingReadyMethod) UExec.next(_starlingReadyMethod);
 			//_starlingReadyMethod = null;
 		}
 		
 		public function onStarlingAppReady():void { // Called by _StarlingApp once all starling setup is complete
+		Debug.warning(_debugPrefix, "onStarlingAppReady()");
 			// This is where all logic starts
 			/* CALL THIS TO START APPLICATION AFER ALL STARILING CONTENT IS SETUP */
 		}
