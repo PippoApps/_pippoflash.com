@@ -1,4 +1,4 @@
-/* UMethod - ver 0.1 - Filippo Gregoretti - www.pippoflash.com
+﻿/* UMethod - ver 0.1 - Filippo Gregoretti - www.pippoflash.com
 Utility class to call methods in sequence according to number of arguments. Works with both vectors and arrays.
 */
 
@@ -11,7 +11,7 @@ package com.pippoflash.utils {
 
 	
 	public class UMethod {
-		public static const _verbose					:Boolean = true;
+		public static const _verbose					:Boolean = false;
 		public static const _debugPrefix				:String = "UMethod";
 		// Constants
 		private static const MAX_ARGUMENTS			:uint = 8; // Maximum number of arguments accepted
@@ -47,6 +47,7 @@ package com.pippoflash.utils {
 			for each (var o:Object in a)			if (o.hasOwnProperty(fn)) _methods[i](o[fn], pars);
 		}
 		public static function callMethodNameTunnel		(o:Object, fn:String, pars:Array):void { /* THIS IS CALLED AS A TUNNEL FROM A METHOD THAT ALREADY USES ...rest */
+			// trace(o, fn, pars);
 			if (o.hasOwnProperty(fn))				_methods[pars.length](o[fn], pars);
 		}
 		public static function callMethodTunnel			(f:Function, pars:Array=null):void {

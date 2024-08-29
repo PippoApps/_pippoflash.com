@@ -297,8 +297,8 @@ package com.pippoflash.framework {
 			m();
 		}
 		private static function callMethodPar1(m:Function, p:Array):void {
-			trace(p)
-			trace(typeof p);
+			// trace(p)
+			// trace(typeof p);
 			m(p[0]);
 		}
 		private static function callMethodPar2			(m:Function, p:Array):void {

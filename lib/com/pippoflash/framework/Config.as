@@ -20,7 +20,7 @@ package com.pippoflash.framework {
 	public class Config {
 // UTYLITIES ////////////////////////////////////////////////////////////////////////////
 		// CONSTANTS
-		protected static const _verbose:Boolean = true;
+		protected static const _verbose:Boolean = false;
 		protected static const LANGUAGE_CODE_GROUP:Object = {en:"en", it:"it", es:"es"}; // Some specific languages refer to other languages
 		protected static const PREFERENCES_SO_VAR_NAME:String = "PF_PREFERENCES"; // Name of variable in SharedObject for preferences name
 		protected static const PREFERENCES_NODE_NAME:String = "PREFERENCES"; // Name of the preferences node

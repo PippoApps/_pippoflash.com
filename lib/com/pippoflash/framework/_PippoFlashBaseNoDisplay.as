@@ -13,7 +13,7 @@ package com.pippoflash.framework {
 	public dynamic class _PippoFlashBaseNoDisplay implements IPippoFlashBase {
 		// STATIC USER DEFINABLE //////////////////////////////////////////////////////
 		public static var _debug:Boolean = true; // Main debug switch
-		private var _verbose:Boolean = true;
+		private var _verbose:Boolean = false;
 		// STATIC SYSTEM 
 		// STATIC REFERENCES
 		// Public

@@ -28,7 +28,7 @@ package com.pippoflash.framework.air {
 	public class UFile {
 // UTYLITIES ////////////////////////////////////////////////////////////////////////////
 		// SWITCHES
-		public static var _verbose:Boolean = true;
+		public static var _verbose:Boolean = false;
 		static public var FORCE_AUTHORISATION:Boolean = false;
 		// STATIC CONSTANTS
 		private static const DEFAULT_FILE_PATH_FOR_PREMISSION:String = "PippoAppsDummyFolder/permission.txt";
